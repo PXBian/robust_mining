@@ -1,4 +1,4 @@
 # robust_mining
 Command line to execute:
 1. make all
-2. run ./main <text_file> <tau> <k> 
+2. ./main <text_file> <tau> <k> 
