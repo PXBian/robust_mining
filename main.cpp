@@ -652,8 +652,8 @@ bool is_periodic(int I, int J, InPlacePST ippst, int &p, map<PSTPoint, int, PSTP
 
 int greedy(vector<int> O, int t, int lamda) {
   cout << "**********Into the Greedy function!**********" << endl;
-  if (t==1)
-    return 1;
+  // if (t==1)
+  //   return 1;
   int k_prime_prime = 0, O_size = O.size();
   cout << "O_size = " << O_size << ", lamda = " << lamda << ", t = " << t << endl;
   for (int ell = 0; ell < O_size; ell++) {
@@ -741,11 +741,15 @@ vector<vector<int>> create_clusters(int suffix_array[], int l, int r, int p, int
   return H;
 }
 
+int ceilDivision(int a, int b) {
+    return (a + b - 1) / b;
+}
+
 
 bool periodic_survive(int l, int r, int I, int J, int freq_threshold, int k, vector<vector<int>> H, int p) {
   cout << "****************Into the periodic_survive function.**************" << endl;
   int Occ = r - l + 1;
-  int alpha = (floor) ((J - I + 1) / p);
+  int alpha = (J - I + 1) / p;
   cout << "Occ = " << Occ << ", J - I + 1 = " << J - I + 1 << ", alpha = " << alpha << ", p = " << p << endl;
 
   vector<vector<int>> cal_C;
@@ -822,10 +826,10 @@ bool periodic_survive(int l, int r, int I, int J, int freq_threshold, int k, vec
   cout << endl;
 
   int t = k, K = 0;
-  while (!cal_D.empty() && t >= ceil(cal_D.top() / alpha)) {
-    cout << "cal_D.top() = " << cal_D.top() << ", ceil(cal_D.top() / alpha) = " << ceil(cal_D.top() / alpha) << ", t = " << t << endl;
+  while (!cal_D.empty() && t >= ceilDivision(cal_D.top(), alpha)) {
+    // cout << "cal_D.top() = " << cal_D.top() << ", (cal_D.top() + alpha - 1) / alpha = " << (cal_D.top() + alpha - 1) / alpha << ", t = " << t << endl;
     K = K + cal_D.top();
-    t = t - ceil(cal_D.top() / alpha);
+    t = t - ceilDivision(cal_D.top(), alpha);
     cal_D.pop();
   }
   cout << "Now t = " << t << ", K = " << K << endl;
