@@ -78,13 +78,14 @@ void KMP(unsigned char * x, unsigned char * y, vector<interval> &occ)
 /** Binary search **/
 void binarySearch(INT start, INT &end, INT n, bool result, INT * tested_index)
 {
+
 	if( result == 1 ) // result returned 'YES'
 	{
-		end = end + (end - start + 1) / 2;
+		end = min( n-1, end + (end - start + 1) / 2 );
 	}
         else if (result == 0) // result returned 'NO'
         {	
-        	end = start + (end - start) / 2;
+        	end = min( n-1, start + (end - start) / 2);
 	}
 	
 }
@@ -132,18 +133,16 @@ INT DP( vector<interval> occ, INT k )
 			
 		}
 	}
-
+	
 	// Initialize DP
 	INT ** T = new INT*[occ.size()];
 	for(INT i = 0; i<occ.size(); i++)
 		T[i] = new INT[k];
-	
-	T[0][0] = 0;
-	
-	for (INT b = 1; b < occ.size(); b++)
-		T[b][0] = occ.at(b-1).contain;
+		
+	for (INT b = 0; b < occ.size(); b++)
+		T[b][0] = occ.at(b).contain;
 
-	for (INT h = 1; h < k; h++)
+	for (INT h = 0; h < k; h++)
 		T[0][h] = occ.at(0).contain;
 
 	// Compute DP
@@ -164,9 +163,12 @@ INT DP( vector<interval> occ, INT k )
 		}
 
 	}
-
-	M = T[occ.size()-1][k-1];
-
+	
+	for(INT i = 0; i<occ.size(); i++)
+		for(INT j = 0; j<k; j++ )
+			if( T[i][j] > M )
+				M = T[i][j];
+				
 	for(INT a = 0; a<occ.size(); a++)
 	{
 		delete[] T[a];
@@ -250,6 +252,7 @@ int main(int argc, char **argv)
 		
 	for(INT i = 0; i<n; i++)
 	{
+	
 		INT * tested_index = ( INT * ) malloc (  ( n ) * sizeof ( INT ) );
 		
 		for(INT i = 0; i<n; i++)
@@ -270,7 +273,7 @@ int main(int argc, char **argv)
 			{ 
 				// Compute killed intervals
 				INT M = DP( occ, k );
-
+				
 				if( occ.size() - M >= t )
 				{
 					result = 1; 
