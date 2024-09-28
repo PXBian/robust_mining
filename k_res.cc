@@ -165,9 +165,8 @@ INT DP( vector<interval> occ, INT k )
 	}
 	
 	for(INT i = 0; i<occ.size(); i++)
-		for(INT j = 0; j<k; j++ )
-			if( T[i][j] > M )
-				M = T[i][j];
+		if( T[i][k-1] > M )
+			M = T[i][k-1];
 				
 	for(INT a = 0; a<occ.size(); a++)
 	{
