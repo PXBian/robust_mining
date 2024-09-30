@@ -6,6 +6,7 @@
 #include <cstring>
 #include <vector>
 #include <climits>
+#include <set>
 
 using namespace std;
 typedef int64_t INT;  
@@ -95,19 +96,26 @@ INT DP( vector<interval> occ, INT k )
 {
 	INT M = 0;
 
+	vector<set<INT>> hit_intervals;
+	
 	// Compute number of intervals that contain d for initialisation
 	for (INT b = 0; b < occ.size(); b++) 
 	{
 		INT d_b = occ.at(b).end;
 		INT count = 0;
+		set<INT> ins;
 
 		for (INT i = 0; i < occ.size(); i++)
 		{
 
 			if (occ.at(i).start <= d_b && occ.at(i).end >= d_b)
+			{
+				ins.insert( i );
 				count++;
-
+			}
 		}
+		
+		hit_intervals.push_back(ins);
 
 		occ.at(b).contain = count;
 	}
@@ -122,17 +130,22 @@ INT DP( vector<interval> occ, INT k )
 		for(INT j = 0; j<occ.size(); j++)
 			w_ab[i][j] = 0;
 			
+
 	for (INT a = 0; a < occ.size(); a++)
 	{
-		for (INT b = a+1; b <occ.size(); b++)
+
+		for (INT b = a+1; b < occ.size(); b++)
 		{
-			if( occ.at(b).start > occ.at(a).end )
-			{
-				w_ab[a][b] = 1;
-			}
-			
+			set<int> difference;
+
+		    	set_difference(hit_intervals.at(b).begin(), hit_intervals.at(b).end(), hit_intervals.at(a).begin(), hit_intervals.at(a).end(), inserter(difference, difference.begin()));
+		    	
+		    	w_ab[a][b] = difference.size();
+		  
 		}
+
 	}
+	
 	
 	// Initialize DP
 	INT ** T = new INT*[occ.size()];
