@@ -12,6 +12,7 @@
 #include <fstream>
 #include <stack>
 #include <algorithm>
+#include <chrono>
 #include "PSTPoint.h"
 #include "InPlacePST.h"
 #include "array_utilities.h"
@@ -461,8 +462,7 @@ vector<vector<int>> neighborInterval(vector<vector<int>> &intervals) {
 }
 
 
-map<STvertex*,vector<int>> bottom_up_SA_interval(STvertex* r, int suffix_array[], int txt_size) {
-	// int n = sizeof(suffix_array) / sizeof(suffix_array[0]);
+map<STvertex*,vector<int>> bottom_up_SA_interval(STvertex* r, int suffix_array[], int inv_suffix_array[], int txt_size) {
 	cout << "The sizeof suffix array is " << txt_size << endl;
 	map<STvertex*,vector<int>> interval_map;
 
@@ -476,18 +476,25 @@ map<STvertex*,vector<int>> bottom_up_SA_interval(STvertex* r, int suffix_array[]
   // Start with the root node
   DFS_stack.push(current);
   // Traverse the tree using DFS & bottom-up
+  cout << "Start DFS traverse!" << endl;
+  
+  // ofstream output_file;
+  // output_file.open("runtime_record");
+  // if(!output_file.is_open()) {
+  //       cout << "Couldn't open output file\n" << endl; 
+  //      // return exit(1);
+  // }
   while (!DFS_stack.empty()) {
+    auto start = chrono::high_resolution_clock::now();
     current = DFS_stack.top();
     DFS_stack.pop();
 	  children_map = current->g;
 	  bool is_root = current == r;
-	  // cout << "Enter the DFS traverse. The current.numer is " << current->numer << ", it is root " << is_root << endl;
+	  cout << "In the DFS traverse, the current.numer is " << current->numer << ", it is root " << is_root << endl;
 
 	  if(current->numer > -1 && current->numer < txt_size) {	// current is a leaf
-	  	// using find() to get the pointer to the occurrence of current in the SA
-	  	int* target_ptr = find(&suffix_array[0], suffix_array + txt_size, current->numer);
-	  	// getting index from pointer
-	  	int current_idx = target_ptr - suffix_array;
+	  	// getting index to SA from invSA
+	  	int current_idx = inv_suffix_array[current->numer];
 	  	// Initialize the interval of the current node (leaf)
 	  	vector<int> current_interval;
 	  	current_interval.push_back(current_idx);
@@ -496,7 +503,7 @@ map<STvertex*,vector<int>> bottom_up_SA_interval(STvertex* r, int suffix_array[]
 
 	  	interval_map.insert(make_pair(current, current_interval));
 	  }
-	  // else {
+
 	  // Push all the children to the traversal stack (in the order they appear)
 	  for (auto const &child : children_map) {
 	  	DFS_stack.push(child.second.v);
@@ -506,11 +513,14 @@ map<STvertex*,vector<int>> bottom_up_SA_interval(STvertex* r, int suffix_array[]
 	  	bottom_up_stack.push(current);
 	  	// cout << "Now push the " << current->numer << " into the result_stack!" << endl;
 	  }
+    auto end = chrono::high_resolution_clock::now();
+    chrono::duration<double> elapsed = end - start;
+    // output_file << elapsed.count() << "\n";
 
-	  // }
 	  // cout << "***********************" << endl;
 	  // After this bottom-up traverse finished, only the leaves has records in the interval_map
   }
+  // output_file.close();
 	cout << "****************************************" << endl;
 
 	cout << "End DFS traverse, start bottom-up traverse!" << endl;
@@ -946,9 +956,11 @@ int main(int argv, char** argc) {
     }
     // Input text file
     ifstream is_text;
-    is_text.open (argc[1], ios::in | ios::binary);
+    string text_file = argc[1];
+    string text_file_path = "data/" + text_file;
+    is_text.open (text_file_path, ios::in | ios::binary);
     
-    ifstream in_file(argc[1], ios::binary);
+    ifstream in_file(text_file_path, ios::binary);
       in_file.seekg(0, ios::end);
       INT text_file_size = in_file.tellg();
     
@@ -965,10 +977,10 @@ int main(int argv, char** argc) {
 
       text_string[i] = chr;
       text_size++;
-      cout << chr << "(" << text_size << ") ";
+      // cout << chr << "(" << text_size << ") ";
     }
     is_text.close();
-    cout << endl;
+    // cout << endl;
     
     text_string[ text_size+1] = '$';
     text_string[ text_size+2] = '!';	// Change '~' to '!' to make the symbol's ascii is smaller than the chars in txt
@@ -982,6 +994,8 @@ int main(int argv, char** argc) {
     // Input the number of positions about letter replacements in S
     k = stoi(argc[3]); 
 
+    string output_file = "output/" + text_file + "_" + to_string(freq_threshold) + "_" + to_string(k);
+
 
     // Pre-processing begin
     STvertex *r = Create_suffix_tree( text_string , text_size+1 );
@@ -989,22 +1003,29 @@ int main(int argv, char** argc) {
 
     int *suffix_array =(int*) malloc(sizeof(int) * text_size);
     build_suffix_array(suffix_array, text_size, r);
-    cout<<"Suffix Array for String ";
-    for(int i=0; i<text_size; i++)
-        cout<<txt[i];
-   	cout<<" is: ";
-    for(int i=0; i<text_size; i++)
-        cout<<suffix_array[i]<<" ";
-    cout<<endl;
+    cout << "Construct SA successfully!" << endl;
+    // cout<<"Suffix Array for String ";
+    // for(int i=0; i<text_size; i++)
+    //     cout<<txt[i];
+   	// cout<<" is: ";
+    // for(int i=0; i<text_size; i++)
+    //     cout<<suffix_array[i]<<" ";
+    // cout<<endl;
+    int *inv_suffix_array =(int*) malloc(sizeof(int) * text_size);
+    for(int i=0; i<text_size; i++) {
+      inv_suffix_array[suffix_array[i]] = i;
+    }
+
     // interval_map: key is each node in ST, value is <l,r>, where [l,r] is corresponding SA interval of this node
-    map<STvertex*,vector<int>> interval_map = bottom_up_SA_interval(root, suffix_array, text_size);
+    map<STvertex*,vector<int>> interval_map = bottom_up_SA_interval(root, suffix_array, inv_suffix_array, text_size);
+    cout << "Construct SA interval for each node in ST successfully. Preprocessing end!" << endl;
     // Pre-processing end
 
 
     // Check if a substring is periodic, and return its period if it is periodic
     // Find all runs of S, and store it in a PST ippst
     map<PSTPoint, int, PSTPointCompare> per_map;
-    InPlacePST ippst = is_periodic_preprocessing(text_string, text_size - 1, per_map);  // don't include the last char $
+    InPlacePST ippst = is_periodic_preprocessing(text_string, text_size - 1, per_map);  // don't include the last char !
     
 
     // Start MAIN ALGORITHM: Traverse ST by DFS + bottom-up
@@ -1043,7 +1064,7 @@ int main(int argv, char** argc) {
           STvertex* child_node = child.second.v;
           int child_edge_length = child.second.r - child.second.l + 1;
           // // Print the current child's info on edge
-          Print_edge(child.second, text_string);
+          // Print_edge(child.second, text_string);
           int child_str_depth = current_str_depth + child_edge_length;
           // cout << "The numer of child_node is" << child_node->numer << ", the child_edge_length is " << child_edge_length << ", the child_str_depth is " << child_str_depth << endl; 
           vector<STvertex*> child_path = current_path;
@@ -1066,20 +1087,20 @@ int main(int argv, char** argc) {
 	    }
     }
 	  cout << "****************************************" << endl;
-    cout << "After DFS traverse, the path_map is as following:" << endl;
-    for (const auto &item : path_map) {
-      STvertex* node = item.first;
-      if(node == r) {
-        cout << "This is a root! ";
-      }
-      vector<STvertex*> path = item.second.first;
-      int str_depth = item.second.second;
-      cout << "The numer of this node is " << node->numer << ", str_depth = " << str_depth << ", the path is: ";
-      for (const auto &path_node : path) {
-        cout << path_node->numer << " ";
-      }
-      cout << endl;
-    }
+    // cout << "After DFS traverse, the path_map is as following:" << endl;
+    // for (const auto &item : path_map) {
+    //   STvertex* node = item.first;
+    //   if(node == r) {
+    //     cout << "This is a root! ";
+    //   }
+    //   vector<STvertex*> path = item.second.first;
+    //   int str_depth = item.second.second;
+    //   cout << "The numer of this node is " << node->numer << ", str_depth = " << str_depth << ", the path is: ";
+    //   for (const auto &path_node : path) {
+    //     cout << path_node->numer << " ";
+    //   }
+    //   cout << endl;
+    // }
     // cout << "the freq_survive_map is as following:" << endl;
     // for (const auto &item : freq_survive_map) {
     //   STvertex* node = item.first;
@@ -1117,7 +1138,6 @@ int main(int argv, char** argc) {
               cout << "Binary search end! The refined cut [I, J] is [" << I << "," << J << "]" << endl;
               cout << "The OUTPUT for index (suffix_array[i]) " << suffix_array[i] << " is " <<  J - I + 1 << endl;
               cout << "The u str_depth = " << path_map[current].second << endl;
-              // OUTPUT[suffix_array[i]] = path_map[current].second + J - I;
               OUTPUT[suffix_array[i]] = J - I + 1;
 
             }
@@ -1137,7 +1157,6 @@ int main(int argv, char** argc) {
         // cout << "Cut node's info is I"
         for (auto const &child : children_map) {
           STvertex* child_node = child.second.v;
-          // int child_l = child.second.l, child_r = child.second.r;
           int child_l = interval_map[child_node][0], child_r = interval_map[child_node][1];
           cout << "Current child's [l,r] is [" << child_l << "," << child_r << "]" << endl;
           for (int i = child_l; i <= child_r; i++) {
@@ -1158,11 +1177,21 @@ int main(int argv, char** argc) {
 
   }
 
+  // map<string,int> test_map;
+  ofstream output_stream;
+  output_stream.open(output_file);
+  if(!output_stream.is_open()) {
+        cout << "Couldn't open output file\n" << endl; 
+       // return exit(1);
+  }
   cout << "The OUTPUT with size " << text_size - 2 << " is ";
   for(int i = 1; i < text_size - 1; i++) {  // Exclude the first and last special char
     cout << OUTPUT[i] << " ";
+    output_stream << OUTPUT[i] << " ";
   }
   cout << endl;
+  output_stream << "\n";
+  output_stream.close();
 
 
   return 0;

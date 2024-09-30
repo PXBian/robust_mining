@@ -16,6 +16,8 @@
         "ostream": "cpp",
         "algorithm": "cpp",
         "limits": "cpp",
-        "tuple": "cpp"
+        "tuple": "cpp",
+        "random": "cpp",
+        "chrono": "cpp"
     }
 }
