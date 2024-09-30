@@ -296,7 +296,7 @@ void Print_edge(STedge edge, unsigned char *x) {
 	cout << "The string on current edge is " << substring << endl;
 }
 
-void build_suffix_array(int suffixArray[], int txt_size, STvertex *r){
+void build_suffix_array(int* suffixArray, int txt_size, STvertex *r){
     for(int i=0; i< txt_size; i++)
         suffixArray[i] = -1;
     
@@ -335,7 +335,7 @@ void build_suffix_array(int suffixArray[], int txt_size, STvertex *r){
     // cout<<endl;
 }
 
-vector<STvertex*> find_branch_frequent_and_build_SA(STvertex* r, int freq_threshold, unsigned char *x, int suffix_array[], int txt_size) {
+vector<STvertex*> find_branch_frequent_and_build_SA(STvertex* r, int freq_threshold, unsigned char *x, int* suffix_array, int txt_size) {
 	map<STvertex*, pair<vector<STvertex*>, int>> nonleaf_info;
 	vector<pair<STvertex*, bool>> nonleaf_insert_order;	// Record the DFS order and whether check propagating upward
 	vector<STvertex*> branching_frequent_nodes;
@@ -462,9 +462,10 @@ vector<vector<int>> neighborInterval(vector<vector<int>> &intervals) {
 }
 
 
-map<STvertex*,vector<int>> bottom_up_SA_interval(STvertex* r, int suffix_array[], int inv_suffix_array[], int txt_size) {
+map<STvertex*,vector<int>> bottom_up_SA_interval(STvertex* r, int* suffix_array, int* inv_suffix_array, int txt_size) {
 	cout << "The sizeof suffix array is " << txt_size << endl;
 	map<STvertex*,vector<int>> interval_map;
+  // ofstream output_stream;
 
 	// Stack for traversing the tree
   stack<STvertex*> DFS_stack;
@@ -479,13 +480,14 @@ map<STvertex*,vector<int>> bottom_up_SA_interval(STvertex* r, int suffix_array[]
   cout << "Start DFS traverse!" << endl;
   
   // ofstream output_file;
-  // output_file.open("runtime_record");
+  // output_stream.open("DFS_runtime", ofstream::out | ofstream::app);
   // if(!output_file.is_open()) {
   //       cout << "Couldn't open output file\n" << endl; 
   //      // return exit(1);
   // }
+  auto start = chrono::high_resolution_clock::now();
   while (!DFS_stack.empty()) {
-    auto start = chrono::high_resolution_clock::now();
+    
     current = DFS_stack.top();
     DFS_stack.pop();
 	  children_map = current->g;
@@ -513,17 +515,18 @@ map<STvertex*,vector<int>> bottom_up_SA_interval(STvertex* r, int suffix_array[]
 	  	bottom_up_stack.push(current);
 	  	// cout << "Now push the " << current->numer << " into the result_stack!" << endl;
 	  }
-    auto end = chrono::high_resolution_clock::now();
-    chrono::duration<double> elapsed = end - start;
-    // output_file << elapsed.count() << "\n";
 
 	  // cout << "***********************" << endl;
 	  // After this bottom-up traverse finished, only the leaves has records in the interval_map
   }
-  // output_file.close();
+  auto end = chrono::high_resolution_clock::now();
+  chrono::duration<double> elapsed = end - start;
+  // output_stream << elapsed.count() << " ";
+
 	cout << "****************************************" << endl;
 
 	cout << "End DFS traverse, start bottom-up traverse!" << endl;
+  start = chrono::high_resolution_clock::now();
   // Now, the nodes are in reverse post-order, so we need to process them in the correct order
   while (!bottom_up_stack.empty()) {
     current = bottom_up_stack.top();
@@ -552,7 +555,11 @@ map<STvertex*,vector<int>> bottom_up_SA_interval(STvertex* r, int suffix_array[]
       cout << "The current interval is " << cur_interval[0] << "," << cur_interval[1] << endl;
     }
   }
-	
+  end = chrono::high_resolution_clock::now();
+
+	elapsed = end - start;
+  // output_stream << elapsed.count() << "\n";
+  // output_stream.close();
 	return interval_map;
 }
 
@@ -618,7 +625,7 @@ InPlacePST is_periodic_preprocessing(unsigned char * text_string, int text_size,
     return ippst;
 }
 
-bool is_periodic(int I, int J, InPlacePST ippst, int &p, map<PSTPoint, int, PSTPointCompare>& per_map) {
+bool is_periodic(int I, int J, InPlacePST& ippst, int &p, map<PSTPoint, int, PSTPointCompare>& per_map) {
     time_t before, after;
     int xmin = 0, xmax = 0, ymin = 0, ymax = 0;
 
@@ -681,7 +688,7 @@ int greedy(vector<int> O, int t, int lamda) {
   return k_prime + 2 * k_prime_prime;
 }
 
-bool aperiodic_survive(STvertex* root, int suffix_array[], int freq_threshold, int k, int l, int r, int I, int J) {
+bool aperiodic_survive(STvertex* root, int* suffix_array, int freq_threshold, int k, int l, int r, int I, int J) {
 
   int Occ = r - l + 1;
   cout << "****************Into the aperiodic_survive function.**************" << endl;
@@ -719,7 +726,7 @@ bool aperiodic_survive(STvertex* root, int suffix_array[], int freq_threshold, i
 }
 
 
-vector<vector<int>> create_clusters(int suffix_array[], int l, int r, int p, int max_H_size) {
+vector<vector<int>> create_clusters(int* suffix_array, int l, int r, int p, int max_H_size) {
   vector<int> O;
   for (int i = l; i <= r; i++) {
       O.push_back(suffix_array[i]);
@@ -756,7 +763,7 @@ int ceilDivision(int a, int b) {
 }
 
 
-bool periodic_survive(int l, int r, int I, int J, int freq_threshold, int k, vector<vector<int>> H, int p) {
+bool periodic_survive(int l, int r, int I, int J, int freq_threshold, int k, vector<vector<int>>& H, int p) {
   cout << "****************Into the periodic_survive function.**************" << endl;
   int Occ = r - l + 1;
   int alpha = (J - I + 1) / p;
@@ -858,18 +865,31 @@ bool periodic_survive(int l, int r, int I, int J, int freq_threshold, int k, vec
 }
 
 
-bool check_freq_periodic_survive(bool is_node_checking, bool &is_cut_point, STvertex* r, STvertex* current, int left, int right, int I, int J, int freq_threshold, int k, int suffix_array[], InPlacePST ippst, map<PSTPoint, int, PSTPointCompare>& per_map, map<STvertex*, pair<vector<STvertex*>, int>> path_map, map<STvertex*, bool>& freq_survive_map) {
+bool check_freq_periodic_survive(bool is_node_checking, bool &is_cut_point, STvertex* r, STvertex* current, int left, int right, int I, int J, int freq_threshold, int k, int* suffix_array, InPlacePST& ippst, map<PSTPoint, int, PSTPointCompare>& per_map, map<STvertex*, pair<vector<STvertex*>, int>>& path_map, map<STvertex*, bool>& freq_survive_map) {
   cout << "current node's left = " << left << ", right = " << right << ", I = " << I << ", J = " << J << endl;
+  // ofstream output_stream;
+  auto total_start = chrono::high_resolution_clock::now();
+  // output_stream.open("FaS_runtime_detail", ofstream::out | ofstream::app);
   bool periodic_survive_value = false, aperiodic_survive_value = false;
   if (right - left + 1 >= freq_threshold) {   // This is a \tau-frequent node
     cout << "This node is frequent!" << endl;
     int p = 1000000;
+    auto start = chrono::high_resolution_clock::now();
     bool is_periodic_value = is_periodic(I, J, ippst, p, per_map);  // Here p can store the return value from is_periodic when YES
+    auto end = chrono::high_resolution_clock::now();
+    chrono::duration<double> elapsed = end - start;
+    // output_stream << "is_periodic:" << elapsed.count() << " ";
+    
     cout << "The value of is_periodic_value is " << is_periodic_value << ", the p = " << p << endl;
     if (is_periodic_value) {
       // First create the clusters H
       int max_H_size = 2 * k + freq_threshold;
+      start = chrono::high_resolution_clock::now();
       vector<vector<int>> H = create_clusters(suffix_array, left, right, p, max_H_size);
+      end = chrono::high_resolution_clock::now();
+      elapsed = end - start;
+      // output_stream << "is_periodic=YES create_clusters:" << elapsed.count() << " ";
+
       cout << "The clusters in the H are: " << endl;
       for(auto const &C : H) {
         for(auto const &item : C) {
@@ -879,7 +899,11 @@ bool check_freq_periodic_survive(bool is_node_checking, bool &is_cut_point, STve
       }
 
       // Then call periodic_survive
+      start = chrono::high_resolution_clock::now();
       periodic_survive_value = periodic_survive(left, right, I, J, freq_threshold, k, H, p);
+      end = chrono::high_resolution_clock::now();
+      elapsed = end - start;
+      // output_stream << "periodic_survive:" << elapsed.count() << " ";
       cout << "The value of periodic_survive_value is " << periodic_survive_value << endl;
       if (periodic_survive_value) {   // current is a node lying on the cut of ST
         if (is_node_checking) {   // Propagate upforward the status of frequent and survive to all ancestors except root
@@ -894,7 +918,11 @@ bool check_freq_periodic_survive(bool is_node_checking, bool &is_cut_point, STve
     }
 
     else {
+      start = chrono::high_resolution_clock::now();
       aperiodic_survive_value = aperiodic_survive(r, suffix_array, freq_threshold, k, left, right, I, J);
+      end = chrono::high_resolution_clock::now();
+      elapsed = end - start;
+      // output_stream << "periodic_survive:" << elapsed.count() << " ";
       cout << "The value of aperiodic_survive_result is " << aperiodic_survive_value << endl;
       if (aperiodic_survive_value) {   // current is a node lying on the cut of ST
         if (is_node_checking) {   // Propagate upforward the status of frequent and survive to all ancestors except root
@@ -908,11 +936,15 @@ bool check_freq_periodic_survive(bool is_node_checking, bool &is_cut_point, STve
       }
     }
   }
+  auto total_end = chrono::high_resolution_clock::now();
+  chrono::duration<double> elapsed = total_end - total_start;
+  // output_stream << "Total:" << elapsed.count() << "\n";
+  // output_stream.close();
 
   return (aperiodic_survive_value || periodic_survive_value);
 }
 
-int binary_search_longest_substring (int low, int high, int I, int child_l, int child_r, int freq_threshold, int k, bool &is_cut_point, STvertex* root, STvertex* current, int suffix_array[], InPlacePST ippst, map<PSTPoint, int, PSTPointCompare>& per_map, map<STvertex*, pair<vector<STvertex*>, int>> path_map, map<STvertex*, bool>& freq_survive_map) {
+int binary_search_longest_substring (int low, int high, int I, int child_l, int child_r, int freq_threshold, int k, bool &is_cut_point, STvertex* root, STvertex* current, int* suffix_array, InPlacePST& ippst, map<PSTPoint, int, PSTPointCompare>& per_map, map<STvertex*, pair<vector<STvertex*>, int>>& path_map, map<STvertex*, bool>& freq_survive_map) {
   int mid = 0, success_record = low;
   while (low < high) {
     mid = low + (high - low) / 2;     // mid is the floor int
@@ -942,6 +974,7 @@ int main(int argv, char** argc) {
     time_t before, after;
     int k, freq_threshold;
     string S;
+    ofstream output_stream;
     /////////////////////////////////////////////////////////////////////////////
     // Seed the PRNG                                                           //
     /////////////////////////////////////////////////////////////////////////////
@@ -1049,6 +1082,7 @@ int main(int argv, char** argc) {
     dfs_stack.push(current);
     path_map.insert({current, make_pair(path, 0)});
     // Traverse the tree using DFS & bottom-up
+    auto start = chrono::high_resolution_clock::now();
     while (!dfs_stack.empty()) {
       current = dfs_stack.top();
 		  dfs_stack.pop();
@@ -1086,7 +1120,13 @@ int main(int argv, char** argc) {
 	    	// cout << "Now push the " << current->numer << " into the result_stack!" << endl;
 	    }
     }
+    auto end = chrono::high_resolution_clock::now();
+    chrono::duration<double> elapsed = end - start;
+    // output_stream.open("DFS_runtime", ofstream::out | ofstream::app);
+    // output_stream << elapsed.count() << "\n";
+    // output_stream.close();
 	  cout << "****************************************" << endl;
+    
     // cout << "After DFS traverse, the path_map is as following:" << endl;
     // for (const auto &item : path_map) {
     //   STvertex* node = item.first;
@@ -1111,6 +1151,8 @@ int main(int argv, char** argc) {
     cout << "The size of bottom_up_stack is " << bottom_up_stack.size() << ", text_size = " << text_size << endl;
     // Now, the nodes are in reverse post-order, so we need to process them in the correct order
     while (!bottom_up_stack.empty()) {
+      auto total_start = chrono::high_resolution_clock::now();
+    
       current = bottom_up_stack.top();
       bottom_up_stack.pop();
 
@@ -1145,40 +1187,52 @@ int main(int argv, char** argc) {
         }
       }
       else {
+        // cout << "Start to find the first cut node!" << endl;
         int left = interval_map[current][0], right = interval_map[current][1];
         int I = suffix_array[left], J = suffix_array[left] + path_map[current].second - 1;
         string target_string(reinterpret_cast<const char*>(text_string) + I, J - I + 1);
+
+        auto start = chrono::high_resolution_clock::now();
         is_freq_survive = check_freq_periodic_survive(true, is_cut_point, r, current, left, right, I, J, freq_threshold, k, suffix_array, ippst, per_map, path_map, freq_survive_map);
+        auto end = chrono::high_resolution_clock::now();
+        chrono::duration<double> elapsed = end - start;
+        // output_stream.open("FaS_runtime", ofstream::out | ofstream::app);
+        // output_stream << "Total check_FaS:" << elapsed.count() << " ";
+        // output_stream.close();
 
         if (is_cut_point) {
-        cout << "*********This is a cut node! Start binary search to find out the refined cut!********" << endl;
-        is_freq_survive = false;
+          cout << "*********This is a cut node! Start binary search to find out the refined cut!********" << endl;
+          is_freq_survive = false;
 
-        // cout << "Cut node's info is I"
-        for (auto const &child : children_map) {
-          STvertex* child_node = child.second.v;
-          int child_l = interval_map[child_node][0], child_r = interval_map[child_node][1];
-          cout << "Current child's [l,r] is [" << child_l << "," << child_r << "]" << endl;
-          for (int i = child_l; i <= child_r; i++) {
-            int I = suffix_array[i], J; // left bound of the substring is fixed, we need to find out the right bound
-            int low = suffix_array[i] + path_map[current].second - 1, high = suffix_array[i] + path_map[child_node].second - 1;
-            // START BINARY SEARCH for J
-            // Initialization: low is the end position of node u (cut node), high is the end position of node v (child of u)
-            cout << "Binary search start! i= " << i << ", I = " << I << endl;
-            J = binary_search_longest_substring(low, high, I, child_l, child_r, freq_threshold, k, is_cut_point, root, current, suffix_array, ippst, per_map, path_map, freq_survive_map);
-            cout << "Binary search end! The refined cut [I, J] is [" << I << "," << J << "]" << endl;
-            cout << "The OUTPUT for index (suffix_array[i]) " << suffix_array[i] << " is " <<  J - I + 1 << endl;
-            // OUTPUT[suffix_array[i]] = path_map[current].second + J - I;
-            OUTPUT[suffix_array[i]] = J - I + 1;
+          // cout << "Cut node's info is I"
+          for (auto const &child : children_map) {
+            STvertex* child_node = child.second.v;
+            int child_l = interval_map[child_node][0], child_r = interval_map[child_node][1];
+            cout << "Current child's [l,r] is [" << child_l << "," << child_r << "]" << endl;
+            for (int i = child_l; i <= child_r; i++) {
+              int I = suffix_array[i], J; // left bound of the substring is fixed, we need to find out the right bound
+              int low = suffix_array[i] + path_map[current].second - 1, high = suffix_array[i] + path_map[child_node].second - 1;
+              // START BINARY SEARCH for J
+              // Initialization: low is the end position of node u (cut node), high is the end position of node v (child of u)
+              cout << "Binary search start! i= " << i << ", I = " << I << endl;
+              J = binary_search_longest_substring(low, high, I, child_l, child_r, freq_threshold, k, is_cut_point, root, current, suffix_array, ippst, per_map, path_map, freq_survive_map);
+              cout << "Binary search end! The refined cut [I, J] is [" << I << "," << J << "]" << endl;
+              cout << "The OUTPUT for index (suffix_array[i]) " << suffix_array[i] << " is " <<  J - I + 1 << endl;
+              // OUTPUT[suffix_array[i]] = path_map[current].second + J - I;
+              OUTPUT[suffix_array[i]] = J - I + 1;
+            }
           }
-        }
       }
     }
-
+    auto total_end = chrono::high_resolution_clock::now();
+    chrono::duration<double> elapsed = total_end - total_start;
+    // output_stream.open("FaS_runtime", ofstream::out | ofstream::app);
+    // output_stream << "Total while:" << elapsed.count() << "\n";
+    // output_stream.close();
   }
 
   // map<string,int> test_map;
-  ofstream output_stream;
+  
   output_stream.open(output_file);
   if(!output_stream.is_open()) {
         cout << "Couldn't open output file\n" << endl; 
