@@ -77,18 +77,19 @@ void KMP(unsigned char * x, unsigned char * y, vector<interval> &occ)
 }
 
 /** Binary search **/
-void binarySearch(INT start, INT &end, INT n, bool result, INT * tested_index)
+void binarySearch(INT start, INT &end, INT &l, INT &r, INT n, bool result, INT * tested_index)
 {
-
 	if( result == 1 ) // result returned 'YES'
 	{
-		end = min( n-1, end + (end - start + 1) / 2 );
+		l = end;
+		end = l + (r - l) / 2 ; 
+
 	}
         else if (result == 0) // result returned 'NO'
-        {	
-        	end = min( n-1, start + (end - start) / 2);
-	}
-	
+	{	
+		r = end;
+		end = l + (r - l) / 2 ;  
+	}	
 }
 
 
@@ -146,7 +147,6 @@ INT DP( vector<interval> occ, INT k )
 
 	}
 	
-	
 	// Initialize DP
 	INT ** T = new INT*[occ.size()];
 	for(INT i = 0; i<occ.size(); i++)
@@ -159,15 +159,17 @@ INT DP( vector<interval> occ, INT k )
 		T[0][h] = occ.at(0).contain;
 
 	// Compute DP
-	for (INT h = 1; h < k; h++) 
+	
+	for (INT b = 1; b < occ.size(); b++)
 	{
-		for (INT b = 1; b < occ.size(); b++)
+	
+		for (INT h = 1; h < k; h++) 
 		{
 			INT max_val = 0;
 
 			for (INT a = 0; a<b; a++)
 			{
-				INT val = T[a][h - 1] + w_ab[a][b-1];
+				INT val = T[a][h - 1] + w_ab[a][b];
 				if (val > max_val)
 					max_val = val;
 			}
@@ -264,15 +266,19 @@ int main(int argc, char **argv)
 		
 	for(INT i = 0; i<n; i++)
 	{
-	
 		INT * tested_index = ( INT * ) malloc (  ( n ) * sizeof ( INT ) );
 		
 		for(INT i = 0; i<n; i++)
 			tested_index[i] = 0;
 				
-		INT end = i + ( n-i )/2 ;
+	
 		INT result = 1; // to check if the answer was 'YES' or 'NO'
 		
+		
+		INT l = i;
+		INT r = n;
+		
+		INT end = l + (r-1 -l) / 2; 
 		while(  tested_index[end] == 0 )
 		{
 			memcpy( &pattern[0], &text[i], end-i+1 );
@@ -290,8 +296,8 @@ int main(int argc, char **argv)
 				{
 					result = 1; 
 					
-					if( end > output[i] )
-						output[i] = end;		
+					if( end - i + 1 > output[i] )
+						output[i] = end - i + 1;		
 				}
 				else result = 0;
 					
@@ -302,7 +308,7 @@ int main(int argc, char **argv)
 			tested_index[end] = 1;
 			
 			//binary search using i and end position
-			binarySearch( i, end, n, result, tested_index ); 
+			binarySearch( i, end, l, r,n, result, tested_index ); 
 				
 		}
 		
@@ -315,9 +321,7 @@ int main(int argc, char **argv)
 	// Output results
 	for(INT i = 0; i<n; i++)
 	{
-		if( output[i] > 0 )
-			output_f<<output[i]-i+1<<endl;
-		else output_f<<output[i]<<endl;
+		output_f<<output[i]<<endl;
 	}
 	
 	free( output );
