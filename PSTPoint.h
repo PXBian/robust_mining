@@ -27,6 +27,7 @@
 
 #include <ostream>
 #include <algorithm>
+#include <limits>
 using std::basic_ostream;
 
 namespace PrioritySearchTree {
@@ -53,6 +54,7 @@ namespace PrioritySearchTree {
     bool operator<(const PSTPoint& p); // compares x coordinate
     bool yGreaterThan(const PSTPoint& p);
     bool yLessThan(const PSTPoint& p);
+    int per = std::numeric_limits<int>::max();
   };
 
   /////////////////////////////////////////////////////////////////////////////
