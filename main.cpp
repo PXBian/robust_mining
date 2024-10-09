@@ -16,7 +16,6 @@
 #include "runs.hpp"
 #include "intervaltree.hpp"
 
-
 using namespace std;
 using namespace Intervals;
 
