@@ -1,5 +1,8 @@
 #!/bin/bash
 
+mkdir peak_ram
+rm runtime_details.csv
+
 (/usr/bin/time -v ./main dna.50MB 100 100)      &> peak_ram/mem_dna50_100_100.txt
 (/usr/bin/time -v ./main dna.50MB 100 1000)     &> peak_ram/mem_dna50_100_1000.txt
 (/usr/bin/time -v ./main dna.50MB 100 10000)    &> peak_ram/mem_dna50_100_10000.txt
