@@ -1,0 +1,4 @@
+text_file,tau,k,read_txt,create_ST,create_SA,create_intervals,is_periodic_preprocess,find_cut,total
+ecoli.txt,50,3,0.0652071,4.8031,1.71293,7.85832,2.59886,3.03571,28.0907
+text_file,tau,k,read_txt,create_ST,create_SA,create_intervals,is_periodic_preprocess,find_cut,total
+ecoli.txt,50,3,0.0579319,5.31931,2.05043,8.65614,2.87051,3.35376,24.042

@@ -941,13 +941,13 @@ int main(int argv, char** argc) {
     output_stream << elapsed.count() << ",";
     output_stream.close();
     
-    cout<<"Suffix Array for String ";
-    for(int i=0; i<text_size; i++)
-        cout<<txt[i];
-   	cout<<" is: ";
-    for(int i=0; i<text_size; i++)
-        cout<<suffix_array[i]<<" ";
-    cout<<endl;
+    // cout<<"Suffix Array for String ";
+    // for(int i=0; i<text_size; i++)
+    //     cout<<txt[i];
+   	// cout<<" is: ";
+    // for(int i=0; i<text_size; i++)
+    //     cout<<suffix_array[i]<<" ";
+    // cout<<endl;
 
     int *inv_suffix_array =(int*) malloc(sizeof(int) * text_size);
     for(int i=0; i<text_size; i++) {
