@@ -12,7 +12,7 @@
 using namespace std;
 
 int main(int argc, char **argv) {
-	const int num_bits = 14;  // Number of bits in each binary string
+	const int num_bits = 16;  // Number of bits in each binary string
     const int total_strings = 1 << num_bits; // Total number of strings (2^16 = 65536)
     
     for (int i = 0; i < total_strings; ++i) {

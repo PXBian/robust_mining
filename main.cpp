@@ -33,6 +33,7 @@ typedef int64_t INT;
 // double interval_tree_build_runtime = 0, interval_query_runtime = 0, check_freq_periodic_survive_runtime = 0, forward_runtime = 0, OUTPUT_runtime = 0;
 // double success_setting_runtime = 0, success_child_setting_runtime = 0, fail_setting_runtime = 0, fail_child_setting_runtime = 0;
 // int sum_sel=0, count_sel=0;
+int num_of_freq = 0, num_of_resi = 0;
 
 INT read_patterns( string pattern_filename, unsigned char ** &patterns, INT &num_patterns)
 {	
@@ -326,7 +327,7 @@ void build_suffix_array(int* suffixArray, int txt_size, STvertex *r){
 }
 
 
-vector<STvertex*> bottom_up_SA_interval(STvertex* &r, int* &suffix_array, int* &inv_suffix_array, int txt_size) {
+vector<STvertex*> bottom_up_SA_interval(STvertex* &r, int* &suffix_array, int* &inv_suffix_array, int txt_size, int freq_threshold) {
 	cout << "The sizeof suffix array is " << txt_size << endl;
 
 	// Stack for traversing the tree
@@ -335,9 +336,10 @@ vector<STvertex*> bottom_up_SA_interval(STvertex* &r, int* &suffix_array, int* &
   stack<STvertex*> bottom_up_stack;
 	STvertex* current = r;
   vector<STvertex*> current_path;
-  vector<STvertex*> rev_bottomup_ordered_nodes;
-  STvertex* child_node;
   vector<STvertex*> child_path;
+  STvertex* child_node;
+  STvertex* parent_node;
+  vector<STvertex*> rev_bottomup_ordered_nodes;
   map<unsigned char,STedge,greater<unsigned char>> children_map;
 
   // Start with the root node
@@ -391,9 +393,6 @@ vector<STvertex*> bottom_up_SA_interval(STvertex* &r, int* &suffix_array, int* &
       // cout << endl;
       child_node->path = child_path;
       child_node->str_depth_of_N = child_str_depth;
-      // for (const auto &node : child_path) {
-      //   STDelete(node);
-      // }
     }
 
     // Push the current node to the result stack: Don't push the root, as well as the special char $
@@ -404,7 +403,6 @@ vector<STvertex*> bottom_up_SA_interval(STvertex* &r, int* &suffix_array, int* &
     }
 
   }
-  // output_stream << "DFS:" << elapsed.count() << " DFS_if_runtime:" << DFS_if_runtime << " DFS_for_runtime:" << DFS_for_runtime << " DFS_set_runtime:" << DFS_set_runtime << " DFS_remain_runtime:" << DFS_remain_runtime << "\n";
 
 	cout << "End DFS traverse, start bottom-up ordered traverse..." << endl;
 
@@ -412,9 +410,8 @@ vector<STvertex*> bottom_up_SA_interval(STvertex* &r, int* &suffix_array, int* &
   for (auto it = rev_bottomup_ordered_nodes.rbegin(); it != rev_bottomup_ordered_nodes.rend(); ++it) {
     current = *it;
 
-    // auto if_start = chrono::high_resolution_clock::now();
+    // After the DFS traverse, only leaves have SA_interval
     if(current->SA_interval.size() == 0) {
-      // cout << "Didn't find out the record of interval" << endl;
       children_map = current->g;
       vector<int> current_interval;
       int current_min = numeric_limits<int>::max(), current_max = numeric_limits<int>::min();
@@ -429,12 +426,18 @@ vector<STvertex*> bottom_up_SA_interval(STvertex* &r, int* &suffix_array, int* &
       }
       current_interval.push_back(current_min);
       current_interval.push_back(current_max);
-
       current->SA_interval = current_interval;
     }
-    // auto if_end = chrono::high_resolution_clock::now();
-    // chrono::duration<double> if_elapsed = if_end - if_start;
-    // bottomup_if_runtime = bottomup_if_runtime + if_elapsed.count();
+
+    // Calculate the sum of the num_of_freq
+    int range_left = current->SA_interval[0], range_right = current->SA_interval[1];
+    if(range_right - range_left + 1 >= freq_threshold) {
+        current_path = current->path;
+        parent_node = current_path[current_path.size() - 2];
+        int parent_str_depth = parent_node->str_depth_of_N, cur_str_depth = current->str_depth_of_N;
+        num_of_freq = num_of_freq + (cur_str_depth - parent_str_depth);
+        // cout << "Now add " << cur_str_depth - parent_str_depth << " to num_of_freq, num_of_freq = " << num_of_freq << endl;
+    }
   }
 
   return rev_bottomup_ordered_nodes;
@@ -937,13 +940,15 @@ int main(int argv, char** argc) {
     output_stream.open(runtime_detail_csv, ios::app);
     output_stream << elapsed.count() << ",";
     output_stream.close();
-    // cout<<"Suffix Array for String ";
-    // for(int i=0; i<text_size; i++)
-    //     cout<<txt[i];
-   	// cout<<" is: ";
-    // for(int i=0; i<text_size; i++)
-    //     cout<<suffix_array[i]<<" ";
-    // cout<<endl;
+    
+    cout<<"Suffix Array for String ";
+    for(int i=0; i<text_size; i++)
+        cout<<txt[i];
+   	cout<<" is: ";
+    for(int i=0; i<text_size; i++)
+        cout<<suffix_array[i]<<" ";
+    cout<<endl;
+
     int *inv_suffix_array =(int*) malloc(sizeof(int) * text_size);
     for(int i=0; i<text_size; i++) {
       inv_suffix_array[suffix_array[i]] = i;
@@ -951,7 +956,7 @@ int main(int argv, char** argc) {
 
     // interval_map: key is each node in ST, value is <l,r>, where [l,r] is corresponding SA interval of this node
     start = chrono::high_resolution_clock::now();
-    vector<STvertex*> rev_bottomup_ordered_nodes = bottom_up_SA_interval(root, suffix_array, inv_suffix_array, text_size);
+    vector<STvertex*> rev_bottomup_ordered_nodes = bottom_up_SA_interval(root, suffix_array, inv_suffix_array, text_size, freq_threshold);
     cout << "Construct SA interval for each node in ST successfully. Preprocessing end!" << endl;
     end = chrono::high_resolution_clock::now();
     elapsed = end - start;
@@ -980,6 +985,8 @@ int main(int argv, char** argc) {
     map<unsigned char,STedge,greater<unsigned char>> children_map;
 	  STvertex* current = r;
     STvertex* child_node;
+    STvertex* parent_node;
+    vector<STvertex*> current_path;
     int *OUTPUT =(int*) malloc(sizeof(int) * text_size);
     for (int i = 0; i < text_size; i++) {
       OUTPUT[i] = 0;
@@ -989,93 +996,74 @@ int main(int argv, char** argc) {
     // cout << "The size of bottom_up_ordered_nodes is " << rev_bottomup_ordered_nodes.size() << ", text_size = " << text_size << endl;
     // Now, the nodes are in reverse post-order, so we need to process them in the correct order
     start = chrono::high_resolution_clock::now();
-    double success_binary_search_runtime = 0, fail_binary_search_runtime = 0, check_FaS_runtime = 0, loop_runtime = 0, if_loop_runtime = 0, else_loop_runtime = 0, if_child_runtime = 0, is_cut_runtime = 0, else_remain_runtime = 0;
+    // double success_binary_search_runtime = 0, fail_binary_search_runtime = 0, check_FaS_runtime = 0, loop_runtime = 0, if_loop_runtime = 0, else_loop_runtime = 0, if_child_runtime = 0, is_cut_runtime = 0, else_remain_runtime = 0;
     int binary_search_count = 0, check_FaS_count = 0;
     for (auto it = rev_bottomup_ordered_nodes.rbegin(); it != rev_bottomup_ordered_nodes.rend(); ++it) {
-      // output_stream.open("FaS_runtime", ofstream::out | ofstream::app);
       current = *it;
-      // auto loop_start = chrono::high_resolution_clock::now();
+      current_path = current->path;
+      parent_node = current_path[current_path.size() - 2];
+      int parent_str_depth = parent_node->str_depth_of_N, current_str_depth = current->str_depth_of_N;
+
       bool is_cut_point = false, is_freq_survive = false;
       children_map = current->g;
-      int current_str_depth = current->str_depth_of_N;
+      vector<int> current_SA_interval = current->SA_interval;
+      int cur_left = current_SA_interval[0], cur_right = current_SA_interval[1];
+
       if(current->flag) {   // This node is the ancestor of a cut node u
-        // auto if_loop_start = chrono::high_resolution_clock::now();
-        // auto inner_start = chrono::high_resolution_clock::now();
-        // cout << "current node is already frequent and survive, continue to next current" << endl;
-        // auto success_child_start = chrono::high_resolution_clock::now();
+        num_of_resi = num_of_resi + current_str_depth - parent_str_depth;
+        // cout << "Now add child_str_len " << current_str_depth - parent_str_depth << " to num_of_resi, num_of_resi = " << num_of_resi << endl;
+
         for (auto const &child : children_map) {
           child_node = child.second.v;
           vector<int> child_SA_interval = child_node->SA_interval;
           int child_l = child_SA_interval[0], child_r = child_SA_interval[1];
-          int child_str_depth = child_node->str_depth_of_N;
+          // cout << "child_l = " << child_l << ", child_r = " << child_r << endl;
+          int child_str_depth = child_node->str_depth_of_N; 
+          int I, J, low, high;
           
-          // cout << "Current child's [l,r] is [" << child_l << "," << child_r << "]" << endl;
-
           if (child_node->flag) {
             continue;
           }
           else {    // This child node is v
-            // auto if_child_start = chrono::high_resolution_clock::now();
             for (int i = child_l; i <= child_r; i++) {
-              // auto success_child_setting_start = chrono::high_resolution_clock::now();
-              int I = suffix_array[i], J; // left bound of the substring is fixed, we need to find out the right bound
-              int low = I + current_str_depth - 1, high = I + child_str_depth - 1;
-              // auto success_child_setting_end = chrono::high_resolution_clock::now();
-              // elapsed = success_child_setting_end - success_child_setting_start;
-              // success_child_setting_runtime = success_child_setting_runtime + elapsed.count();
+              I = suffix_array[i]; // left bound of the substring is fixed, we need to find out the right bound
+              low = I + current_str_depth - 1, high = I + child_str_depth - 1;
               // START BINARY SEARCH for J
               // Initialization: low is the end position of node u (cut node), high is the end position of node v (child of u)
               // cout << "Binary search start! i= " << i << ", I = " << I << endl;
-              // auto bs_start = chrono::high_resolution_clock::now();
               binary_search_count ++;
               J = binary_search_longest_substring(low, high, I, child_l, child_r, freq_threshold, k, is_cut_point, root, current, suffix_array, runs);
-              // auto bs_end = chrono::high_resolution_clock::now();
-              // chrono::duration<double> bs_elapsed = bs_end - bs_start;
-              // success_binary_search_runtime = success_binary_search_runtime + bs_elapsed.count();
-
               // cout << "Binary search end! The refined cut [I, J] is [" << I << "," << J << "]" << endl;
               // cout << "The OUTPUT for index (suffix_array[i]) " << I << " is " <<  J - I + 1 << endl;
               // cout << "The u str_depth = " << current->str_depth_of_N << endl;
               OUTPUT[I] = J - I + 1;
             }
-            // auto if_child_end = chrono::high_resolution_clock::now();
-            // chrono::duration<double> if_child_elapsed = if_child_end - if_child_start;
-            // if_child_runtime = if_child_runtime + if_child_elapsed.count();
-          }
-          
-        }
-        // auto success_child_end = chrono::high_resolution_clock::now();
-        // chrono::duration<double> elapsed = success_child_end - success_child_start;
-        // success_setting_runtime = success_setting_runtime + elapsed.count();
 
-        // auto if_loop_end = chrono::high_resolution_clock::now();
-        // chrono::duration<double> if_loop_elapsed = if_loop_end - if_loop_start;
-        // if_loop_runtime = if_loop_runtime + if_loop_elapsed.count();
-        // STDelete(child_node);
+            num_of_resi = num_of_resi + J - low;
+            // cout << "Now add (a)J - low = " << J - low << " to num_of_resi, num_of_resi = " << num_of_resi << endl;
+          }
+        }
       }
       else {
-        // auto else_loop_start = chrono::high_resolution_clock::now();
         // cout << "Start to find the first cut node!" << endl;
-        // auto else_remain_start = chrono::high_resolution_clock::now();
-        vector<int> current_SA_interval = current->SA_interval;
-        int left = current_SA_interval[0], right = current_SA_interval[1];
-        if (right - left + 1 < freq_threshold) {  // If the current node is not frequent, continue to the next current
+        // vector<int> current_SA_interval = current->SA_interval;
+        // int left = current_SA_interval[0], right = current_SA_interval[1];
+        if (cur_right - cur_left + 1 < freq_threshold) {  // If the current node is not frequent, continue to the next current
           continue;
         }
-        int I = suffix_array[left];
+        int I = suffix_array[cur_left];
         int J = I + current_str_depth - 1;
         
+        is_freq_survive = check_freq_periodic_survive(true, is_cut_point, r, current, cur_left, cur_right, I, J, freq_threshold, k, suffix_array, runs);
 
-        // auto fas_start = chrono::high_resolution_clock::now();
-        // check_FaS_count ++;
-        is_freq_survive = check_freq_periodic_survive(true, is_cut_point, r, current, left, right, I, J, freq_threshold, k, suffix_array, runs);
-        // auto fas_end = chrono::high_resolution_clock::now();
-        // chrono::duration<double> fas_elapsed = fas_end - fas_start;
-        // check_FaS_runtime = check_FaS_runtime + fas_elapsed.count();
-
-        
         if (is_cut_point) {
           // cout << "*********This is a cut node! Start binary search to find out the refined cut!********" << endl;
+          current_path = current->path;
+          parent_node = current_path[current_path.size() - 2];
+          int parent_str_depth = parent_node->str_depth_of_N;
+          num_of_resi = num_of_resi + current_str_depth - parent_str_depth;
+          // cout << "Now add " << current_str_depth - parent_str_depth << " to num_of_resi, num_of_resi = " << num_of_resi << endl;
+          
           is_freq_survive = false;
           for (auto const &child : children_map) {
             // auto fail_child_setting_start = chrono::high_resolution_clock::now();
@@ -1083,49 +1071,28 @@ int main(int argv, char** argc) {
             vector<int> child_SA_interval = child_node->SA_interval;
             int child_l = child_SA_interval[0], child_r = child_SA_interval[1];
             int child_str_depth = child_node->str_depth_of_N;
+            int I, J, low, high;
             
             // cout << "Current child's [l,r] is [" << child_l << "," << child_r << "]" << endl;
             for (int i = child_l; i <= child_r; i++) {
-              // auto is_cut_start = chrono::high_resolution_clock::now();
-
-              int I = suffix_array[i], J; // left bound of the substring is fixed, we need to find out the right bound
-              int low = I + current_str_depth - 1, high = I + child_str_depth - 1;
+              I = suffix_array[i]; // left bound of the substring is fixed, we need to find out the right bound
+              low = I + current_str_depth - 1, high = I + child_str_depth - 1;
               // START BINARY SEARCH for J
               // Initialization: low is the end position of node u (cut node), high is the end position of node v (child of u)
               // cout << "Binary search start! i= " << i << ", I = " << I << endl;
-              // auto bs_start = chrono::high_resolution_clock::now();
               // binary_search_count ++;
               J = binary_search_longest_substring(low, high, I, child_l, child_r, freq_threshold, k, is_cut_point, root, current, suffix_array, runs);
-              // auto bs_end = chrono::high_resolution_clock::now();
-              // chrono::duration<double> bs_elapsed = bs_end - bs_start;
-              // fail_binary_search_runtime = fail_binary_search_runtime + bs_elapsed.count();
-
-              // auto is_cut_end = chrono::high_resolution_clock::now();
-              // chrono::duration<double> is_cut_elapsed = is_cut_end - is_cut_start;
-              // is_cut_runtime = is_cut_runtime + is_cut_elapsed.count();
-              
-              // cout << "Binary search end! The refined cut [I, J] is [" << I << "," << J << "]" << endl;
+              // cout << "Binary search end! The refined cut [I, J] is [" << I << "," << J << "], low = " << low << endl;
               // cout << "The OUTPUT for index (suffix_array[i]) " << I << " is " <<  J - I + 1 << endl;
               OUTPUT[I] = J - I + 1;
             }
 
-            // auto fail_child_setting_end = chrono::high_resolution_clock::now();
-            // elapsed = fail_child_setting_end - fail_child_setting_start;
-            // fail_child_setting_runtime = fail_child_setting_runtime + elapsed.count();
+            num_of_resi = num_of_resi + J - low;
+            // cout << "Now add (b)J - low = " << J - low << " to num_of_resi, num_of_resi = " << num_of_resi << endl;
           }
-          
-          // STDelete(child_node);
         }
-
-        // auto else_loop_end = chrono::high_resolution_clock::now();
-        // chrono::duration<double> else_loop_elapsed = else_loop_end - else_loop_start;
-        // else_loop_runtime = else_loop_runtime + else_loop_elapsed.count();
       }
-
-    // auto loop_end = chrono::high_resolution_clock::now();
-    // chrono::duration<double> loop_elapsed = loop_end - loop_start;
-    // loop_runtime = loop_runtime + loop_elapsed.count();
-  }
+    }
   end = chrono::high_resolution_clock::now();
   elapsed = end - start;
   output_stream.open(runtime_detail_csv, ios::app);
@@ -1133,9 +1100,6 @@ int main(int argv, char** argc) {
   output_stream.close();
 
   // Clear suffix array, suffix tree and interval tree
-  // for (const auto &node : rev_bottomup_ordered_nodes) {
-  //   STDelete(node);
-  // }
   free(suffix_array);
   STDelete(r);
   runs.clear();
@@ -1154,7 +1118,7 @@ int main(int argv, char** argc) {
         cout << "Couldn't open output file\n" << endl; 
   }
   // cout << "The OUTPUT with size " << text_size - 2 << " is ";
-  for(int i = 1; i < text_size - 1; i++) {  // Exclude the first and last special char
+  for(int i = 1; i < text_size - 2; i++) {  // Exclude the first and last special char
     // cout << OUTPUT[i] << " ";
     output_stream << OUTPUT[i] << "\n";
   }
@@ -1162,6 +1126,8 @@ int main(int argv, char** argc) {
   output_stream.close();
   free(OUTPUT);
 
+  if(freq_threshold == 2) num_of_freq--;
+  cout << "The num_of_freq = " << num_of_freq << ", num_of_resi = " << num_of_resi << ", num_of_resi / num_of_freq = " << (double) num_of_resi / (double) num_of_freq << ", num_of_freq - num_of_resi = " << num_of_freq - num_of_resi << endl;
 
   cout << "Finish!\n" << endl;
 
