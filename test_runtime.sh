@@ -2,7 +2,6 @@
 
 mkdir peak_ram
 rm runtime_details.csv
-
 gunzip *.gz
 
 (/usr/bin/time -v ./main dna.50MB 100 100)      &> peak_ram/mem_dna50_100_100.txt

@@ -8,4 +8,4 @@ endif
 
 all: main
 
-main: runs.hpp intervaltree.hpp main.cpp 
+main: runs.hpp intervaltree.hpp suffixtree.hpp main.cpp 
