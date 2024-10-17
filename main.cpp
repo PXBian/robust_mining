@@ -674,8 +674,6 @@ int main(int argv, char** argc) {
     // cout << "The size of bottom_up_ordered_nodes is " << rev_bottomup_ordered_nodes.size() << ", text_size = " << text_size << endl;
     // Now, the nodes are in reverse post-order, so we need to process them in the correct order
     start = chrono::high_resolution_clock::now();
-    // double success_binary_search_runtime = 0, fail_binary_search_runtime = 0, check_FaS_runtime = 0, loop_runtime = 0, if_loop_runtime = 0, else_loop_runtime = 0, if_child_runtime = 0, is_cut_runtime = 0, else_remain_runtime = 0;
-    // int binary_search_count = 0, check_FaS_count = 0;
     for (auto it = rev_bottomup_ordered_nodes.rbegin(); it != rev_bottomup_ordered_nodes.rend(); ++it) {
       current = *it;
       current_path = current->path;
@@ -697,24 +695,19 @@ int main(int argv, char** argc) {
           int child_l = child_SA_interval[0], child_r = child_SA_interval[1];
           // cout << "child_l = " << child_l << ", child_r = " << child_r << endl;
           int child_str_depth = child_node->str_depth_of_N; 
-          int I, J, low, high;
           
           if (child_node->flag) {
             continue;
           }
           else {    // This child node is v
+            int I = suffix_array[child_l], J; // left bound of the substring is fixed, we need to find out the right bound
+            int low = I + current_str_depth - 1, high = I + child_str_depth - 1;
+            J = binary_search_longest_substring(low, high, I, child_l, child_r, freq_threshold, k, is_cut_point, root, current, suffix_array, runs);
+            int refined_cut_len = J - I + 1;
+
             for (int i = child_l; i <= child_r; i++) {
-              I = suffix_array[i]; // left bound of the substring is fixed, we need to find out the right bound
-              low = I + current_str_depth - 1, high = I + child_str_depth - 1;
-              // START BINARY SEARCH for J
-              // Initialization: low is the end position of node u (cut node), high is the end position of node v (child of u)
-              // cout << "Binary search start! i= " << i << ", I = " << I << endl;
-              // binary_search_count ++;
-              J = binary_search_longest_substring(low, high, I, child_l, child_r, freq_threshold, k, is_cut_point, root, current, suffix_array, runs);
-              // cout << "Binary search end! The refined cut [I, J] is [" << I << "," << J << "]" << endl;
-              // cout << "The OUTPUT for index (suffix_array[i]) " << I << " is " <<  J - I + 1 << endl;
-              // cout << "The u str_depth = " << current->str_depth_of_N << endl;
-              OUTPUT[I] = J - I + 1;
+              // cout << "The OUTPUT for index (suffix_array[i]) " << suffix_array[i] << " is " << refined_cut_len << endl;
+              OUTPUT[suffix_array[i]] = refined_cut_len;
             }
 
             num_of_resi = num_of_resi + J - low;
@@ -748,20 +741,16 @@ int main(int argv, char** argc) {
             vector<int> child_SA_interval = child_node->SA_interval;
             int child_l = child_SA_interval[0], child_r = child_SA_interval[1];
             int child_str_depth = child_node->str_depth_of_N;
-            int I, J, low, high;
+            
+            int I = suffix_array[child_l], J; // left bound of the substring is fixed, we need to find out the right bound
+            int low = I + current_str_depth - 1, high = I + child_str_depth - 1;
+            J = binary_search_longest_substring(low, high, I, child_l, child_r, freq_threshold, k, is_cut_point, root, current, suffix_array, runs);
+            int refined_cut_len = J - I + 1;
             
             // cout << "Current child's [l,r] is [" << child_l << "," << child_r << "]" << endl;
             for (int i = child_l; i <= child_r; i++) {
-              I = suffix_array[i]; // left bound of the substring is fixed, we need to find out the right bound
-              low = I + current_str_depth - 1, high = I + child_str_depth - 1;
-              // START BINARY SEARCH for J
-              // Initialization: low is the end position of node u (cut node), high is the end position of node v (child of u)
-              // cout << "Binary search start! i= " << i << ", I = " << I << endl;
-              // binary_search_count ++;
-              J = binary_search_longest_substring(low, high, I, child_l, child_r, freq_threshold, k, is_cut_point, root, current, suffix_array, runs);
-              // cout << "Binary search end! The refined cut [I, J] is [" << I << "," << J << "], low = " << low << endl;
-              // cout << "The OUTPUT for index (suffix_array[i]) " << I << " is " <<  J - I + 1 << endl;
-              OUTPUT[I] = J - I + 1;
+              // cout << "The OUTPUT for index (suffix_array[i]) " << suffix_array[i] << " is " << refined_cut_len << endl;
+              OUTPUT[suffix_array[i]] = refined_cut_len;
             }
 
             num_of_resi = num_of_resi + J - low;
