@@ -16,7 +16,7 @@
 
 using namespace std;
 
-typedef int64_t INT;
+typedef int32_t INT;
 
 #define FOR(I, A, B) for (INT I = (A); I <= (B); I++)
 #define FORD(I, A, B) for (INT I = (A); I >= (B); I--)
