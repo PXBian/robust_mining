@@ -555,11 +555,14 @@ int main(int argv, char** argc) {
     
     ifstream in_file(text_file_path, ios::binary);
     in_file.seekg(0, ios::end);
-    INT text_file_size = in_file.tellg();
+    // INT text_file_size = in_file.tellg();
+    int32_t text_file_size = in_file.tellg();
+
     
     unsigned char * text_string = ( unsigned char * ) malloc (  ( text_file_size+4 ) * sizeof ( unsigned char ) );
     char chr = 0;
-    INT text_size = 0;
+    // INT text_size = 0;
+    int32_t text_size = 0;
     
     string runtime_detail_csv = "runtime_details.csv";
     ofstream output_stream;
@@ -573,8 +576,8 @@ int main(int argv, char** argc) {
     auto start = chrono::high_resolution_clock::now();
     text_string[0] = '\1';
     // cout << "text_file_size is " << text_file_size << ", start reading! " << endl;
-    for (INT i = 1; i <= text_file_size; i++)
-    {	
+    // for (INT i = 1; i <= text_file_size; i++) {	
+    for (int32_t i = 1; i <= text_file_size; i++) {	
       is_text.read(reinterpret_cast<char*>(&chr), 1);
       text_string[i] = chr;
       // cout << "i=" << i << "," << chr << "(" << text_size << "),dec_value=" << (unsigned int)chr << "; ";
