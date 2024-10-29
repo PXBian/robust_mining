@@ -4,4 +4,5 @@
 
 rm error*
 rm testing_results_summary
+g++ test_random.cpp -o test
 ./test

@@ -121,7 +121,7 @@ struct Interval
     interval_type low;
     interval_type high;
     value_type value;
-    int per;
+    interval_type per;
 };
 
 

@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
-#include <map>
+#include <unordered_map>
+#include <unordered_set>
 #include <set>
 #include <queue>
 #include <cmath>
@@ -13,30 +14,158 @@
 #include <stack>
 #include <algorithm>
 #include <chrono>
-#include "runs.hpp"
-#include "intervaltree.hpp"
+#include <math.h> 
 #include "suffixtree.hpp"
+#include "utils.hpp"
+#include "karp_rabin_hashing.hpp"
+
 
 using namespace std;
-using namespace Intervals;
-
-// using namespace PrioritySearchTree;
-
-// int is_periodic_yes = 0, is_periodic_no = 0;
-int num_of_freq = 0, num_of_resi = 0;
 
 
-void build_suffix_array(int* suffixArray, int txt_size, STvertex *r){
-    for(int i=0; i< txt_size; i++)
-        suffixArray[i] = -1;
-    
+namespace karp_rabin_hashing {
+
+//=============================================================================
+// Base and exponent used in Karp-Rabin hashing.
+//=============================================================================
+std::uint64_t hash_variable;
+std::uint64_t mersenne_prime_exponent;
+
+//=============================================================================
+// Return (a * b) mod p, where p = (2^k) - 1.
+// Requires a, b <= 2^k. Tested for k = 1, .., 63.
+//=============================================================================
+std::uint64_t mul_mod_mersenne(
+    const std::uint64_t a,
+    const std::uint64_t b,
+    const std::uint64_t k) {
+  const std::uint64_t p = ((std::uint64_t)1 << k) - 1;
+  __extension__ const unsigned __int128 ab =
+    (unsigned __int128)a *
+    (unsigned __int128)b;
+  std::uint64_t lo = (std::uint64_t)ab;
+  const std::uint64_t hi = (ab >>  (uint64_t) 64);
+  lo = (lo & p) + ((lo >> k) + (hi << ( (uint64_t) 64 - k)));
+  lo = (lo & p) + (lo >> k);
+  return lo == p ?  (uint64_t) 0 : lo;
+}
+
+//=============================================================================
+// Return a mod p, where p = (2^k) - 1.
+// Works for any a in [0..2^64).
+// Tested for k = 1, .., 63.
+//=============================================================================
+std::uint64_t mod_mersenne(
+    std::uint64_t a,
+    const std::uint64_t k) {
+  std::uint64_t p = ((std::uint64_t)1 << k) -  (uint64_t) 1;
+  if (k < (uint64_t) 32) {
+
+    // We need to check if a <= 2^(2k).
+    const std::uint64_t threshold = ((std::uint64_t)1 << (k <<  (uint64_t) 1));
+    if (a <= threshold) {
+      a = (a & p) + (a >> k);
+      a = (a & p) + (a >> k);
+      return a == p ?  (uint64_t) 0 : a;
+    } else return a % p;
+  } else {
+
+    // We are guaranteed that a < 2^(2k)
+    // because a < 2^64 <= 2^(2k).
+    a = (a & p) + (a >> k);
+    a = (a & p) + (a >> k);
+    return a == p ?  (uint64_t) 0 : a;
+  }
+}
+
+//=============================================================================
+// Return random number x in [0..p), where p = (2^k) - 1.
+//=============================================================================
+std::uint64_t rand_mod_mersenne(const std::uint64_t k) {
+  const std::uint64_t p = ((std::uint64_t)1 << k) -  (uint64_t) 1;
+  return utils::random_int<std::uint64_t>(
+      (std::uint64_t)0, (std::uint64_t(p -  (uint64_t) 1)));
+}
+
+//=============================================================================
+// Return (a^n) mod p, where p = (2^k) - 1.
+//=============================================================================
+std::uint64_t  pow_mod_mersenne(
+    const std::uint64_t a,
+    std::uint64_t n,
+    const std::uint64_t k) {
+  std::uint64_t pow = mod_mersenne(a, k);
+  std::uint64_t ret = mod_mersenne( (uint64_t) 1, k);
+  while (n >  (uint64_t) 0) {
+    if (n &  (uint64_t) 1)
+      ret = mul_mod_mersenne(ret, pow, k);
+    pow = mul_mod_mersenne(pow, pow, k);
+    n >>=  (uint64_t) 1;
+  }
+  return ret;
+}
+
+//=============================================================================
+// Given Karp-Rabin hashes of two substrings, return
+// the Karp-Rabin hash of their concatenation.
+//=============================================================================
+std::uint64_t concat(
+    const std::uint64_t left_hash,
+    const std::uint64_t right_hash,
+    const std::uint64_t right_len) {
+  const std::uint64_t pow = pow_mod_mersenne(
+      hash_variable, right_len, mersenne_prime_exponent);
+  const std::uint64_t tmp = mul_mod_mersenne(
+      left_hash, pow, mersenne_prime_exponent);
+  const std::uint64_t ret = mod_mersenne(
+      tmp + right_hash, mersenne_prime_exponent);
+  return ret;
+}
+std::uint64_t power(const std::uint64_t k)
+{
+	return pow((uint64_t)2,k);
+}
+
+std::uint64_t subtract(
+        const std::uint64_t long_hash,
+        const std::uint64_t short_hash,
+        const std::uint64_t right_len) {
+    const std::uint64_t pow = pow_mod_mersenne(
+            hash_variable, right_len, mersenne_prime_exponent);
+    const std::uint64_t tmp = mul_mod_mersenne(
+            short_hash, pow, mersenne_prime_exponent);
+    const std::uint64_t p = ((std::uint64_t)1 << mersenne_prime_exponent) - 1;
+    return (long_hash >= tmp) ?
+           (long_hash - tmp) :
+           ((long_hash + p) - tmp);
+}
+
+//=============================================================================
+// Initialize the base and exponent for Karp-Rabin hashing.
+//=============================================================================
+void init() {
+  mersenne_prime_exponent = 61;
+  hash_variable = rand_mod_mersenne(mersenne_prime_exponent);
+}
+
+}  // namespace karp_rabin_kashing
+
+INT num_of_freq = 0, num_of_resi = 0;
+
+
+void build_suffix_array(INT* suffixArray, INT txt_size, STvertex *r){
+    for(INT i=0; i< txt_size; i++)
+    { 
+           suffixArray[i] = -1;
+    }
+
 	// Iterative DFS traverse to build the Suffix Array by using stack
 	STvertex* current_node = r;
 	STvertex* child_node;
 	stack<STvertex*> traverse_stack;
 	traverse_stack.push(current_node);
 
-	int idx = 0;
+	INT idx = 0;
 	while(!traverse_stack.empty()) {
 		current_node = traverse_stack.top();
 		traverse_stack.pop();
@@ -48,7 +177,7 @@ void build_suffix_array(int* suffixArray, int txt_size, STvertex *r){
 			suffixArray[idx] = current_node->numer;
 			idx ++;
 		}
-		else if(current_node->numer == -1) {		// current_node is a internal node
+		else if(current_node->numer == -1) {		// current_node is a INTernal node
 			for (auto const &child : children_map) {
 				child_node = child.second.v;
 				traverse_stack.push(child_node);
@@ -58,263 +187,406 @@ void build_suffix_array(int* suffixArray, int txt_size, STvertex *r){
 }
 
 
-vector<STvertex*> bottom_up_SA_interval(STvertex* &r, int* &suffix_array, int* &inv_suffix_array, int txt_size, int freq_threshold) {
+vector<STvertex*> bottom_up_SA_interval(STvertex* &r, INT* &suffix_array, INT* &inv_suffix_array, unsigned char* text_string, INT txt_size, INT freq_threshold, unordered_set<uint64_t> &freq_set) {
 	cout << "The sizeof suffix array is " << txt_size << endl;
+    // karp_rabin_hashing::init();
 
 	// Stack for traversing the tree
-  stack<STvertex*> DFS_stack;
-  // Stack to store the post-order traversal (in reverse order)
-  stack<STvertex*> bottom_up_stack;
-	STvertex* current = r;
-  vector<STvertex*> current_path;
-  vector<STvertex*> child_path;
-  STvertex* child_node;
-  STvertex* parent_node;
-  vector<STvertex*> rev_bottomup_ordered_nodes;
-  map<unsigned char,STedge,greater<unsigned char>> children_map;
+    stack<STvertex*> DFS_stack;
+    // Stack to store the post-order traversal (in reverse order)
+    stack<STvertex*> bottom_up_stack;
+    STvertex* current = r;
+    // vector<STvertex*> current_path;
+    // vector<STvertex*> child_path;
+    STvertex* child_node;
+    STvertex* parent_node;
+    vector<STvertex*> rev_bottomup_ordered_nodes;
 
-  // Start with the root node
-  DFS_stack.push(current);
-  current_path.push_back(current);
-  current->path = current_path;
-  current->str_depth_of_N = 0;
-  // Traverse the tree using DFS & bottom-up
-  cout << "Start DFS traverse!" << endl;
-
-  while (!DFS_stack.empty()) {
-    current = DFS_stack.top();
-    DFS_stack.pop();
-    current->flag = false;
-    int current_num = current->numer;
-    // vector<STvertex*> current_path = current->path;
-    current_path = current->path;
-    int current_str_depth = current->str_depth_of_N;
-	  children_map = current->g;
     
-	  bool is_root = current == r;
+    // map<unsigned char,STedge,greater<unsigned char>> children_map;
 
-	  // cout << "In the DFS traverse, the current.numer is " << current->numer << ", it is root " << is_root << endl;
+    // Start with the root node
+    DFS_stack.push(current);
+    // current_path.push_back(current);
+    // current->path = current_path;
+    // current->parent = new STvertex;
+    // current->parent->numer = -100;
+    current->str_depth_of_N = 0;
+    // Traverse the tree using DFS & bottom-up
+    cout << "Start DFS traverse!" << endl;
 
-    vector<int> current_interval;
-	  if(current_num > -1 && current_num < txt_size) {	// current is a leaf
-      // getting index to SA from invSA
-      int current_idx = inv_suffix_array[current_num];
-      // Initialize the interval of the current node (leaf)
-      
-      current_interval.push_back(current_idx);
-      current_interval.push_back(current_idx);
+    while (!DFS_stack.empty()) {
+        current = DFS_stack.top();
+        DFS_stack.pop();
+        // cout<<"DS size: "<<DFS_stack.size()<<endl;
+
+        current->flag = false;
+        INT current_num = current->numer;
+        // vector<STvertex*> current_path = current->path;
+        // current_path = current->path;
+        INT current_str_depth = current->str_depth_of_N;
+        // children_map = current->g;
+        
+        bool is_root = current == r;
+
+        pair<INT,INT> current_interval = make_pair(-10,-10);
+        if(current_num > -1 && current_num < txt_size) {	// current is a leaf
+            // getting index to SA from invSA
+            // cout<<"c:"<<current_num<<" ";
+            INT current_idx = inv_suffix_array[current_num];
+            // cout << "Current is a leaf with current_idx = " << current_idx << endl;
+            // Initialize the interval of the current node (leaf)
+            
+            // current_interval.push_back(current_idx);
+            // current_interval.push_back(current_idx);
+            current_interval = {current_idx,current_idx};
+        }
+        current->SA_interval = current_interval;
+
+        // Push all the children to the traversal stack (in the order they appear)
+        for (auto const &child : current->g) {
+            child_node = child.second.v;
+            DFS_stack.push(child_node);
+            INT child_edge_length = child.second.r - child.second.l + 1;
+            INT child_str_depth = current_str_depth + child_edge_length;
+            child_node->str_depth_of_N = child_str_depth;
+            // cout << "The numer of child_node is" << child_node->numer << ", the child_edge_length is " << child_edge_length << ", the child_str_depth is " << child_str_depth << endl; 
+            child_node->parent = current;
+        }
+
+        // Push the current node to the result stack: Don't push the root, as well as the special char $
+        if (!is_root && current_num < txt_size) {
+            // bottom_up_stack.push(current);
+            rev_bottomup_ordered_nodes.push_back(current);
+            // cout << "Now push the " << current->numer << " into the result_stack!" << endl;
+        }
     }
-    current->SA_interval = current_interval;
 
-	  // Push all the children to the traversal stack (in the order they appear)
-	  for (auto const &child : children_map) {
-      child_node = child.second.v;
-      DFS_stack.push(child_node);
-      int child_edge_length = child.second.r - child.second.l + 1;
-      // // Print the current child's info on edge
-      // Print_edge(child.second, text_string);
-      int child_str_depth = current_str_depth + child_edge_length;
-      // cout << "The numer of child_node is" << child_node->numer << ", the child_edge_length is " << child_edge_length << ", the child_str_depth is " << child_str_depth << endl; 
-      child_path = current_path;
-      child_path.push_back(child_node);
-      // cout << "After push the child_node to the path, the child_path is " << endl;
-      // for (const auto &node : child_path) {
-      //   cout << node->numer << " ";
-      // }
-      // cout << endl;
-      child_node->path = child_path;
-      child_node->str_depth_of_N = child_str_depth;
-    }
-
-    // Push the current node to the result stack: Don't push the root, as well as the special char $
-    if (!is_root && current_num < txt_size) {
-      // bottom_up_stack.push(current);
-      rev_bottomup_ordered_nodes.push_back(current);
-      // cout << "Now push the " << current->numer << " into the result_stack!" << endl;
-    }
-
-  }
-
+    free(inv_suffix_array);
 	cout << "End DFS traverse, start bottom-up ordered traverse..." << endl;
 
-  // Now, the nodes are in reverse post-order, so we need to process them in the correct order
-  for (auto it = rev_bottomup_ordered_nodes.rbegin(); it != rev_bottomup_ordered_nodes.rend(); ++it) {
-    current = *it;
+    INT tmp = 0;
+    // Now, the nodes are in reverse post-order, so we need to process them in the correct order
+    for (auto it = rev_bottomup_ordered_nodes.rbegin(); it != rev_bottomup_ordered_nodes.rend(); ++it) {
+    // while(!bottom_up_stack.empty()) {
+        current = *it;
+        // current = bottom_up_stack.top();
+        // bottom_up_stack.pop();
 
-    // After the DFS traverse, only leaves have SA_interval
-    if(current->SA_interval.size() == 0) {
-      children_map = current->g;
-      vector<int> current_interval;
-      int current_min = numeric_limits<int>::max(), current_max = numeric_limits<int>::min();
-      for (auto const &child : children_map) {
-        vector<int> child_interval = child.second.v->SA_interval;
-        if (child_interval[0] < current_min) {
-          current_min = child_interval[0];
+        // After the DFS traverse, only leaves have SA_interval
+        // if(current->SA_interval.size() == 0) {
+        if (current->SA_interval.first != -10 && current->SA_interval.second != -10) {  // Skip the leaf nodes: Assume tau > 1
+            // cout << "Leaf" << endl;
+            continue;
+        } 
+        else {
+            INT current_min = numeric_limits<INT>::max(), current_max = numeric_limits<INT>::min();
+            for (auto const &child : current->g) {
+                pair<INT,INT> child_interval = child.second.v->SA_interval;
+                if (child_interval.first < current_min) {
+                    current_min = child_interval.first;
+                }
+                if (child_interval.second > current_max) {
+                    current_max = child_interval.second;
+                }
+            }
+            current->SA_interval = {current_min,current_max};
+            // cout << "[" << current_min << "," << current_max << "]" << endl;
+
+            // Calculate the sum of the num_of_freq
+            // INT range_left = current->SA_interval.first, range_right = current->SA_interval.second;
+            if(current_max - current_min + 1 >= freq_threshold) {
+                tmp++;
+                // cout << "This is FREQUENT" << endl;
+                INT cur_str_depth = current->str_depth_of_N;
+                // string freq_pattern = string(reinterpret_cast<char*>(text_string + suffix_array[current_min]), cur_str_depth);
+                
+                uint64_t freq_fingerprint = karp_rabin_hashing::hash_string(text_string + suffix_array[current_min],cur_str_depth);
+                // uint64_t freq_fingerprint = 1;
+                freq_set.insert(freq_fingerprint);
+                // cout << "freq_pattern = " << freq_pattern << ", freq_fingerprint = " << freq_fingerprint << endl;
+            }
         }
-        if (child_interval[1] > current_max) {
-          current_max = child_interval[1];
-        }
-      }
-      current_interval.push_back(current_min);
-      current_interval.push_back(current_max);
-      current->SA_interval = current_interval;
     }
 
-    // Calculate the sum of the num_of_freq
-    int range_left = current->SA_interval[0], range_right = current->SA_interval[1];
-    if(range_right - range_left + 1 >= freq_threshold) {
-        current_path = current->path;
-        parent_node = current_path[current_path.size() - 2];
-        int parent_str_depth = parent_node->str_depth_of_N, cur_str_depth = current->str_depth_of_N;
-        num_of_freq = num_of_freq + (cur_str_depth - parent_str_depth);
-        // cout << "Now add " << cur_str_depth - parent_str_depth << " to num_of_freq, num_of_freq = " << num_of_freq << endl;
-    }
-  }
+    cout << "the hashing calling times are " << tmp << endl;
+    // cout << "current size of freq_set = " << freq_set.size() << endl;
 
-  return rev_bottomup_ordered_nodes;
+    return rev_bottomup_ordered_nodes;
 }
 
 int main(int argv, char** argc) {
 
-   if(argv < 4) {
-      cout << "Usage: ./main [text_file] [freq_threshold] [number of letter substitions]" << endl;
+    if(argv < 4) {
+      cout << "Usage: ./main [text_file] [freq_threshold] [number of letter substitions] [first_str_file]" << endl;
       return 1;
     }
     // Input text file
     ifstream is_text;
-    string text_file = argc[1];
+    string text_file = argc[1], str_file = argc[4];
 
      // Input frequency threshold (tau)
-    int freq_threshold = stoi(argc[2]); 
+    INT freq_threshold = stoi(argc[2]); 
     // Input the number of positions about letter replacements in S
-    int k = stoi(argc[3]); 
+    INT k = stoi(argc[3]); 
 
-    string output_file = "output/" + text_file + "_" + to_string(freq_threshold) + "_" + to_string(k);
-
-    string text_file_path = "data/" + text_file;
+    // Start to read the multi-str file
+    // string output_file = "output/" + text_file + "_" + to_string(freq_threshold) + "_" + to_string(k);
+    // string text_file_path = "data/" + text_file;
+    // string first_str_file = "data/" + str_file;
+    string text_file_path = text_file;
+    string first_str_file = str_file;
+    cout << "text_file_path is " << text_file_path << endl;
+    cout << "first_str_file is " << first_str_file << endl;
+    cout << "tau = " << freq_threshold << ", k = " << k << endl;
     is_text.open (text_file_path, ios::in | ios::binary);
-    
-    ifstream in_file(text_file_path, ios::binary);
-    in_file.seekg(0, ios::end);
-    // INT text_file_size = in_file.tellg();
-    int32_t text_file_size = in_file.tellg();
 
-    
-    unsigned char * text_string = ( unsigned char * ) malloc (  ( text_file_size+4 ) * sizeof ( unsigned char ) );
+    unordered_set<uint64_t> freq_set;
+    unordered_set<uint64_t> common_freq_set;
+    unordered_set<uint64_t> resi_set;
+    karp_rabin_hashing::init();
+
+    INT str_num = 0;
     char chr = 0;
-    // INT text_size = 0;
-    int32_t text_size = 0;
-    
-    string runtime_detail_csv = "runtime_details.csv";
-    ofstream output_stream;
-    output_stream.open(runtime_detail_csv, ios::app);
-    output_stream << "text_file,tau,k,read_txt,create_ST,create_SA,create_intervals,is_periodic_preprocess,find_cut,total\n";
-    // output_stream << "text_file,tau,k,total_runtime\n";
-    output_stream << text_file << "," << to_string(freq_threshold) << "," << to_string(k) << ",";
-    output_stream.close();
+    INT text_size = 0, max_alloc_seq_len = 0, ALLOC_SIZE = 180224;    //180224
+    unsigned char * text_string = ( unsigned char * ) malloc (  ( ALLOC_SIZE ) * sizeof ( unsigned char ) );
+    max_alloc_seq_len += ALLOC_SIZE;
 
-    // At the beginning and end of S, add two $ to ensure the all_run runs successfully!
-    auto start = chrono::high_resolution_clock::now();
-    text_string[0] = '\1';
-    // cout << "text_file_size is " << text_file_size << ", start reading! " << endl;
-    // for (INT i = 1; i <= text_file_size; i++) {	
-    for (int32_t i = 1; i <= text_file_size; i++) {	
-      is_text.read(reinterpret_cast<char*>(&chr), 1);
-      text_string[i] = chr;
-      // cout << "i=" << i << "," << chr << "(" << text_size << "),dec_value=" << (unsigned int)chr << "; ";
-      text_size++;
-    }
-    is_text.close();
-    // cout << endl;
+    double common_time = 0, inter_time = 0, final_time = 0;
     
-    text_string[ text_size+1] = '\1';
-    text_string[ text_size+2] = '\0';	// Change '~' to '!' to make the symbol's ascii is smaller than the chars in txt
-    text_size = text_size + 2;  // Do not include the final \0
-    cout << "Finish reading the text file!" << endl;
-    // cout << "CHECK! The text_size = " << text_size << endl;
-    // for(int i = 0; i < text_size; i++) {
-    //   cout << "char:" << (unsigned int)text_string[i] << endl;
+
+    // INT startPos = -1, N_count = 0;
+    // vector<pair<int,int>> N_group;
+    // unordered_set<char> alphabet;
+
+    // Read line by line. When get one line, find the frequent substrings and record in freq_map.
+    while (is_text.read(reinterpret_cast<char*>(&chr), 1)) {
+        // cout << "read chr = " << chr << endl;
+		// if( text_size != 0 && chr == '\n' ) {
+		if(chr == '\n') {
+            str_num ++;
+            cout << "Read one line successfully! text_size = " << text_size << endl;
+            
+
+            // if (N_count > 0) {
+            //     N_group.push_back({startPos, N_count});
+            // }
+
+            // cout << "The alphabet is " << endl;
+            // for (const auto &record : alphabet) {
+            //     cout << record << " ";
+            // }
+            // cout << endl;
+
+            // cout << "The N groups in the "<< str_num << " line is " << endl;
+            // for(const auto &item : N_group) {
+            //     cout << "start pos: " << item.first << ", count: " << item.second << endl;
+            // }
+
+            // N_group.clear();
+            // N_count = 0;
+            // startPos = -1;
+
+
+            text_string[text_size] = '\1';
+			text_string[text_size+1] = '\0';
+            // text_string = ( unsigned char * ) realloc (text_string, ( text_size + 2 ) * sizeof ( unsigned char ) );
+            // string str(reinterpret_cast<char*>(text_string), text_size+2);
+            // cout << "current str is " << str << endl;
+
+
+            auto start = chrono::high_resolution_clock::now();
+
+			STvertex *r = Create_suffix_tree( text_string , text_size+1 );
+            cout << "Create ST successfully! The number of leaves is " << liscie << endl;
+
+            INT *suffix_array =(INT*) malloc(sizeof(INT) * text_size);
+            build_suffix_array(suffix_array, text_size, r);
+            cout << "Construct SA successfully!" << endl;
+
+            INT *inv_suffix_array =(INT*) malloc(sizeof(INT) * text_size);
+            for(INT i=0; i<text_size; i++) {
+                inv_suffix_array[suffix_array[i]] = i;
+            }
+
+            vector<STvertex*> rev_bottomup_ordered_nodes = bottom_up_SA_interval(r, suffix_array, inv_suffix_array, text_string, text_size, freq_threshold, freq_set);
+            cout << "Construct SA interval for each node in ST successfully. Preprocessing end!" << endl;
+            
+            // free all the arraies and ST
+            free(text_string);
+            free(suffix_array); 
+            text_string = nullptr;
+            suffix_array = nullptr;
+            for (auto it = rev_bottomup_ordered_nodes.rbegin(); it != rev_bottomup_ordered_nodes.rend(); ++it) {
+                delete *it;
+            }
+
+            auto end = chrono::high_resolution_clock::now();
+            chrono::duration<double> elapsed = end - start;
+            common_time = common_time + elapsed.count();
+
+            // cout << "Delete the ST" << endl;
+            // STDelete(r);
+            // cout << "Delete the ST again" << endl;
+            
+            start = chrono::high_resolution_clock::now();
+            if (str_num == 1) {
+                common_freq_set = freq_set;
+            }
+            else {
+                unordered_set<uint64_t> intersection_set;
+                for (const auto& elem : common_freq_set) {
+                    if (freq_set.find(elem) != freq_set.end()) {
+                        intersection_set.insert(elem);
+                    }
+                }
+                common_freq_set = intersection_set;
+            }
+            end = chrono::high_resolution_clock::now();
+            elapsed = end - start;
+            inter_time = inter_time + elapsed.count();
+
+            cout << "****** Line " << str_num << " end! The size of common_freq_set is " << common_freq_set.size() << " ******" << endl;
+
+            freq_set.clear();
+
+            // cout << "Intialize the text_string again" << endl;
+
+			text_size = 0;
+            max_alloc_seq_len = 0;
+            text_string = ( unsigned char * ) malloc (  ( ALLOC_SIZE ) * sizeof ( unsigned char ) );
+            max_alloc_seq_len += ALLOC_SIZE;
+            
+            // cout << "Finish intializing the text_string" << endl;
+
+            
+		}
+		else {
+            // alphabet.insert(chr);
+            // cout << "Continue to read this line, text_size = " << text_size << ", max_alloc_seq_len = " << max_alloc_seq_len << endl;
+            if ( text_size >= max_alloc_seq_len ) {
+				text_string = ( unsigned char * ) realloc (text_string, ( max_alloc_seq_len + ALLOC_SIZE ) * sizeof ( unsigned char ) );
+				max_alloc_seq_len += ALLOC_SIZE;
+			}
+
+            // if (chr == 'N') {
+            //     if (startPos == -1) {
+            //         startPos = text_size;
+            //     }
+            //     N_count++;
+            // }
+            // else {
+            //     if (N_count > 0) {
+            //         N_group.push_back({startPos, N_count});
+            //         N_count = 0;
+            //         startPos = -1;
+            //     }
+            // }
+            if(text_size > 0 && chr == 'N' && text_string[text_size - 1] == 'N') {
+                continue;
+            }
+			text_string[text_size] = chr;
+            text_size++;
+		}
+	}
+    free(text_string);
+    text_string = nullptr;
+	is_text.close();
+    
+    // cout << "After building the common_freq_set, str_num = " << str_num << endl;
+    // cout << "********The size of common_freq_set = " << common_freq_set.size() << "*******" << endl;
+
+
+    // Run the first str in MAIN algorithm
+    string command_str = "./main " + str_file + " " + to_string(freq_threshold) + " " + to_string(k);
+    cout << "////// Execute MAIN algorithm: " << command_str << " //////" << endl;
+    const char* command = command_str.c_str();
+    system(command);
+
+
+    cout << "////// Finish executing MAIN algorithm to find resilient //////" << endl; 
+
+    
+    // Read the first string again to set text_string
+    text_size = 0;
+    max_alloc_seq_len = 0;
+    unsigned char * txt_string = ( unsigned char * ) malloc (  ( ALLOC_SIZE ) * sizeof ( unsigned char ) );
+    max_alloc_seq_len += ALLOC_SIZE;
+    is_text.open (first_str_file, ios::in | ios::binary);
+    while (is_text.read(reinterpret_cast<char*>(&chr), 1)) {
+		if(chr == '\n') {
+            cout << "Read one line successfully!" << endl;
+			txt_string[text_size] = '\0';
+            txt_string = ( unsigned char * ) realloc (txt_string, ( text_size + 1 ) * sizeof ( unsigned char ) );
+
+            // string str(reinterpret_cast<char*>(txt_string), text_size+1);
+            // cout << "current str is " << str << endl;
+		}
+        else {
+            if ( text_size >= max_alloc_seq_len ) {
+				txt_string = ( unsigned char * ) realloc (txt_string, ( max_alloc_seq_len + ALLOC_SIZE ) * sizeof ( unsigned char ) );
+				max_alloc_seq_len += ALLOC_SIZE;
+			}
+
+            if(text_size > 0 && chr == 'N' && txt_string[text_size - 1] == 'N') {
+                continue;
+            }
+            txt_string[text_size] = chr;
+            text_size++;
+        }
+	} 
+	is_text.close();
+
+    // Read the OUTPUT file and get the resilient substrings. Store them in resi_set (Y)
+    // cout << "Start to read the MAIN OUTPUT!" << endl;
+    ifstream file("main_output");
+    string line;
+    INT index = 0;
+
+    if (file.is_open()) {
+        while (getline(file, line)) {
+            int current_len = stoi(line);
+            // cout << "current_len = " << current_len << ", index = " << index << endl;
+            // string str(reinterpret_cast<char*>(txt_string + index), current_len);
+            uint64_t str = karp_rabin_hashing::hash_string(txt_string + index, current_len);
+            resi_set.insert(str);
+            index ++;
+        }
+        file.close();
+    }
+    free(txt_string);
+
+    // cout << "The common_freq_set is " << endl;
+    // for(const auto &item : common_freq_set) {
+    //     cout << item << " ";
     // }
-    // auto end = chrono::high_resolution_clock::now();
-    // chrono::duration<double> elapsed = end - start;
-    // output_stream.open(runtime_detail_csv, ios::app);
-    // output_stream << elapsed.count() << ",";
-    // output_stream.close();
+    // cout << endl;
 
-    // auto whole_start = chrono::high_resolution_clock::now();
-    
-    // Pre-processing begin
-    // start = chrono::high_resolution_clock::now();
-    STvertex *r = Create_suffix_tree( text_string , text_size+1 );
-    cout << "Create ST successfully! The number of leaves is " << liscie << endl;
-    // end = chrono::high_resolution_clock::now();
-    // elapsed = end - start;
-    // output_stream.open(runtime_detail_csv, ios::app);
-    // output_stream << elapsed.count() << ",";
-    // output_stream.close();
+    // cout << "The resi_set is " << endl;
+    // for(const auto &item : resi_set) {
+    //     cout << item << " ";
+    // }
+    // cout << endl;
 
-    // start = chrono::high_resolution_clock::now();
-    int *suffix_array =(int*) malloc(sizeof(int) * text_size);
-    build_suffix_array(suffix_array, text_size, r);
-    cout << "Construct SA successfully!" << endl;
-    // end = chrono::high_resolution_clock::now();
-    // elapsed = end - start;
-    // output_stream.open(runtime_detail_csv, ios::app);
-    // output_stream << elapsed.count() << ",";
-    // output_stream.close();
-    
-    // cout<<"Suffix Array for String ";
-    // for(int i=0; i<text_size; i++)
-    //     cout<<txt[i];
-   	// cout<<" is: ";
-    // for(int i=0; i<text_size; i++)
-    //     cout<<suffix_array[i]<<" ";
-    // cout<<endl;
-
-    int *inv_suffix_array =(int*) malloc(sizeof(int) * text_size);
-    for(int i=0; i<text_size; i++) {
-      inv_suffix_array[suffix_array[i]] = i;
+    auto start = chrono::high_resolution_clock::now();
+    // Get the intersection of X and Y
+    unordered_set<uint64_t> intersectionSet;
+    for (const auto & elem : resi_set) {
+        if (common_freq_set.find(elem) != common_freq_set.end()) {
+            intersectionSet.insert(elem);
+        }
     }
+    auto end = chrono::high_resolution_clock::now();
+    chrono::duration<double> elapsed = end - start;
+    final_time = elapsed.count();
 
-    // interval_map: key is each node in ST, value is <l,r>, where [l,r] is corresponding SA interval of this node
-    // start = chrono::high_resolution_clock::now();
-    vector<STvertex*> rev_bottomup_ordered_nodes = bottom_up_SA_interval(root, suffix_array, inv_suffix_array, text_size, freq_threshold);
-    cout << "Construct SA interval for each node in ST successfully. Preprocessing end!" << endl;
-    // end = chrono::high_resolution_clock::now();
-    // elapsed = end - start;
-    // output_stream.open(runtime_detail_csv, ios::app);
-    // output_stream << elapsed.count() << ",";
-    // output_stream.close();
-    free(inv_suffix_array);
-    // Pre-processing end
 
-    // Clear suffix array, suffix tree and interval tree
-    free(suffix_array);
-    STDelete(r);
-    //   runs.clear();
+    INT common_freq_size = common_freq_set.size();
+    INT inter_size = intersectionSet.size();
+    cout << "common_freq_size (X) = " << common_freq_size << ", inter_size (X inter Y) = " << inter_size << ", ratio = " << double(inter_size) / double(common_freq_size) << endl;
+    cout << "common_time = " << common_time << ", inter_time = " << inter_time << ", final_time = " << final_time << endl;
 
-  
-  // output_stream.open(output_file);
-//   output_stream.open("main_output");
-//   if(!output_stream.is_open()) {
-//         cout << "Couldn't open output file\n" << endl; 
-//   }
-//   // cout << "The OUTPUT with size " << text_size - 2 << " is ";
-//   for(int i = 1; i < text_size - 2; i++) {  // Exclude the first and last special char
-//     // cout << OUTPUT[i] << " ";
-//     output_stream << OUTPUT[i] << "\n";
-//   }
-//   // cout << endl;
-//   output_stream.close();
-//   free(OUTPUT);
-
-//   if(freq_threshold == 2) num_of_freq--;    // Remove the case of two \1 at the beginning and end of string S
-//   cout << "The num_of_freq = " << num_of_freq << ", num_of_resi = " << num_of_resi << ", num_of_resi / num_of_freq = " << (double) num_of_resi / (double) num_of_freq << ", num_of_freq - num_of_resi = " << num_of_freq - num_of_resi << endl;
-
-  cout << "Finish!\n" << endl;
-
-  // cout << "\nThe count of is_periodic_yes = " << is_periodic_yes << ", count of is_periodic_no = " << is_periodic_no << endl;
-
+    cout << "Finish Case Study!\n" << endl;
 
   return 0;
 }

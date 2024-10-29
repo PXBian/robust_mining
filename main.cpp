@@ -22,12 +22,12 @@ using namespace Intervals;
 
 // using namespace PrioritySearchTree;
 
-// int is_periodic_yes = 0, is_periodic_no = 0;
-int num_of_freq = 0, num_of_resi = 0;
+// INT is_periodic_yes = 0, is_periodic_no = 0;
+INT num_of_freq = 0, num_of_resi = 0;
 
 
-void build_suffix_array(int* suffixArray, int txt_size, STvertex *r){
-    for(int i=0; i< txt_size; i++)
+void build_suffix_array(INT* suffixArray, INT txt_size, STvertex *r){
+    for(INT i=0; i< txt_size; i++)
         suffixArray[i] = -1;
     
 	// Iterative DFS traverse to build the Suffix Array by using stack
@@ -36,7 +36,7 @@ void build_suffix_array(int* suffixArray, int txt_size, STvertex *r){
 	stack<STvertex*> traverse_stack;
 	traverse_stack.push(current_node);
 
-	int idx = 0;
+	INT idx = 0;
 	while(!traverse_stack.empty()) {
 		current_node = traverse_stack.top();
 		traverse_stack.pop();
@@ -48,7 +48,7 @@ void build_suffix_array(int* suffixArray, int txt_size, STvertex *r){
 			suffixArray[idx] = current_node->numer;
 			idx ++;
 		}
-		else if(current_node->numer == -1) {		// current_node is a internal node
+		else if(current_node->numer == -1) {		// current_node is a INTernal node
 			for (auto const &child : children_map) {
 				child_node = child.second.v;
 				traverse_stack.push(child_node);
@@ -58,7 +58,7 @@ void build_suffix_array(int* suffixArray, int txt_size, STvertex *r){
 }
 
 
-vector<STvertex*> bottom_up_SA_interval(STvertex* &r, int* &suffix_array, int* &inv_suffix_array, int txt_size, int freq_threshold) {
+vector<STvertex*> bottom_up_SA_interval(STvertex* &r, INT* &suffix_array, INT* &inv_suffix_array, INT txt_size, INT freq_threshold) {
 	cout << "The sizeof suffix array is " << txt_size << endl;
 
 	// Stack for traversing the tree
@@ -66,17 +66,16 @@ vector<STvertex*> bottom_up_SA_interval(STvertex* &r, int* &suffix_array, int* &
   // Stack to store the post-order traversal (in reverse order)
   stack<STvertex*> bottom_up_stack;
 	STvertex* current = r;
-  vector<STvertex*> current_path;
-  vector<STvertex*> child_path;
   STvertex* child_node;
   STvertex* parent_node;
   vector<STvertex*> rev_bottomup_ordered_nodes;
-  map<unsigned char,STedge,greater<unsigned char>> children_map;
+  // map<unsigned char,STedge,greater<unsigned char>> children_map;
 
   // Start with the root node
   DFS_stack.push(current);
-  current_path.push_back(current);
-  current->path = current_path;
+  // current_path.push_back(current);
+  // current->parent = new STvertex;
+  // current->parent->numer = -100;
   current->str_depth_of_N = 0;
   // Traverse the tree using DFS & bottom-up
   cout << "Start DFS traverse!" << endl;
@@ -85,52 +84,41 @@ vector<STvertex*> bottom_up_SA_interval(STvertex* &r, int* &suffix_array, int* &
     current = DFS_stack.top();
     DFS_stack.pop();
     current->flag = false;
-    int current_num = current->numer;
-    // vector<STvertex*> current_path = current->path;
-    current_path = current->path;
-    int current_str_depth = current->str_depth_of_N;
-	  children_map = current->g;
+    INT current_num = current->numer;
+    INT current_str_depth = current->str_depth_of_N;
+	  // children_map = current->g;
     
 	  bool is_root = current == r;
 
 	  // cout << "In the DFS traverse, the current.numer is " << current->numer << ", it is root " << is_root << endl;
 
-    vector<int> current_interval;
+    pair<INT,INT> current_interval = {-10,-10};
 	  if(current_num > -1 && current_num < txt_size) {	// current is a leaf
       // getting index to SA from invSA
-      int current_idx = inv_suffix_array[current_num];
+      INT current_idx = inv_suffix_array[current_num];
       // Initialize the interval of the current node (leaf)
-      
-      current_interval.push_back(current_idx);
-      current_interval.push_back(current_idx);
+
+      current_interval = {current_idx,current_idx};
     }
     current->SA_interval = current_interval;
 
 	  // Push all the children to the traversal stack (in the order they appear)
-	  for (auto const &child : children_map) {
+	  for (auto const &child : current->g) {
       child_node = child.second.v;
       DFS_stack.push(child_node);
-      int child_edge_length = child.second.r - child.second.l + 1;
-      // // Print the current child's info on edge
-      // Print_edge(child.second, text_string);
-      int child_str_depth = current_str_depth + child_edge_length;
-      // cout << "The numer of child_node is" << child_node->numer << ", the child_edge_length is " << child_edge_length << ", the child_str_depth is " << child_str_depth << endl; 
-      child_path = current_path;
-      child_path.push_back(child_node);
-      // cout << "After push the child_node to the path, the child_path is " << endl;
-      // for (const auto &node : child_path) {
-      //   cout << node->numer << " ";
-      // }
-      // cout << endl;
-      child_node->path = child_path;
+      INT child_edge_length = child.second.r - child.second.l + 1;
+
+      INT child_str_depth = current_str_depth + child_edge_length;
       child_node->str_depth_of_N = child_str_depth;
+      // cout << "The numer of child_node is" << child_node->numer << ", the child_edge_length is " << child_edge_length << ", the child_str_depth is " << child_str_depth << endl; 
+      child_node->parent = current;
     }
 
     // Push the current node to the result stack: Don't push the root, as well as the special char $
     if (!is_root && current_num < txt_size) {
       // bottom_up_stack.push(current);
       rev_bottomup_ordered_nodes.push_back(current);
-      // cout << "Now push the " << current->numer << " into the result_stack!" << endl;
+      // cout << "Now push the " << current->numer << " INTo the result_stack!" << endl;
     }
 
   }
@@ -140,55 +128,53 @@ vector<STvertex*> bottom_up_SA_interval(STvertex* &r, int* &suffix_array, int* &
   // Now, the nodes are in reverse post-order, so we need to process them in the correct order
   for (auto it = rev_bottomup_ordered_nodes.rbegin(); it != rev_bottomup_ordered_nodes.rend(); ++it) {
     current = *it;
+    bool is_root = current == r;
 
     // After the DFS traverse, only leaves have SA_interval
-    if(current->SA_interval.size() == 0) {
-      children_map = current->g;
-      vector<int> current_interval;
-      int current_min = numeric_limits<int>::max(), current_max = numeric_limits<int>::min();
-      for (auto const &child : children_map) {
-        vector<int> child_interval = child.second.v->SA_interval;
-        if (child_interval[0] < current_min) {
-          current_min = child_interval[0];
+    if (current->SA_interval.first == -10 && current->SA_interval.second == -10) {
+      // children_map = current->g;
+      // vector<INT> current_interval;
+      INT current_min = numeric_limits<INT>::max(), current_max = numeric_limits<INT>::min();
+      for (auto const &child : current->g) {
+        if (child.second.v->SA_interval.first < current_min) {
+          current_min = child.second.v->SA_interval.first;
         }
-        if (child_interval[1] > current_max) {
-          current_max = child_interval[1];
+        if (child.second.v->SA_interval.second > current_max) {
+          current_max = child.second.v->SA_interval.second;
         }
       }
-      current_interval.push_back(current_min);
-      current_interval.push_back(current_max);
-      current->SA_interval = current_interval;
+      current->SA_interval = {current_min,current_max};
     }
 
     // Calculate the sum of the num_of_freq
-    int range_left = current->SA_interval[0], range_right = current->SA_interval[1];
-    if(range_right - range_left + 1 >= freq_threshold) {
-        current_path = current->path;
-        parent_node = current_path[current_path.size() - 2];
-        int parent_str_depth = parent_node->str_depth_of_N, cur_str_depth = current->str_depth_of_N;
-        num_of_freq = num_of_freq + (cur_str_depth - parent_str_depth);
-        // cout << "Now add " << cur_str_depth - parent_str_depth << " to num_of_freq, num_of_freq = " << num_of_freq << endl;
+    INT range_left = current->SA_interval.first, range_right = current->SA_interval.second;
+    if(range_right - range_left + 1 >= freq_threshold && !is_root) {
+      // current_path = current->path;
+      parent_node = current->parent;
+      INT parent_str_depth = parent_node->str_depth_of_N, cur_str_depth = current->str_depth_of_N;
+      num_of_freq = num_of_freq + (cur_str_depth - parent_str_depth);
+      // cout << "Now add " << cur_str_depth - parent_str_depth << " to num_of_freq, num_of_freq = " << num_of_freq << endl;
     }
   }
 
   return rev_bottomup_ordered_nodes;
 }
 
-IntervalTree<int> is_periodic_preprocessing(unsigned char* text_string, int text_size) {
-    // const int MAX_POINTS_DISPLAY = 20;
-    // cout << "Go into the is_periodic_preprocessing function!" << endl;
+IntervalTree<INT> is_periodic_preprocessing(unsigned char* text_string, INT text_size) {
+    // const INT MAX_POINTS_DISPLAY = 20;
+    // cout << "Go INTo the is_periodic_preprocessing function!" << endl;
 
     // Get all runs of S
-    // string S(reinterpret_cast<const char*>(text_string), strlen(reinterpret_cast<const char*>(text_string)) - 1);
+    // string S(reINTerpret_cast<const char*>(text_string), strlen(reINTerpret_cast<const char*>(text_string)) - 1);
     // auto const R = linear_time_runs::compute_all_runs(S.data(), S.size());
     auto const R = linear_time_runs::compute_all_runs(text_string, text_size);
-    int points_num = R.size();
-    // cout << "\nString S contains " << points_num << " runs:" << endl;
+    INT poINTs_num = R.size();
+    // cout << "\nString S contains " << poINTs_num << " runs:" << endl;
 
     // Create an interval tree
-    IntervalTree<int> tree;  
+    IntervalTree<INT> tree;  
     for (auto run : R) {
-      Interval<int> cur = {run.start, run.end};
+      Interval<INT> cur = {run.start, run.end};
       cur.per = run.period;
       tree.insert(cur);
       // cout << "start=" << run.start
@@ -203,16 +189,16 @@ IntervalTree<int> is_periodic_preprocessing(unsigned char* text_string, int text
 }
 
 
-bool is_periodic(int I, int J, IntervalTree<int>& interval_tree, int &p) {
-    Interval<int> wantedInterval(I, J);
+bool is_periodic(INT I, INT J, IntervalTree<INT>& interval_tree, INT &p) {
+    Interval<INT> wantedInterval(I, J);
     const auto &outerIntervals = interval_tree.findOuterIntervals(wantedInterval);
 
     bool check_length = false;
-    int tmp_p = J - I + 1;
-    // Print all intervals
+    INT tmp_p = J - I + 1;
+    // PrINT all intervals
     // cout << "Outer intervals for " << wantedInterval << ":" << endl;
     for (const auto &interval : outerIntervals) {
-        int per = interval.per;
+        INT per = interval.per;
         // cout << interval << ", per = " << per << endl;
         tmp_p = min(tmp_p, per);
     }
@@ -227,13 +213,13 @@ bool is_periodic(int I, int J, IntervalTree<int>& interval_tree, int &p) {
 }
 
 
-int greedy(vector<int>& O, int t, int lamda) {
+INT greedy(vector<INT>& O, INT t, INT lamda) {
   // cout << "**********Into the Greedy function!**********" << endl;
   // if (t==1)
   //   return 1;
-  int k_prime_prime = 0, O_size = O.size();
+  INT k_prime_prime = 0, O_size = O.size();
   // cout << "O_size = " << O_size << ", lamda = " << lamda << ", t = " << t << endl;
-  for (int ell = 0; ell < O_size; ell++) {
+  for (INT ell = 0; ell < O_size; ell++) {
     // cout << "The current ell = " << ell << endl;
     if (ell <= O_size - 2 && O[ell + 1] - O[ell] <= lamda - 1 && k_prime_prime < t) {
       // cout << "Kill a pair! O[ell + 1] = " << O[ell + 1] << ", O[ell] = " << O[ell] << endl;
@@ -241,7 +227,7 @@ int greedy(vector<int>& O, int t, int lamda) {
       ell ++;
     }
   }
-  int k_prime = t - k_prime_prime;
+  INT k_prime = t - k_prime_prime;
   // cout << "k_prime = " << k_prime << ", k_prime_prime = " << k_prime_prime << ", return value is " << k_prime + 2 * k_prime_prime << endl;
   // cout << "************Greedy function end*************" << endl;
   
@@ -249,8 +235,8 @@ int greedy(vector<int>& O, int t, int lamda) {
 }
 
 
-bool aperiodic_survive(STvertex* root, int* &suffix_array, int freq_threshold, int k, int l, int r, int I, int J) {
-  int Occ = r - l + 1;
+bool aperiodic_survive(STvertex* root, INT* &suffix_array, INT freq_threshold, INT k, INT l, INT r, INT I, INT J) {
+  INT Occ = r - l + 1;
   // cout << "****************Into the aperiodic_survive function.**************" << endl;
   // cout << "The Occ is " << Occ << ", freq_threshold is " << freq_threshold << ", k is " << k << endl;
   if (Occ >= freq_threshold + 2 * k) {
@@ -262,8 +248,8 @@ bool aperiodic_survive(STvertex* root, int* &suffix_array, int freq_threshold, i
     return false;
   }
   else {
-    vector<int> O;
-    for (int i = l; i <= r; i++) {
+    vector<INT> O;
+    for (INT i = l; i <= r; i++) {
       O.push_back(suffix_array[i]);
     }
     sort(O.begin(), O.end());
@@ -285,23 +271,23 @@ bool aperiodic_survive(STvertex* root, int* &suffix_array, int freq_threshold, i
 }
 
 
-vector<vector<int>> create_clusters(int* &suffix_array, int l, int r, int p, int max_H_size) {
-  vector<int> O;
-  for (int i = l; i <= r; i++) {
+vector<vector<INT>> create_clusters(INT* &suffix_array, INT l, INT r, INT p, INT max_H_size) {
+  vector<INT> O;
+  for (INT i = l; i <= r; i++) {
       O.push_back(suffix_array[i]);
   }
   sort(O.begin(), O.end());
-  int O_size = O.size();
+  INT O_size = O.size();
   // cout << "The size of O set is " << O_size << endl;
   // for (auto const &item : O) {
   //   cout << item << " ";
   // }
   // cout << endl;
 
-  vector<vector<int>> H;
-  vector<int> current_cluster;
+  vector<vector<INT>> H;
+  vector<INT> current_cluster;
   current_cluster.push_back(O[0]);
-  for(int i = 1; i < O_size; i++) {
+  for(INT i = 1; i < O_size; i++) {
     // cout << "Current O[i] is " << O[i] << ", O[i - 1] is " << O[i - 1] << endl;
     if (O[i] - O[i - 1] != p) {
       H.push_back(current_cluster);
@@ -318,22 +304,22 @@ vector<vector<int>> create_clusters(int* &suffix_array, int l, int r, int p, int
   return H;
 }
 
-int ceilDivision(int a, int b) {
+INT ceilDivision(INT a, INT b) {
     return (a + b - 1) / b;
 }
 
 
-bool periodic_survive(int l, int r, int I, int J, int freq_threshold, int k, vector<vector<int>>& H, int p) {
+bool periodic_survive(INT l, INT r, INT I, INT J, INT freq_threshold, INT k, vector<vector<INT>>& H, INT p) {
   // cout << "****************Into the periodic_survive function.**************" << endl;
-  int Occ = r - l + 1;
-  // int alpha = (J - I + 1) / p;
-  int alpha = ceilDivision(J - I + 1, p);
+  INT Occ = r - l + 1;
+  // INT alpha = (J - I + 1) / p;
+  INT alpha = ceilDivision(J - I + 1, p);
   // cout << "Occ = " << Occ << ", J - I + 1 = " << J - I + 1 << ", alpha = " << alpha << ", p = " << p << endl;
 
-  vector<vector<int>> cal_C;
+  vector<vector<INT>> cal_C;
   for (auto const &C : H) {
-    int C_size = C.size();
-    int mod_num = C_size % alpha;
+    INT C_size = C.size();
+    INT mod_num = C_size % alpha;
     // cout << "C_size = " << C_size << ", mod_num = " << mod_num << endl;
     if (mod_num == 1 || mod_num == 2) {
       cal_C.push_back(C);
@@ -347,28 +333,28 @@ bool periodic_survive(int l, int r, int I, int J, int freq_threshold, int k, vec
   //   cout << endl;
   // }
 
-  int cal_C_size = cal_C.size();
+  INT cal_C_size = cal_C.size();
   // cout << "cal_C_size = " << cal_C_size << endl;
-  vector<int> OV;
+  vector<INT> OV;
   OV.push_back(0);
-  for (int i = 1; i < cal_C_size; i++) {
+  for (INT i = 1; i < cal_C_size; i++) {
     // cout << "i = " << i << ", cal_C[i - 1].size() - 1 = " << cal_C[i - 1].size() - 1<< ", cal_C[i - 1][cal_C[i - 1].size() - 1] = " << cal_C[i - 1][cal_C[i - 1].size() - 1] << ", cal_C[i][0] = " << cal_C[i][0] << endl;
     // OV[i] = max(cal_C[i - 1][cal_C[i - 1].size() - 1] + J - I + 1 - cal_C[i][0], 0);
-    OV.push_back(max(cal_C[i - 1][cal_C[i - 1].size() - 1] + J - I + 1 - cal_C[i][0], 0));
+    OV.push_back(max(cal_C[i - 1][cal_C[i - 1].size() - 1] + J - I + 1 - cal_C[i][0], (INT) 0));
   }
   // cout << "Now check the value of OV: " << endl;
-  // for (int i = 0; i < OV.size(); i++) {
+  // for (INT i = 0; i < OV.size(); i++) {
   //   cout << OV[i] << " ";
   // }
   // cout << endl;
 
-  vector<int> cal_C_prime;
-  int curr = 0, i = 0; 
-  priority_queue<int> cal_D;
+  vector<INT> cal_C_prime;
+  INT curr = 0, i = 0; 
+  priority_queue<INT> cal_D;
   // cout << "**********Start to check |C| mod alpha!**********" << endl;
   for (auto const &C : H) {
-    int C_size = C.size();
-    int mod_num = C_size % alpha;
+    INT C_size = C.size();
+    INT mod_num = C_size % alpha;
     // cout << "C_size = " << C_size << ", mod_num = " << mod_num << ", curr = " << curr << ", i = " << i << endl;
     if(mod_num == 0) {
       // cout << "Push to cal_D with mode = 0" << endl;
@@ -382,16 +368,16 @@ bool periodic_survive(int l, int r, int I, int J, int freq_threshold, int k, vec
     }
     else if(mod_num == 1) {
       // cout << "Push to cal_D with mode = 1" << endl;
-      int OV_value = OV[i];
+      INT OV_value = OV[i];
       cal_D.push(C_size - 1);
       cal_C_prime.push_back(curr - OV_value);
       curr = curr - OV_value + J - I + 1;
       i++;
     }
     else if(mod_num == 2) {
-      // cout << "Go into the case with mode = 2" << endl;
+      // cout << "Go INTo the case with mode = 2" << endl;
       // cout << "Push to cal_D with mode = 2" << endl;
-      int OV_value = OV[i];
+      INT OV_value = OV[i];
       cal_D.push(C_size - 2);
       cal_C_prime.push_back(curr - OV_value);
       cal_C_prime.push_back(curr - OV_value + p);
@@ -406,7 +392,7 @@ bool periodic_survive(int l, int r, int I, int J, int freq_threshold, int k, vec
   // }
   // cout << endl;
 
-  int t = k, K = 0;
+  INT t = k, K = 0;
   while (!cal_D.empty() && t >= ceilDivision(cal_D.top(), alpha)) {
     // cout << "cal_D.top() = " << cal_D.top() << ", (cal_D.top() + alpha - 1) / alpha = " << (cal_D.top() + alpha - 1) / alpha << ", t = " << t << endl;
     K = K + cal_D.top();
@@ -418,7 +404,7 @@ bool periodic_survive(int l, int r, int I, int J, int freq_threshold, int k, vec
     K = K + greedy(cal_C_prime, t, J - I + 1);
   }
   if(!cal_D.empty() && t < cal_D.top() / alpha) {
-    // cout << "Go into the t * alpha case!" << endl;
+    // cout << "Go INTo the t * alpha case!" << endl;
     K = K + t * alpha;
   }
 
@@ -431,22 +417,23 @@ bool periodic_survive(int l, int r, int I, int J, int freq_threshold, int k, vec
 }
 
 
-bool check_freq_periodic_survive(bool is_node_checking, bool &is_cut_point, STvertex* &r, STvertex* &current, int left, int right, int I, int J, int freq_threshold, int k, int* &suffix_array, IntervalTree<int>& interval_tree) {
+bool check_freq_periodic_survive(bool is_node_checking, bool &is_cut_point, STvertex* r, STvertex* current, INT left, INT right, INT I, INT J, INT freq_threshold, INT k, INT* suffix_array, IntervalTree<INT>& interval_tree) {
   // cout << "current node's left = " << left << ", right = " << right << ", I = " << I << ", J = " << J << endl;
   
   bool periodic_survive_value = false, aperiodic_survive_value = false;
-  vector<STvertex*> current_path;
-  vector<vector<int>> H;
+  // vector<STvertex*> current_path;
+  vector<vector<INT>> H;
+  
   if (right - left + 1 >= freq_threshold) {   // This is a \tau-frequent node
     // cout << "This node is frequent!" << endl;
-    int p = INT_MAX;
+    INT p = INT_MAX;
     bool is_periodic_value = is_periodic(I, J, interval_tree, p);  // Here p can store the return value from is_periodic when YES
     
     // cout << "The value of is_periodic is " << is_periodic_value << ", the p = " << p << endl;
     if (is_periodic_value) {
       // is_periodic_yes ++;   // Count the times of answering YES
       // First create the clusters H
-      int max_H_size = 2 * k + freq_threshold;
+      INT max_H_size = 2 * k + freq_threshold;
       H = create_clusters(suffix_array, left, right, p, max_H_size);
 
       // cout << "The clusters in the H are: " << endl;
@@ -458,7 +445,7 @@ bool check_freq_periodic_survive(bool is_node_checking, bool &is_cut_point, STve
       // }
 
       // Then call periodic_survive
-      // cout << "Before into the periodic_survive, the p = " << p << endl;
+      // cout << "Before INTo the periodic_survive, the p = " << p << endl;
       periodic_survive_value = periodic_survive(left, right, I, J, freq_threshold, k, H, p);
 
       // cout << "The value of periodic_survive is " << periodic_survive_value << endl;
@@ -466,10 +453,15 @@ bool check_freq_periodic_survive(bool is_node_checking, bool &is_cut_point, STve
         if (is_node_checking) {   // Propagate upforward the status of frequent and survive to all ancestors except root
           is_cut_point = true;
           current->flag = true;
-          current_path = current->path;
-          int current_path_length = current_path.size();
-          for (int i = 1; i < current_path_length; i++) {   // Do not include the root
-            current_path[i]->flag = true;
+          // current_path = current->path;
+          // INT current_path_length = current_path.size();
+          // for (INT i = 1; i < current_path_length; i++) {   // Do not include the root
+          //   current_path[i]->flag = true;
+          // }
+          STvertex *it = current;
+          while (it != r) {
+            it->parent->flag = true;
+            it = it->parent;
           }
         }
       }
@@ -484,10 +476,16 @@ bool check_freq_periodic_survive(bool is_node_checking, bool &is_cut_point, STve
         if (is_node_checking) {   // Propagate upforward the status of frequent and survive to all ancestors except root
           is_cut_point = true;
           current->flag = true;
-          current_path = current->path;
-          int current_path_length = current_path.size();
-          for (int i = 1; i < current_path_length; i++) {   // Do not include the root
-            current_path[i]->flag = true;
+        //   current_path = current->path;
+        //   INT current_path_length = current_path.size();
+        //   for (INT i = 1; i < current_path_length; i++) {   // Do not include the root
+        //     current_path[i]->flag = true;
+        //   }
+        // }
+          STvertex *it = current;
+          while (it != r) {
+            it->parent->flag = true;
+            it = it->parent;
           }
         }
       }
@@ -497,14 +495,14 @@ bool check_freq_periodic_survive(bool is_node_checking, bool &is_cut_point, STve
   return (aperiodic_survive_value || periodic_survive_value);
 }
 
-int binary_search_longest_substring (int low, int high, int I, int child_l, int child_r, int freq_threshold, int k, bool &is_cut_point, STvertex* &root, STvertex* &current, int* &suffix_array, IntervalTree<int>& interval_tree) {
+INT binary_search_longest_substring (INT low, INT high, INT I, INT child_l, INT child_r, INT freq_threshold, INT k, bool &is_cut_point, STvertex* &root, STvertex* &current, INT* &suffix_array, IntervalTree<INT>& interval_tree) {
   if (child_r - child_l + 1 < freq_threshold) {   // If the child node is not frequent, continue to the next child
     return low;
   }
 
-  int mid = 0, success_record = low;
+  INT mid = 0, success_record = low;
   while (low < high) {
-    mid = low + (high - low) / 2;     // mid is the floor int
+    mid = low + (high - low) / 2;     // mid is the floor INT
     if (mid == low) {
       bool is_freq_survive = check_freq_periodic_survive(false, is_cut_point, root, current, child_l, child_r, I, high, freq_threshold, k, suffix_array, interval_tree);
       if (is_freq_survive) {
@@ -544,25 +542,32 @@ int main(int argv, char** argc) {
     string text_file = argc[1];
 
      // Input frequency threshold (tau)
-    int freq_threshold = stoi(argc[2]); 
+    INT freq_threshold = stoi(argc[2]); 
     // Input the number of positions about letter replacements in S
-    int k = stoi(argc[3]); 
+    INT k = stoi(argc[3]); 
 
     string output_file = "output/" + text_file + "_" + to_string(freq_threshold) + "_" + to_string(k);
 
-    string text_file_path = "data/" + text_file;
+    // string text_file_path = "data/" + text_file;
+    string text_file_path = text_file;
+
+    // string text_file_path = "/scratch/prj/proj_loukides/github_useful_strings/useful_strings/" + text_file;
+
+    cout << "text_file_path is " << text_file_path << endl;
+    cout << "tau = " << freq_threshold << ", k = " << k << endl;
+
     is_text.open (text_file_path, ios::in | ios::binary);
     
     ifstream in_file(text_file_path, ios::binary);
     in_file.seekg(0, ios::end);
     // INT text_file_size = in_file.tellg();
-    int32_t text_file_size = in_file.tellg();
+    INT text_file_size = in_file.tellg();
 
     
     unsigned char * text_string = ( unsigned char * ) malloc (  ( text_file_size+4 ) * sizeof ( unsigned char ) );
     char chr = 0;
     // INT text_size = 0;
-    int32_t text_size = 0;
+    INT text_size = 0;
     
     string runtime_detail_csv = "runtime_details.csv";
     ofstream output_stream;
@@ -577,10 +582,10 @@ int main(int argv, char** argc) {
     text_string[0] = '\1';
     // cout << "text_file_size is " << text_file_size << ", start reading! " << endl;
     // for (INT i = 1; i <= text_file_size; i++) {	
-    for (int32_t i = 1; i <= text_file_size; i++) {	
+    for (INT i = 1; i <= text_file_size; i++) {	
       is_text.read(reinterpret_cast<char*>(&chr), 1);
       text_string[i] = chr;
-      // cout << "i=" << i << "," << chr << "(" << text_size << "),dec_value=" << (unsigned int)chr << "; ";
+      // cout << "i=" << i << "," << chr << "(" << text_size << "),dec_value=" << (unsigned INT)chr << "; ";
       text_size++;
     }
     is_text.close();
@@ -589,10 +594,10 @@ int main(int argv, char** argc) {
     text_string[ text_size+1] = '\1';
     text_string[ text_size+2] = '\0';	// Change '~' to '!' to make the symbol's ascii is smaller than the chars in txt
     text_size = text_size + 2;  // Do not include the final \0
-    cout << "Finish reading the text file!" << endl;
+    cout << "Finish reading the text file! text_size = " << text_size << endl;
     // cout << "CHECK! The text_size = " << text_size << endl;
-    // for(int i = 0; i < text_size; i++) {
-    //   cout << "char:" << (unsigned int)text_string[i] << endl;
+    // for(INT i = 0; i < text_size; i++) {
+    //   cout << "char:" << (unsigned INT)text_string[i] << endl;
     // }
     auto end = chrono::high_resolution_clock::now();
     chrono::duration<double> elapsed = end - start;
@@ -613,7 +618,7 @@ int main(int argv, char** argc) {
     output_stream.close();
 
     start = chrono::high_resolution_clock::now();
-    int *suffix_array =(int*) malloc(sizeof(int) * text_size);
+    INT *suffix_array =(INT*) malloc(sizeof(INT) * text_size);
     build_suffix_array(suffix_array, text_size, r);
     cout << "Construct SA successfully!" << endl;
     end = chrono::high_resolution_clock::now();
@@ -621,17 +626,20 @@ int main(int argv, char** argc) {
     output_stream.open(runtime_detail_csv, ios::app);
     output_stream << elapsed.count() << ",";
     output_stream.close();
-    
+
+    // return 0;
+
+
     // cout<<"Suffix Array for String ";
-    // for(int i=0; i<text_size; i++)
+    // for(INT i=0; i<text_size; i++)
     //     cout<<txt[i];
    	// cout<<" is: ";
-    // for(int i=0; i<text_size; i++)
+    // for(INT i=0; i<text_size; i++)
     //     cout<<suffix_array[i]<<" ";
     // cout<<endl;
 
-    int *inv_suffix_array =(int*) malloc(sizeof(int) * text_size);
-    for(int i=0; i<text_size; i++) {
+    INT *inv_suffix_array =(INT*) malloc(sizeof(INT) * text_size);
+    for(INT i=0; i<text_size; i++) {
       inv_suffix_array[suffix_array[i]] = i;
     }
 
@@ -652,7 +660,7 @@ int main(int argv, char** argc) {
     // Find all runs of S, and store it in an interval tree
     start = chrono::high_resolution_clock::now();
     // InPlacePST ippst = is_periodic_preprocessing(text_string, text_size - 1);  // don't include the last char !
-    IntervalTree<int> runs = is_periodic_preprocessing(text_string, text_size);
+    IntervalTree<INT> runs = is_periodic_preprocessing(text_string, text_size);
     cout << "Construct all runs successfully!" << endl;
     end = chrono::high_resolution_clock::now();
     elapsed = end - start;
@@ -661,15 +669,16 @@ int main(int argv, char** argc) {
     output_stream.close();
     free(text_string);
 
+    // return 0;
 
     // Start MAIN ALGORITHM
-    map<unsigned char,STedge,greater<unsigned char>> children_map;
+    // map<unsigned char,STedge,greater<unsigned char>> children_map;
 	  STvertex* current = r;
     STvertex* child_node;
     STvertex* parent_node;
     vector<STvertex*> current_path;
-    int *OUTPUT =(int*) malloc(sizeof(int) * text_size);
-    for (int i = 0; i < text_size; i++) {
+    INT *OUTPUT =(INT*) malloc(sizeof(INT) * text_size);
+    for (INT i = 0; i < text_size; i++) {
       OUTPUT[i] = 0;
     }
 
@@ -679,36 +688,37 @@ int main(int argv, char** argc) {
     start = chrono::high_resolution_clock::now();
     for (auto it = rev_bottomup_ordered_nodes.rbegin(); it != rev_bottomup_ordered_nodes.rend(); ++it) {
       current = *it;
-      current_path = current->path;
-      parent_node = current_path[current_path.size() - 2];
-      int parent_str_depth = parent_node->str_depth_of_N, current_str_depth = current->str_depth_of_N;
-
+      
       bool is_cut_point = false, is_freq_survive = false;
-      children_map = current->g;
-      vector<int> current_SA_interval = current->SA_interval;
-      int cur_left = current_SA_interval[0], cur_right = current_SA_interval[1];
 
+      INT cur_left = current->SA_interval.first, cur_right = current->SA_interval.second;
+      if (cur_right - cur_left + 1 < freq_threshold) {  // If the current node is not frequent, continue to the next current
+          continue;
+      }
+
+      parent_node = current->parent;
+      INT parent_str_depth = parent_node->str_depth_of_N, current_str_depth = current->str_depth_of_N;
       if(current->flag) {   // This node is the ancestor of a cut node u
         num_of_resi = num_of_resi + current_str_depth - parent_str_depth;
         // cout << "Now add child_str_len " << current_str_depth - parent_str_depth << " to num_of_resi, num_of_resi = " << num_of_resi << endl;
 
-        for (auto const &child : children_map) {
+        for (auto const &child : current->g) {
           child_node = child.second.v;
-          vector<int> child_SA_interval = child_node->SA_interval;
-          int child_l = child_SA_interval[0], child_r = child_SA_interval[1];
+          // vector<INT> child_SA_interval = child_node->SA_interval;
+          INT child_l = child_node->SA_interval.first, child_r = child_node->SA_interval.second;
           // cout << "child_l = " << child_l << ", child_r = " << child_r << endl;
-          int child_str_depth = child_node->str_depth_of_N; 
+          INT child_str_depth = child_node->str_depth_of_N; 
           
           if (child_node->flag) {
             continue;
           }
           else {    // This child node is v
-            int I = suffix_array[child_l], J; // left bound of the substring is fixed, we need to find out the right bound
-            int low = I + current_str_depth - 1, high = I + child_str_depth - 1;
+            INT I = suffix_array[child_l], J; // left bound of the substring is fixed, we need to find out the right bound
+            INT low = I + current_str_depth - 1, high = I + child_str_depth - 1;
             J = binary_search_longest_substring(low, high, I, child_l, child_r, freq_threshold, k, is_cut_point, root, current, suffix_array, runs);
-            int refined_cut_len = J - I + 1;
+            INT refined_cut_len = J - I + 1;
 
-            for (int i = child_l; i <= child_r; i++) {
+            for (INT i = child_l; i <= child_r; i++) {
               // cout << "The OUTPUT for index (suffix_array[i]) " << suffix_array[i] << " is " << refined_cut_len << endl;
               OUTPUT[suffix_array[i]] = refined_cut_len;
             }
@@ -720,38 +730,32 @@ int main(int argv, char** argc) {
       }
       else {
         // cout << "Start to find the first cut node!" << endl;
-        // vector<int> current_SA_interval = current->SA_interval;
-        // int left = current_SA_interval[0], right = current_SA_interval[1];
-        if (cur_right - cur_left + 1 < freq_threshold) {  // If the current node is not frequent, continue to the next current
-          continue;
-        }
-        int I = suffix_array[cur_left];
-        int J = I + current_str_depth - 1;
+        
+        INT I = suffix_array[cur_left];
+        INT J = I + current_str_depth - 1;
         
         is_freq_survive = check_freq_periodic_survive(true, is_cut_point, r, current, cur_left, cur_right, I, J, freq_threshold, k, suffix_array, runs);
 
         if (is_cut_point) {
           // cout << "*********This is a cut node! Start binary search to find out the refined cut!********" << endl;
-          current_path = current->path;
-          parent_node = current_path[current_path.size() - 2];
-          int parent_str_depth = parent_node->str_depth_of_N;
+
           num_of_resi = num_of_resi + current_str_depth - parent_str_depth;
           // cout << "Now add " << current_str_depth - parent_str_depth << " to num_of_resi, num_of_resi = " << num_of_resi << endl;
           
           is_freq_survive = false;
-          for (auto const &child : children_map) {
+          for (auto const &child : current->g) {
             child_node = child.second.v;
-            vector<int> child_SA_interval = child_node->SA_interval;
-            int child_l = child_SA_interval[0], child_r = child_SA_interval[1];
-            int child_str_depth = child_node->str_depth_of_N;
+            // vector<INT> child_SA_interval = child_node->SA_interval;
+            INT child_l = child_node->SA_interval.first, child_r = child_node->SA_interval.second;
+            INT child_str_depth = child_node->str_depth_of_N;
             
-            int I = suffix_array[child_l], J; // left bound of the substring is fixed, we need to find out the right bound
-            int low = I + current_str_depth - 1, high = I + child_str_depth - 1;
+            INT I = suffix_array[child_l], J; // left bound of the substring is fixed, we need to find out the right bound
+            INT low = I + current_str_depth - 1, high = I + child_str_depth - 1;
             J = binary_search_longest_substring(low, high, I, child_l, child_r, freq_threshold, k, is_cut_point, root, current, suffix_array, runs);
-            int refined_cut_len = J - I + 1;
+            INT refined_cut_len = J - I + 1;
             
             // cout << "Current child's [l,r] is [" << child_l << "," << child_r << "]" << endl;
-            for (int i = child_l; i <= child_r; i++) {
+            for (INT i = child_l; i <= child_r; i++) {
               // cout << "The OUTPUT for index (suffix_array[i]) " << suffix_array[i] << " is " << refined_cut_len << endl;
               OUTPUT[suffix_array[i]] = refined_cut_len;
             }
@@ -770,8 +774,14 @@ int main(int argv, char** argc) {
 
   // Clear suffix array, suffix tree and interval tree
   free(suffix_array);
-  STDelete(r);
   runs.clear();
+  // STDelete(r);
+  // STDelete(root);
+  for (auto it = rev_bottomup_ordered_nodes.rbegin(); it != rev_bottomup_ordered_nodes.rend(); ++it) {
+    delete *it;
+  }
+  cout << "Delete the ST" << endl;
+  rev_bottomup_ordered_nodes.clear();
 
   auto whole_end = chrono::high_resolution_clock::now();
   chrono::duration<double> whole_elapsed = whole_end - whole_start;
@@ -787,7 +797,7 @@ int main(int argv, char** argc) {
         cout << "Couldn't open output file\n" << endl; 
   }
   // cout << "The OUTPUT with size " << text_size - 2 << " is ";
-  for(int i = 1; i < text_size - 2; i++) {  // Exclude the first and last special char
+  for(INT i = 1; i < text_size - 2; i++) {  // Exclude the first and last special char
     // cout << OUTPUT[i] << " ";
     output_stream << OUTPUT[i] << "\n";
   }

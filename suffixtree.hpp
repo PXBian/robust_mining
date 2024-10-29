@@ -24,59 +24,59 @@ typedef int32_t INT;
 #define VAR(V, init) __typeof(init) V = (init)
 #define FORE(I, C) for (VAR(I, (C).begin()); I != (C).end(); I++)
 
-INT read_patterns( string pattern_filename, unsigned char ** &patterns, INT &num_patterns)
-{	
+// INT read_patterns( string pattern_filename, unsigned char ** &patterns, INT &num_patterns)
+// {	
 
-	ifstream is_patterns;
- 	is_patterns.open (pattern_filename, ios::in | ios::binary);
+// 	ifstream is_patterns;
+//  	is_patterns.open (pattern_filename, ios::in | ios::binary);
  	
-	INT max_len_pattern = 0;
-	INT ALLOC_SIZE = 180224;
-	INT seq_len = 0;
-	INT max_alloc_seq_len = 0;
-	INT max_alloc_seqs = 0;
-	unsigned char chr = 0;
+// 	INT max_len_pattern = 0;
+// 	INT ALLOC_SIZE = 180224;
+// 	INT seq_len = 0;
+// 	INT max_alloc_seq_len = 0;
+// 	INT max_alloc_seqs = 0;
+// 	unsigned char chr = 0;
 	
-	while ( is_patterns.read(reinterpret_cast<char*>(&chr), 1) )
-	{
-		if( num_patterns >= max_alloc_seqs )
-		{
-			patterns = ( unsigned char ** ) realloc ( patterns,   ( max_alloc_seqs + ALLOC_SIZE ) * sizeof ( unsigned char* ) );
-			patterns[ num_patterns ] = NULL;
+// 	while ( is_patterns.read(reinterpret_cast<char*>(&chr), 1) )
+// 	{
+// 		if( num_patterns >= max_alloc_seqs )
+// 		{
+// 			patterns = ( unsigned char ** ) realloc ( patterns,   ( max_alloc_seqs + ALLOC_SIZE ) * sizeof ( unsigned char* ) );
+// 			patterns[ num_patterns ] = NULL;
 			
-			max_alloc_seqs += ALLOC_SIZE;
-		}
+// 			max_alloc_seqs += ALLOC_SIZE;
+// 		}
 		
-		if( seq_len != 0 && chr == '\n' )
-		{
-			patterns[ num_patterns ][ seq_len ] = '\0';
+// 		if( seq_len != 0 && chr == '\n' )
+// 		{
+// 			patterns[ num_patterns ][ seq_len ] = '\0';
 			
-			num_patterns++;
+// 			num_patterns++;
 
-			if( seq_len > max_len_pattern)
-				max_len_pattern = seq_len;
+// 			if( seq_len > max_len_pattern)
+// 				max_len_pattern = seq_len;
 			
-			seq_len = 0;
-			max_alloc_seq_len = 0;
+// 			seq_len = 0;
+// 			max_alloc_seq_len = 0;
 			
-			patterns[ num_patterns ] = NULL;
-		}
-		else 
-		{
-			if ( seq_len >= max_alloc_seq_len )
-			{
-				patterns[ num_patterns ] = ( unsigned char * ) realloc ( patterns[ num_patterns ],   ( max_alloc_seq_len + ALLOC_SIZE ) * sizeof ( unsigned char ) );
-				max_alloc_seq_len += ALLOC_SIZE;
-			}
+// 			patterns[ num_patterns ] = NULL;
+// 		}
+// 		else 
+// 		{
+// 			if ( seq_len >= max_alloc_seq_len )
+// 			{
+// 				patterns[ num_patterns ] = ( unsigned char * ) realloc ( patterns[ num_patterns ],   ( max_alloc_seq_len + ALLOC_SIZE ) * sizeof ( unsigned char ) );
+// 				max_alloc_seq_len += ALLOC_SIZE;
+// 			}
 			
-			patterns[ num_patterns ][ seq_len ] = ( unsigned char) chr;	
-			seq_len++;	
-		}
-	} 
-	is_patterns.close();
+// 			patterns[ num_patterns ][ seq_len ] = ( unsigned char) chr;	
+// 			seq_len++;	
+// 		}
+// 	} 
+// 	is_patterns.close();
 	
-return 0;
-}
+// return 0;
+// }
 
 struct STedge;
 struct STvertex
@@ -86,8 +86,9 @@ struct STvertex
   	/* suffix number (0 is the whole word, -1 means the vertex is not a leaf) */
   	INT numer, str_depth_of_N;
     bool flag; /*false: not frequent and survive; true: frequent and survive*/
-    vector<STvertex*> path; /*the path from root to this node*/
-    vector<int> SA_interval;
+    // vector<STvertex*> path; /*the path from root to this node*/
+	STvertex *parent;
+    pair<INT,INT> SA_interval;
 };
 struct STedge
 {
@@ -259,8 +260,10 @@ vector<INT> Find(unsigned char *s,STvertex *r, unsigned char *x)	// *s is the pa
 				{
 					vector<INT> children = search(r);
 					
-					for(INT a = 0; a<children.size(); a++)	
-						occ.push_back( children.at(a) );		
+					for(INT a = 0; a<children.size(); a++) {
+						occ.push_back( children.at(a) );
+					}	
+								
 				}
 				else occ.push_back( r->numer );
 	

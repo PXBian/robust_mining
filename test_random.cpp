@@ -63,7 +63,7 @@ int main(int argc, char **argv) {
         command = command_str.c_str();
         system(command);
 
-        command_str = "./main " + filename + " " + to_string(tau) + " " + to_string(k);
+        command_str = "./main " + pathname + " " + to_string(tau) + " " + to_string(k);
         command = command_str.c_str();
         system(command);
 
