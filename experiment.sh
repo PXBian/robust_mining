@@ -106,3 +106,9 @@ make all
 (/usr/bin/time -v ./main data/dblp.xml.200MB 10000 1000000)    &> peak_ram/ex_xml200_10000_1000000.txt
 
 
+
+## change n
+(/usr/bin/time -v ./main data/dna.200MB_25MB  10000 100)    &> peak_ram/ex_dna200_25MB_10000_100.txt
+(/usr/bin/time -v ./main data/dna.200MB_50MB  10000 100)    &> peak_ram/ex_dna200_50MB_10000_100.txt
+(/usr/bin/time -v ./main data/dna.200MB_75MB  10000 100)    &> peak_ram/ex_dna200_75MB_10000_100.txt
+(/usr/bin/time -v ./main data/dna.200MB_100MB 10000 100)    &> peak_ram/ex_dna200_100MB_10000_100.txt
