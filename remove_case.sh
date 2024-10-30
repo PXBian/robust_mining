@@ -2,7 +2,13 @@
 #!/bin/bash
 
 # ls -latSh chr19_pengxin_*.txt
-# grep -H "Elapsed (wall clock) time" casestudy_16_100000_*.txt
+# grep -H "common_freq_size (X) =" casestudy_16_10000_*.txt
+# grep -H "common_time = " casestudy_16_10000_*.txt
+
+# grep -H "The whole process takes" casestudy_16_10000_*.txt
+# grep -H "The num_of_freq =" casestudy_16_10000_*.txt
+# grep -H "Maximum resident set size" casestudy_16_10000_*.txt
+
 # grep -c '^' chr19_pengxin_16_1.txt
 # wc -l chr19_pengxin_16_1.txt
 

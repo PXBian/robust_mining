@@ -335,9 +335,9 @@ int main(int argv, char** argc) {
     // string text_file_path = "data/" + text_file;
     // string first_str_file = "data/" + str_file;
     string text_file_path = text_file;
-    string first_str_file = str_file;
+    // string first_str_file = str_file;
     cout << "text_file_path is " << text_file_path << endl;
-    cout << "first_str_file is " << first_str_file << endl;
+    cout << "first_str_file is " << str_file << endl;
     cout << "tau = " << freq_threshold << ", k = " << k << endl;
     is_text.open (text_file_path, ios::in | ios::binary);
 
@@ -366,7 +366,7 @@ int main(int argv, char** argc) {
 		if(chr == '\n') {
             str_num ++;
             cout << "Read one line successfully! text_size = " << text_size << endl;
-            
+        
 
             // if (N_count > 0) {
             //     N_group.push_back({startPos, N_count});
@@ -390,6 +390,18 @@ int main(int argv, char** argc) {
 
             text_string[text_size] = '\1';
 			text_string[text_size+1] = '\0';
+
+            if (str_num == 1) {
+                ofstream file(str_file);
+                if (file.is_open()) {
+                    string str(reinterpret_cast<char*>(text_string), text_size);
+                    file << str;
+                    file << '\n';
+                    file.close();
+                } else {
+                    cerr << "Unable to open file for writing." << endl;
+                }
+            }
             // text_string = ( unsigned char * ) realloc (text_string, ( text_size + 2 ) * sizeof ( unsigned char ) );
             // string str(reinterpret_cast<char*>(text_string), text_size+2);
             // cout << "current str is " << str << endl;
@@ -496,23 +508,20 @@ int main(int argv, char** argc) {
     // cout << "After building the common_freq_set, str_num = " << str_num << endl;
     // cout << "********The size of common_freq_set = " << common_freq_set.size() << "*******" << endl;
 
-
     // Run the first str in MAIN algorithm
     string command_str = "./main " + str_file + " " + to_string(freq_threshold) + " " + to_string(k);
     cout << "////// Execute MAIN algorithm: " << command_str << " //////" << endl;
     const char* command = command_str.c_str();
     system(command);
-
-
     cout << "////// Finish executing MAIN algorithm to find resilient //////" << endl; 
-
     
+
     // Read the first string again to set text_string
     text_size = 0;
     max_alloc_seq_len = 0;
     unsigned char * txt_string = ( unsigned char * ) malloc (  ( ALLOC_SIZE ) * sizeof ( unsigned char ) );
     max_alloc_seq_len += ALLOC_SIZE;
-    is_text.open (first_str_file, ios::in | ios::binary);
+    is_text.open (str_file, ios::in | ios::binary);
     while (is_text.read(reinterpret_cast<char*>(&chr), 1)) {
 		if(chr == '\n') {
             cout << "Read one line successfully!" << endl;
@@ -528,14 +537,16 @@ int main(int argv, char** argc) {
 				max_alloc_seq_len += ALLOC_SIZE;
 			}
 
-            if(text_size > 0 && chr == 'N' && txt_string[text_size - 1] == 'N') {
-                continue;
-            }
+            // if(text_size > 0 && chr == 'N' && txt_string[text_size - 1] == 'N') {
+            //     continue;
+            // }
             txt_string[text_size] = chr;
             text_size++;
         }
 	} 
 	is_text.close();
+
+    
 
     // Read the OUTPUT file and get the resilient substrings. Store them in resi_set (Y)
     // cout << "Start to read the MAIN OUTPUT!" << endl;
@@ -568,7 +579,7 @@ int main(int argv, char** argc) {
     // }
     // cout << endl;
 
-    auto start = chrono::high_resolution_clock::now();
+    // auto start = chrono::high_resolution_clock::now();
     // Get the intersection of X and Y
     unordered_set<uint64_t> intersectionSet;
     for (const auto & elem : resi_set) {
@@ -576,15 +587,19 @@ int main(int argv, char** argc) {
             intersectionSet.insert(elem);
         }
     }
-    auto end = chrono::high_resolution_clock::now();
-    chrono::duration<double> elapsed = end - start;
-    final_time = elapsed.count();
+    // auto end = chrono::high_resolution_clock::now();
+    // chrono::duration<double> elapsed = end - start;
+    // final_time = elapsed.count();
+
+    unordered_set<uint64_t> unionSet = common_freq_set;
+    unionSet.insert(resi_set.begin(), resi_set.end());
 
 
     INT common_freq_size = common_freq_set.size();
     INT inter_size = intersectionSet.size();
-    cout << "common_freq_size (X) = " << common_freq_size << ", inter_size (X inter Y) = " << inter_size << ", ratio = " << double(inter_size) / double(common_freq_size) << endl;
-    cout << "common_time = " << common_time << ", inter_time = " << inter_time << ", final_time = " << final_time << endl;
+    INT union_size = unionSet.size();
+    cout << "common_freq_size (X) = " << common_freq_size << ", inter_size = " << inter_size << ", union_size = " << union_size << ", inter_ratio = " << double(inter_size) / double(common_freq_size) << ", jac_ratio = " << double(inter_size) / double(union_size) << endl;
+    cout << "common_time = " << common_time << ", inter_time = " << inter_time << ", first_part_total = " << common_time + inter_time << endl;
 
     cout << "Finish Case Study!\n" << endl;
 
