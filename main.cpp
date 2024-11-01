@@ -546,7 +546,12 @@ int main(int argv, char** argc) {
     // Input the number of positions about letter replacements in S
     INT k = stoi(argc[3]); 
 
-    string output_file = "output/" + text_file + "_" + to_string(freq_threshold) + "_" + to_string(k);
+
+    // Find the position of the last '/'
+    size_t pos = text_file.find_last_of("/");
+    // Extract the substring after the last '/'
+    string file_name = text_file.substr(pos + 1);
+    string output_file = "output/" + file_name + "_" + to_string(freq_threshold) + "_" + to_string(k);
 
     // string text_file_path = "data/" + text_file;
     string text_file_path = text_file;
@@ -554,6 +559,8 @@ int main(int argv, char** argc) {
     // string text_file_path = "/scratch/prj/proj_loukides/github_useful_strings/useful_strings/" + text_file;
 
     cout << "text_file_path is " << text_file_path << endl;
+    cout << "output_file is " << output_file << endl;
+
     cout << "tau = " << freq_threshold << ", k = " << k << endl;
 
     is_text.open (text_file_path, ios::in | ios::binary);
@@ -571,11 +578,11 @@ int main(int argv, char** argc) {
     
     string runtime_detail_csv = "runtime_details.csv";
     ofstream output_stream;
-    output_stream.open(runtime_detail_csv, ios::app);
-    output_stream << "text_file,tau,k,read_txt,create_ST,create_SA,create_intervals,is_periodic_preprocess,find_cut,total\n";
-    // output_stream << "text_file,tau,k,total_runtime\n";
-    output_stream << text_file << "," << to_string(freq_threshold) << "," << to_string(k) << ",";
-    output_stream.close();
+    // output_stream.open(runtime_detail_csv, ios::app);
+    // output_stream << "text_file,tau,k,read_txt,create_ST,create_SA,create_intervals,is_periodic_preprocess,find_cut,total\n";
+    // // output_stream << "text_file,tau,k,total_runtime\n";
+    // output_stream << text_file << "," << to_string(freq_threshold) << "," << to_string(k) << ",";
+    // output_stream.close();
 
     // At the beginning and end of S, add two $ to ensure the all_run runs successfully!
     auto start = chrono::high_resolution_clock::now();
@@ -601,9 +608,9 @@ int main(int argv, char** argc) {
     // }
     auto end = chrono::high_resolution_clock::now();
     chrono::duration<double> elapsed = end - start;
-    output_stream.open(runtime_detail_csv, ios::app);
-    output_stream << elapsed.count() << ",";
-    output_stream.close();
+    // output_stream.open(runtime_detail_csv, ios::app);
+    // output_stream << elapsed.count() << ",";
+    // output_stream.close();
 
     auto whole_start = chrono::high_resolution_clock::now();
     
@@ -613,9 +620,9 @@ int main(int argv, char** argc) {
     cout << "Create ST successfully! The number of leaves is " << liscie << endl;
     end = chrono::high_resolution_clock::now();
     elapsed = end - start;
-    output_stream.open(runtime_detail_csv, ios::app);
-    output_stream << elapsed.count() << ",";
-    output_stream.close();
+    // output_stream.open(runtime_detail_csv, ios::app);
+    // output_stream << elapsed.count() << ",";
+    // output_stream.close();
 
     start = chrono::high_resolution_clock::now();
     INT *suffix_array =(INT*) malloc(sizeof(INT) * text_size);
@@ -623,11 +630,9 @@ int main(int argv, char** argc) {
     cout << "Construct SA successfully!" << endl;
     end = chrono::high_resolution_clock::now();
     elapsed = end - start;
-    output_stream.open(runtime_detail_csv, ios::app);
-    output_stream << elapsed.count() << ",";
-    output_stream.close();
-
-    // return 0;
+    // output_stream.open(runtime_detail_csv, ios::app);
+    // output_stream << elapsed.count() << ",";
+    // output_stream.close();
 
 
     // cout<<"Suffix Array for String ";
@@ -649,9 +654,9 @@ int main(int argv, char** argc) {
     cout << "Construct SA interval for each node in ST successfully. Preprocessing end!" << endl;
     end = chrono::high_resolution_clock::now();
     elapsed = end - start;
-    output_stream.open(runtime_detail_csv, ios::app);
-    output_stream << elapsed.count() << ",";
-    output_stream.close();
+    // output_stream.open(runtime_detail_csv, ios::app);
+    // output_stream << elapsed.count() << ",";
+    // output_stream.close();
     free(inv_suffix_array);
     // Pre-processing end
 
@@ -664,9 +669,9 @@ int main(int argv, char** argc) {
     cout << "Construct all runs successfully!" << endl;
     end = chrono::high_resolution_clock::now();
     elapsed = end - start;
-    output_stream.open(runtime_detail_csv, ios::app);
-    output_stream << elapsed.count() << ",";
-    output_stream.close();
+    // output_stream.open(runtime_detail_csv, ios::app);
+    // output_stream << elapsed.count() << ",";
+    // output_stream.close();
     free(text_string);
 
     // return 0;
@@ -768,9 +773,9 @@ int main(int argv, char** argc) {
     }
   end = chrono::high_resolution_clock::now();
   elapsed = end - start;
-  output_stream.open(runtime_detail_csv, ios::app);
-  output_stream << elapsed.count() << ",";
-  output_stream.close();
+  // output_stream.open(runtime_detail_csv, ios::app);
+  // output_stream << elapsed.count() << ",";
+  // output_stream.close();
 
   // Clear suffix array, suffix tree and interval tree
   free(suffix_array);
@@ -786,13 +791,13 @@ int main(int argv, char** argc) {
   auto whole_end = chrono::high_resolution_clock::now();
   chrono::duration<double> whole_elapsed = whole_end - whole_start;
   cout << "The whole process takes " << whole_elapsed.count() << " s." << endl;
-  output_stream.open(runtime_detail_csv, ios::app);
-  output_stream << whole_elapsed.count() << "\n";
-  output_stream.close();
+  // output_stream.open(runtime_detail_csv, ios::app);
+  // output_stream << whole_elapsed.count() << "\n";
+  // output_stream.close();
 
   
-  // output_stream.open(output_file);
-  output_stream.open("main_output");
+  output_stream.open(output_file);
+  // output_stream.open("main_output");
   if(!output_stream.is_open()) {
         cout << "Couldn't open output file\n" << endl; 
   }

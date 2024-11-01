@@ -550,7 +550,17 @@ int main(int argv, char** argc) {
 
     // Read the OUTPUT file and get the resilient substrings. Store them in resi_set (Y)
     // cout << "Start to read the MAIN OUTPUT!" << endl;
-    ifstream file("main_output");
+    
+    // ifstream file("main_output");
+    // Find the position of the last '/'
+    size_t pos = str_file.find_last_of("/");
+    // Extract the substring after the last '/'
+    string file_name = str_file.substr(pos + 1);
+    string output_file = "output/" + file_name + "_" + to_string(freq_threshold) + "_" + to_string(k);
+    // cout << "output_file = " << output_file << endl;
+    // string output_file = "output/" + str_file + "_" + to_string(freq_threshold) + "_" + to_string(k);
+    ifstream file(output_file);
+
     string line;
     INT index = 0;
 
@@ -566,6 +576,11 @@ int main(int argv, char** argc) {
         file.close();
     }
     free(txt_string);
+
+    // Delete the 
+    command_str = "rm " + output_file;
+    command = command_str.c_str();
+    system(command);
 
     // cout << "The common_freq_set is " << endl;
     // for(const auto &item : common_freq_set) {
