@@ -6,35 +6,34 @@ mkdir output
 # gunzip -c chr19_pengxin_1000.txt.gz > data/chr19_pengxin_1000.txt
 
 (
+(/usr/bin/time -v ./case data/chr19_pengxin_1000.txt 500 5      data/chr19_pengxin_1000_1.txt)   &> peak_ram/casestudy_1000_500_5.txt     &
+(/usr/bin/time -v ./case data/chr19_pengxin_1000.txt 500 10     data/chr19_pengxin_1000_1.txt)   &> peak_ram/casestudy_1000_500_10.txt    &
+(/usr/bin/time -v ./case data/chr19_pengxin_1000.txt 500 20     data/chr19_pengxin_1000_1.txt)   &> peak_ram/casestudy_1000_500_20.txt    &
+(/usr/bin/time -v ./case data/chr19_pengxin_1000.txt 500 50     data/chr19_pengxin_1000_1.txt)   &> peak_ram/casestudy_1000_500_50.txt    &
+
+(/usr/bin/time -v ./case data/chr19_pengxin_1000.txt 1000 5     data/chr19_pengxin_1000_1.txt)   &> peak_ram/casestudy_1000_1000_5.txt    &
+(/usr/bin/time -v ./case data/chr19_pengxin_1000.txt 1000 10    data/chr19_pengxin_1000_1.txt)   &> peak_ram/casestudy_1000_1000_10.txt   &
+(/usr/bin/time -v ./case data/chr19_pengxin_1000.txt 1000 20    data/chr19_pengxin_1000_1.txt)   &> peak_ram/casestudy_1000_1000_20.txt   &
+(/usr/bin/time -v ./case data/chr19_pengxin_1000.txt 1000 50    data/chr19_pengxin_1000_1.txt)   &> peak_ram/casestudy_1000_1000_50.txt   &
+
+(/usr/bin/time -v ./case data/chr19_pengxin_1000.txt 2500 5     data/chr19_pengxin_1000_1.txt)   &> peak_ram/casestudy_1000_2500_5.txt    &
+(/usr/bin/time -v ./case data/chr19_pengxin_1000.txt 2500 10    data/chr19_pengxin_1000_1.txt)   &> peak_ram/casestudy_1000_2500_10.txt   &
+(/usr/bin/time -v ./case data/chr19_pengxin_1000.txt 2500 20    data/chr19_pengxin_1000_1.txt)   &> peak_ram/casestudy_1000_2500_20.txt   &
+(/usr/bin/time -v ./case data/chr19_pengxin_1000.txt 2500 50    data/chr19_pengxin_1000_1.txt)   &> peak_ram/casestudy_1000_2500_50.txt   &
+
+(/usr/bin/time -v ./case data/chr19_pengxin_1000.txt 5000 5     data/chr19_pengxin_1000_1.txt)   &> peak_ram/casestudy_1000_5000_5.txt    &
+(/usr/bin/time -v ./case data/chr19_pengxin_1000.txt 5000 10    data/chr19_pengxin_1000_1.txt)   &> peak_ram/casestudy_1000_5000_10.txt   &
+(/usr/bin/time -v ./case data/chr19_pengxin_1000.txt 5000 20    data/chr19_pengxin_1000_1.txt)   &> peak_ram/casestudy_1000_5000_20.txt   &
+(/usr/bin/time -v ./case data/chr19_pengxin_1000.txt 5000 50    data/chr19_pengxin_1000_1.txt)   &> peak_ram/casestudy_1000_5000_50.txt   &
+
 # (/usr/bin/time -v ./case data/chr19_pengxin_1000.txt 10000 10     data/chr19_pengxin_1000_1.txt)   &> peak_ram/casestudy_1000_10000_10.txt      &
 # (/usr/bin/time -v ./case data/chr19_pengxin_1000.txt 10000 100    data/chr19_pengxin_1000_1.txt)   &> peak_ram/casestudy_1000_10000_100.txt     &
 # (/usr/bin/time -v ./case data/chr19_pengxin_1000.txt 10000 1000   data/chr19_pengxin_1000_1.txt)   &> peak_ram/casestudy_1000_10000_1000.txt    &
 # (/usr/bin/time -v ./case data/chr19_pengxin_1000.txt 10000 10000  data/chr19_pengxin_1000_1.txt)   &> peak_ram/casestudy_1000_10000_10000.txt   &
-
 # (/usr/bin/time -v ./case data/chr19_pengxin_1000.txt 1000 10     data/chr19_pengxin_1000_1.txt)   &> peak_ram/casestudy_1000_1000_10.txt      &
 # (/usr/bin/time -v ./case data/chr19_pengxin_1000.txt 1000 100    data/chr19_pengxin_1000_1.txt)   &> peak_ram/casestudy_1000_1000_100.txt     &
 # (/usr/bin/time -v ./case data/chr19_pengxin_1000.txt 1000 1000   data/chr19_pengxin_1000_1.txt)   &> peak_ram/casestudy_1000_1000_1000.txt    &
 # (/usr/bin/time -v ./case data/chr19_pengxin_1000.txt 1000 10000  data/chr19_pengxin_1000_1.txt)   &> peak_ram/casestudy_1000_1000_10000.txt   &
-
-(/usr/bin/time -v ./case data/chr19_pengxin_1000.txt 10000 50     data/chr19_pengxin_1000_1.txt)   &> peak_ram/casestudy_1000_10000_50.txt      &
-(/usr/bin/time -v ./case data/chr19_pengxin_1000.txt 10000 500    data/chr19_pengxin_1000_1.txt)   &> peak_ram/casestudy_1000_10000_500.txt     &
-(/usr/bin/time -v ./case data/chr19_pengxin_1000.txt 10000 5000   data/chr19_pengxin_1000_1.txt)   &> peak_ram/casestudy_1000_10000_5000.txt    &
-(/usr/bin/time -v ./case data/chr19_pengxin_1000.txt 10000 50000  data/chr19_pengxin_1000_1.txt)   &> peak_ram/casestudy_1000_10000_50000.txt   &
-
-(/usr/bin/time -v ./case data/chr19_pengxin_1000.txt 1000 50      data/chr19_pengxin_1000_1.txt)   &> peak_ram/casestudy_1000_1000_50.txt       &
-(/usr/bin/time -v ./case data/chr19_pengxin_1000.txt 1000 500     data/chr19_pengxin_1000_1.txt)   &> peak_ram/casestudy_1000_1000_500.txt      &
-(/usr/bin/time -v ./case data/chr19_pengxin_1000.txt 1000 5000    data/chr19_pengxin_1000_1.txt)   &> peak_ram/casestudy_1000_1000_5000.txt     &
-(/usr/bin/time -v ./case data/chr19_pengxin_1000.txt 1000 50000   data/chr19_pengxin_1000_1.txt)   &> peak_ram/casestudy_1000_1000_50000.txt    &
-
-(/usr/bin/time -v ./case data/chr19_pengxin_1000.txt 100 10      data/chr19_pengxin_100_1.txt)   &> peak_ram/casestudy_1000_100_10.txt       &
-(/usr/bin/time -v ./case data/chr19_pengxin_1000.txt 100 100     data/chr19_pengxin_100_1.txt)   &> peak_ram/casestudy_1000_100_100.txt      &
-(/usr/bin/time -v ./case data/chr19_pengxin_1000.txt 100 1000    data/chr19_pengxin_100_1.txt)   &> peak_ram/casestudy_1000_100_1000.txt     &
-(/usr/bin/time -v ./case data/chr19_pengxin_1000.txt 100 10000   data/chr19_pengxin_100_1.txt)   &> peak_ram/casestudy_1000_100_10000.txt    &
-
-(/usr/bin/time -v ./case data/chr19_pengxin_1000.txt 100 50      data/chr19_pengxin_100_1.txt)   &> peak_ram/casestudy_1000_100_50.txt       &
-(/usr/bin/time -v ./case data/chr19_pengxin_1000.txt 100 500     data/chr19_pengxin_100_1.txt)   &> peak_ram/casestudy_1000_100_500.txt      &
-(/usr/bin/time -v ./case data/chr19_pengxin_1000.txt 100 5000    data/chr19_pengxin_100_1.txt)   &> peak_ram/casestudy_1000_100_5000.txt     &
-(/usr/bin/time -v ./case data/chr19_pengxin_1000.txt 100 50000   data/chr19_pengxin_100_1.txt)   &> peak_ram/casestudy_1000_100_50000.txt    &
 )
 
 
