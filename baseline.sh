@@ -46,6 +46,18 @@ rm output/*
 (/usr/bin/time -v ./main data/ecoli20000  50 10 )    &> peak_ram/bl_main_ecoli20000_50_10.txt
 
 
+# ## change n
+(/usr/bin/time -v ./main data/dna.200MB_25MB   10000 100)    &> peak_ram/ex_dna200_25MB_10000_100.txt
+(/usr/bin/time -v ./main data/dna.200MB_50MB   10000 100)    &> peak_ram/ex_dna200_50MB_10000_100.txt
+(/usr/bin/time -v ./main data/dna.200MB_75MB   10000 100)    &> peak_ram/ex_dna200_75MB_10000_100.txt
+(/usr/bin/time -v ./main data/dna.200MB_100MB  10000 100)    &> peak_ram/ex_dna200_100MB_10000_100.txt
+(/usr/bin/time -v ./main data/dna.200MB_125MB  10000 100)    &> peak_ram/ex_dna200_125MB_10000_100.txt
+(/usr/bin/time -v ./main data/dna.200MB_150MB  10000 100)    &> peak_ram/ex_dna200_150MB_10000_100.txt
+(/usr/bin/time -v ./main data/dna.200MB_175MB  10000 100)    &> peak_ram/ex_dna200_175MB_10000_100.txt
+(/usr/bin/time -v ./main data/dna.200MB        10000 100)    &> peak_ram/ex_dna200_10000_100.txt
+
+
+
 # ## Larger data
 # (/usr/bin/time -v ./baseline data/ecoli100000  5   50 bl_output)    &> peak_ram/bl_base_ecoli100000_50_5.txt
 # (/usr/bin/time -v ./baseline data/ecoli100000  10  50 bl_output)    &> peak_ram/bl_base_ecoli100000_50_10.txt
