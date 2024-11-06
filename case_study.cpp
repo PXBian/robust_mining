@@ -596,12 +596,15 @@ int main(int argv, char** argc) {
 
     // auto start = chrono::high_resolution_clock::now();
     // Get the intersection of X and Y
+    ofstream out_file ("inter_1");
     unordered_set<uint64_t> intersectionSet;
     for (const auto & elem : resi_set) {
         if (common_freq_set.find(elem) != common_freq_set.end()) {
             intersectionSet.insert(elem);
+            out_file << elem << "\n";
         }
     }
+    out_file.close();
     // auto end = chrono::high_resolution_clock::now();
     // chrono::duration<double> elapsed = end - start;
     // final_time = elapsed.count();

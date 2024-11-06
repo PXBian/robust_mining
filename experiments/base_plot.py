@@ -4,221 +4,223 @@ from matplotlib.ticker import ScalarFormatter
 import numpy as np
 
 
-## Change k
-# df = pd.read_csv("change_k_dna200.csv")
-
-
-# tau = []
-# k = []
-# space = []
-# runtime = []
-# quality = []
-
-# for index, row in df.iterrows():
-#     tau.append(row['tau'])
-#     k.append(row['k'])
-#     space.append(row['Max RSS (kB)'] / 1000000)
-#     runtime.append(row['runtime (s)'])
-#     quality.append(row['ratio'])
-
-
-# ## Runtime
-# # plt.plot(k, runtime, linewidth=5, marker = 'o', markersize=10, color = 'red', linestyle = '--', label = 'RPM-ST')
-# plt.gca().xaxis.set_major_formatter(ScalarFormatter())
-# plt.ticklabel_format(style='plain')
-# plt.ylim(0, max(runtime) + 500)
-# plt.gca().yaxis.get_major_formatter().set_useOffset(False)
-# plt.gca().yaxis.get_major_formatter().set_scientific(False)
-# plt.xscale("log")
-# widths = np.diff(k + [k[-1] * 10])
-# plt.bar(k, runtime, widths, align='edge', facecolor='red', edgecolor='white', lw=2, label = 'RPM-ST')
-
-# plt.xlabel(r"$k$", fontsize=30)
-# plt.ylabel("runtime (s)", fontsize=30)
-# plt.legend(loc='best', fontsize=28)
-# plt.xticks(fontsize=30, rotation=45)
-# plt.yticks(fontsize=30)
-# plt.grid(True, linestyle='--', linewidth=0.5)
-# # Adjust the layout to be tight
-# # plt.tight_layout()
-# # plt.show()
-# plt.savefig("/home/pengxinbian/Desktop/ex_plots/time_k_dna200.pdf", format="pdf", bbox_inches="tight")
-# plt.clf()
-
-# ## Space
-# # plt.plot(k, space, linewidth=5, marker = '^', markersize=10, color = 'orange', linestyle = '--', label = 'RPM-ST')
-# # plt.bar(k, space, color = 'orange', label = 'RPM-ST', width = 30)
-# plt.gca().xaxis.set_major_formatter(ScalarFormatter())
-# plt.ticklabel_format(style='plain')
-# plt.ylim(0, max(space) + 40)
-# plt.gca().yaxis.get_major_formatter().set_useOffset(False)
-# plt.gca().yaxis.get_major_formatter().set_scientific(False)
-# plt.xscale("log")
-# widths = np.diff(k + [k[-1] * 10])
-# plt.bar(k, space, widths, align='edge', facecolor='orange', edgecolor='white', lw=2, label = 'RPM-ST')
-
-# plt.xlabel(r"$k$", fontsize=30)
-# plt.ylabel("memory (GB)", fontsize=30)
-# plt.legend(loc='best', fontsize=28)
-# plt.xticks(fontsize=30, rotation=45)
-# plt.yticks(fontsize=30)
-# plt.grid(True, linestyle='--', linewidth=0.5)
-# # Adjust the layout to be tight
-# # plt.tight_layout()
-# # plt.show()
-# plt.savefig("/home/pengxinbian/Desktop/ex_plots/mem_k_dna200.pdf", format="pdf", bbox_inches="tight")
-# plt.clf()
-
-# ## Quality
-# # plt.plot(k, quality, linewidth=5, marker = '*', markersize=10, color = 'green', linestyle = '--', label = 'RPM-ST')
-# # plt.bar(k, quality, color = 'green', label = 'RPM-ST', width = 30)
-# plt.gca().xaxis.set_major_formatter(ScalarFormatter())
-# plt.ticklabel_format(style='plain')
-# plt.xscale("log")
-# plt.ylim(0, max(quality) + 0.5)
-# widths = np.diff(k + [k[-1] * 10])
-# plt.bar(k, quality, widths, align='edge', facecolor='green', edgecolor='white', lw=2, label = 'RPM-ST')
-
-# plt.xlabel(r"$k$", fontsize=30)
-# plt.ylabel("ratio", fontsize=30)
-# plt.legend(loc='best', fontsize=28)
-# plt.xticks(fontsize=30, rotation=45)
-# plt.yticks(fontsize=30)
-# plt.grid(True, linestyle='--', linewidth=0.5)
-# # Adjust the layout to be tight
-# # plt.tight_layout()
-# # plt.show()
-# plt.savefig("/home/pengxinbian/Desktop/ex_plots/qua_k_dna200.pdf", format="pdf", bbox_inches="tight")
-# plt.clf()
-
-
 # ## Change tau
-# df = pd.read_csv("change_tau_dna200.csv")
-
+# df = pd.read_csv("/home/pengxinbian/Desktop/experiment/Baseline/change_tau.csv")
+# n = []
 # tau = []
 # k = []
-# space = []
-# runtime = []
-# quality = []
+# bl_runtime = []
+# main_runtime = []
+# bl_mem = []
+# main_mem = []
 
 # for index, row in df.iterrows():
 #     tau.append(row['tau'])
 #     k.append(row['k'])
-#     space.append(row['Max RSS (kB)'] / 1000000)
-#     runtime.append(row['runtime (s)'])
-#     quality.append(row['ratio'])
+#     bl_mem.append(row['bl_mem'] / 1000)
+#     main_mem.append(row['main_mem'] / 1000)
+
+#     bl_runtime.append(row['bl_time (s)'])
+#     main_runtime.append(row['main_time (s)'])
+
 
 # ## Runtime
-# # plt.plot(tau, runtime, linewidth=5, marker = 'o', markersize=10, color = 'red', linestyle = '--', label = 'RPM-ST')
-# # plt.bar(tau, runtime, color = 'red', label = 'RPM-ST', width = 30)
-# plt.gca().xaxis.set_major_formatter(ScalarFormatter())
-# plt.ticklabel_format(style='plain')
-# plt.ylim(0, max(runtime) + 200)
-# plt.gca().yaxis.get_major_formatter().set_useOffset(False)
-# plt.gca().yaxis.get_major_formatter().set_scientific(False)
-# plt.xscale("log")
-# widths = np.diff(tau + [tau[-1] * 10])
-# plt.bar(tau, runtime, widths, align='edge', facecolor='red', edgecolor='white', lw=2, label = 'RPM-ST')
-
+# bar_width = 0.4
+# n_positions = np.arange(len(tau))
+# plt.bar(n_positions - bar_width/2, bl_runtime, width=bar_width, color='b', label='Baseline')
+# plt.bar(n_positions + bar_width/2, main_runtime, width=bar_width, color='r', label='RPM-ST')
+# # plt.ylim(1, pow(10,2))
+# # plt.gca().yaxis.get_major_formatter().set_useOffset(False)
+# # plt.gca().yaxis.get_major_formatter().set_scientific(False)
+# plt.yscale('log')
 # plt.xlabel(r"$\tau$", fontsize=30)
 # plt.ylabel("runtime (s)", fontsize=30)
-# plt.legend(loc='best', fontsize=28)
-# plt.xticks(fontsize=30, rotation=45)
+# # plt.legend(loc='best', fontsize=28)
+# plt.legend(bbox_to_anchor=(1.03, 1.25), ncol=2, fontsize = 28)
+# plt.xticks(n_positions, [5, 10, 20, 50, 100], fontsize=30, rotation=45)
 # plt.yticks(fontsize=30)
 # plt.grid(True, linestyle='--', linewidth=0.5)
 # # Adjust the layout to be tight
 # # plt.tight_layout()
 # # plt.show()
-# plt.savefig("/home/pengxinbian/Desktop/ex_plots/time_tau_dna200.pdf", format="pdf", bbox_inches="tight")
+# plt.savefig("/home/pengxinbian/Desktop/ex_plots/bl_time_tau.pdf", format="pdf", bbox_inches="tight")
 # plt.clf()
 
-# ## Space
-# # plt.plot(tau, space, linewidth=5, marker = '^', markersize=10, color = 'orange', linestyle = '--', label = 'RPM-ST')
-# # plt.bar(tau, space, color = 'orange', label = 'RPM-ST', width = 30)
-# plt.gca().xaxis.set_major_formatter(ScalarFormatter())
-# plt.ticklabel_format(style='plain')
-# plt.ylim(0, max(space) + 40)
-# plt.gca().yaxis.get_major_formatter().set_useOffset(False)
-# plt.gca().yaxis.get_major_formatter().set_scientific(False)
-# plt.xscale("log")
-# widths = np.diff(tau + [tau[-1] * 10])
-# plt.bar(tau, space, widths, align='edge', facecolor='orange', edgecolor='white', lw=2, label = 'RPM-ST')
+# # Memory
+# bar_width = 0.4
+# n_positions = np.arange(len(tau))
+# plt.bar(n_positions - bar_width/2, bl_mem, width=bar_width, color='b', label='Baseline')
+# plt.bar(n_positions + bar_width/2, main_mem, width=bar_width, color='r', label='RPM-ST')
+# # plt.ylim(1, pow(10,5))
+# # plt.ylim(0, max(bl_mem) + 1000)
 
+# # plt.gca().yaxis.get_major_formatter().set_useOffset(False)
+# # plt.gca().yaxis.get_major_formatter().set_scientific(False)
+# # plt.yscale('log')
 # plt.xlabel(r"$\tau$", fontsize=30)
-# plt.ylabel("memory (GB)", fontsize=30)
-# plt.legend(loc='best', fontsize=28)
-# plt.xticks(fontsize=30, rotation=45)
+# plt.ylabel("memory (MB)", fontsize=30)
+# # plt.legend(loc='best', fontsize=28)
+# plt.legend(bbox_to_anchor=(1.03, 1.25), ncol=2, fontsize = 28)
+# plt.xticks(n_positions, [5, 10, 20, 50, 100], fontsize=30, rotation=45)
 # plt.yticks(fontsize=30)
 # plt.grid(True, linestyle='--', linewidth=0.5)
 # # Adjust the layout to be tight
 # # plt.tight_layout()
 # # plt.show()
-# plt.savefig("/home/pengxinbian/Desktop/ex_plots/mem_tau_dna200.pdf", format="pdf", bbox_inches="tight")
-# plt.clf()
-
-# ## Quality
-# # plt.plot(tau, quality, linewidth=5, marker = '*', markersize=10, color = 'green', linestyle = '--', label = 'RPM-ST')
-# # plt.bar(tau, quality, color = 'green', label = 'RPM-ST', width = 30)
-# plt.gca().xaxis.set_major_formatter(ScalarFormatter())
-# plt.ticklabel_format(style='plain')
-# plt.xscale("log")
-# plt.ylim(0, max(quality) + 0.5)
-# widths = np.diff(tau + [tau[-1] * 10])
-# plt.bar(tau, quality, widths, align='edge', facecolor='green', edgecolor='white', lw=2, label = 'RPM-ST')
-
-# plt.xlabel(r"$\tau$", fontsize=30)
-# plt.ylabel("ratio", fontsize=30)
-# plt.legend(loc='best', fontsize=28)
-# plt.xticks(fontsize=30, rotation=45)
-# plt.yticks(fontsize=30)
-# plt.grid(True, linestyle='--', linewidth=0.5)
-# # Adjust the layout to be tight
-# # plt.tight_layout()
-# # plt.show()
-# plt.savefig("/home/pengxinbian/Desktop/ex_plots/qua_tau_dna200.pdf", format="pdf", bbox_inches="tight")
+# plt.savefig("/home/pengxinbian/Desktop/ex_plots/bl_mem_tau.pdf", format="pdf", bbox_inches="tight")
 # plt.clf()
 
 
-# ## Change n
-# df = pd.read_csv("change_n_dna200.csv")
+# ## Change k
+# df = pd.read_csv("/home/pengxinbian/Desktop/experiment/Baseline/change_k.csv")
 # n = []
-# runtime = []
+# tau = []
+# k = []
+# bl_runtime = []
+# main_runtime = []
+# bl_mem = []
+# main_mem = []
 
 # for index, row in df.iterrows():
-#     runtime.append(row['runtime (s)'])
-#     if(row['text_file'] == 'data/dna.200MB_25MB'):
-#         n.append(25)
-#     elif(row['text_file'] == 'data/dna.200MB_50MB'):
-#         n.append(50)
-#     elif(row['text_file'] == 'data/dna.200MB_75MB'):
-#         n.append(75)
-#     elif(row['text_file'] == 'data/dna.200MB_100MB'):
-#         n.append(100)
-#     elif(row['text_file'] == 'data/dna.200MB_125MB'):
-#         n.append(125)
-#     elif(row['text_file'] == 'data/dna.200MB_150MB'):
-#         n.append(150)
-#     elif(row['text_file'] == 'data/dna.200MB_175MB'):
-#         n.append(175)
-#     elif(row['text_file'] == 'data/dna.200MB'):
-#         n.append(200)
+#     tau.append(row['tau'])
+#     k.append(row['k'])
+#     bl_mem.append(row['bl_mem'] / 1000)
+#     main_mem.append(row['main_mem'] / 1000)
+
+#     bl_runtime.append(row['bl_time (s)'])
+#     main_runtime.append(row['main_time (s)'])
 
 # ## Runtime
-# # plt.plot(n, runtime, linewidth=5, marker = 'o', markersize=10, color = 'red', linestyle = '--', label = 'RPM-ST')
-# plt.bar(n, runtime, color = 'skyblue', label = 'RPM-ST', width = 30)
-# # plt.gca().xaxis.set_major_formatter(ScalarFormatter())
-# # plt.ticklabel_format(style='plain')
-# plt.ylim(0, max(runtime) + 200)
-# plt.gca().yaxis.get_major_formatter().set_useOffset(False)
-# plt.gca().yaxis.get_major_formatter().set_scientific(False)
-
-# plt.xlabel(r"$n$ (MB)", fontsize=30)
+# bar_width = 0.4
+# n_positions = np.arange(len(k))
+# plt.bar(n_positions - bar_width/2, bl_runtime, width=bar_width, color='b', label='Baseline')
+# plt.bar(n_positions + bar_width/2, main_runtime, width=bar_width, color='r', label='RPM-ST')
+# # plt.ylim(1, pow(10,2))
+# # plt.gca().yaxis.get_major_formatter().set_useOffset(False)
+# # plt.gca().yaxis.get_major_formatter().set_scientific(False)
+# plt.yscale('log')
+# plt.xlabel(r"$k$", fontsize=30)
 # plt.ylabel("runtime (s)", fontsize=30)
-# plt.legend(loc='best', fontsize=28)
-# plt.xticks(fontsize=30, rotation=45)
+# # plt.legend(loc='best', fontsize=28)
+# plt.legend(bbox_to_anchor=(1.03, 1.25), ncol=2, fontsize = 28)
+# plt.xticks(n_positions, [5, 10, 20, 50, 100], fontsize=30, rotation=45)
 # plt.yticks(fontsize=30)
 # plt.grid(True, linestyle='--', linewidth=0.5)
-# # Adjust the layout to be tight
+# # # Adjust the layout to be tight
 # # plt.tight_layout()
 # # plt.show()
-# plt.savefig("/home/pengxinbian/Desktop/ex_plots/time_n_dna200.pdf", format="pdf", bbox_inches="tight")
+# plt.savefig("/home/pengxinbian/Desktop/ex_plots/bl_time_k.pdf", format="pdf", bbox_inches="tight")
+# plt.clf()
+
+
+# ## Memory
+# bar_width = 0.4
+# n_positions = np.arange(len(k))
+# plt.bar(n_positions - bar_width/2, bl_mem, width=bar_width, color='b', label='Baseline')
+# plt.bar(n_positions + bar_width/2, main_mem, width=bar_width, color='r', label='RPM-ST')
+# # plt.ylim(1, pow(10,5))
+# # plt.ylim(0, max(bl_mem) + 1000)
+# # plt.gca().yaxis.get_major_formatter().set_useOffset(False)
+# # plt.gca().yaxis.get_major_formatter().set_scientific(False)
+# # plt.yscale('log')
+# plt.xlabel(r"$k$", fontsize=30)
+# plt.ylabel("memory (MB)", fontsize=30)
+# # plt.legend(loc='best', fontsize=28)
+# plt.legend(bbox_to_anchor=(1.03, 1.25), ncol=2, fontsize = 28)
+# plt.xticks(n_positions, [5, 10, 20, 50, 100], fontsize=30, rotation=45)
+# plt.yticks(fontsize=30)
+# plt.grid(True, linestyle='--', linewidth=0.5)
+# # # Adjust the layout to be tight
+# # plt.tight_layout()
+# # plt.show()
+# plt.savefig("/home/pengxinbian/Desktop/ex_plots/bl_mem_k.pdf", format="pdf", bbox_inches="tight")
+# plt.clf()
+
+
+
+
+## Change n
+df = pd.read_csv("/home/pengxinbian/Desktop/experiment/Baseline/change_n.csv")
+n = []
+tau = []
+k = []
+bl_runtime = []
+main_runtime = []
+bl_mem = []
+main_mem = []
+
+for index, row in df.iterrows():
+    tau.append(row['tau'])
+    k.append(row['k'])
+    bl_mem.append(row['bl_mem'] / 1000)
+    main_mem.append(row['main_mem'] / 1000)
+
+    bl_runtime.append(row['bl_time (s)'])
+    main_runtime.append(row['main_time (s)'])
+
+    if(row['dataset'] == 'ecoli1000'):
+        n.append(1000)
+    elif(row['dataset'] == 'ecoli2000'):
+        n.append(2000)
+    elif(row['dataset'] == 'ecoli5000'):
+        n.append(5000)
+    elif(row['dataset'] == 'ecoli10000'):
+        n.append(10000)
+    elif(row['dataset'] == 'ecoli20000'):
+        n.append(20000)
+
+
+print(n)
+print(bl_mem)
+print(bl_runtime)
+print(main_mem)
+print(main_runtime)
+
+## Runtime
+bar_width = 0.4
+n_positions = np.arange(len(n))
+plt.bar(n_positions - bar_width/2, bl_runtime, width=bar_width, color='b', label='Baseline')
+plt.bar(n_positions + bar_width/2, main_runtime, width=bar_width, color='r', label='RPM-ST')
+# plt.ylim(1, pow(10,2))
+# plt.gca().yaxis.get_major_formatter().set_useOffset(False)
+# plt.gca().yaxis.get_major_formatter().set_scientific(False)
+# plt.xscale('log')
+plt.yscale('log')
+plt.xlabel(r"$n$", fontsize=30)
+plt.ylabel("runtime (s)", fontsize=30)
+# plt.legend(loc='best', fontsize=28)
+plt.legend(bbox_to_anchor=(1.03, 1.25), ncol=2, fontsize = 28)
+plt.xticks(n_positions, [1000,2000,5000,10000,20000], fontsize=30, rotation=45)
+plt.yticks(fontsize=30)
+plt.grid(True, linestyle='--', linewidth=0.5)
+
+# plt.figure(figsize=(8,6))
+# # Adjust the layout to be tight
+# plt.tight_layout()
+# plt.show()
+plt.savefig("/home/pengxinbian/Desktop/ex_plots/bl_time_n.pdf", format="pdf", bbox_inches="tight")
+plt.clf()
+
+
+## Memory
+bar_width = 0.4
+n_positions = np.arange(len(k))
+plt.bar(n_positions - bar_width/2, bl_mem, width=bar_width, color='b', label='Baseline')
+plt.bar(n_positions + bar_width/2, main_mem, width=bar_width, color='r', label='RPM-ST')
+# plt.ylim(1, pow(10,5))
+# plt.ylim(0, max(bl_mem) + 1000)
+# plt.gca().yaxis.get_major_formatter().set_useOffset(False)
+# plt.gca().yaxis.get_major_formatter().set_scientific(False)
+# plt.xscale('log')
+plt.xlabel(r"$n$", fontsize=30)
+plt.ylabel("memory (MB)", fontsize=30)
+# plt.legend(loc='best', fontsize=28)
+plt.legend(bbox_to_anchor=(1.03, 1.25), ncol=2, fontsize = 28)
+plt.xticks(n_positions, [1000,2000,5000,10000,20000], fontsize=30, rotation=45)
+plt.yticks(fontsize=30)
+plt.grid(True, linestyle='--', linewidth=0.5)
+# # Adjust the layout to be tight
+# plt.tight_layout()
+# plt.show()
+plt.savefig("/home/pengxinbian/Desktop/ex_plots/bl_mem_n.pdf", format="pdf", bbox_inches="tight")
+plt.clf()
