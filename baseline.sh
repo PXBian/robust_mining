@@ -33,6 +33,15 @@ rm output/*
 # (/usr/bin/time -v ./main data/ecoli10000  100 10 )    &> peak_ram/bl_main_ecoli10000_100_10.txt
 
 
+(/usr/bin/time -v ./main data/ecoli1000   50 10 )    &> peak_ram/bl_main_ecoli1000_50_10.txt
+(/usr/bin/time -v ./main data/ecoli2000   50 10 )    &> peak_ram/bl_main_ecoli2000_50_10.txt
+(/usr/bin/time -v ./main data/ecoli5000   50 10 )    &> peak_ram/bl_main_ecoli5000_50_10.txt
+(/usr/bin/time -v ./main data/ecoli10000  50 10 )    &> peak_ram/bl_main_ecoli10000_50_10.txt
+(/usr/bin/time -v ./main data/ecoli20000  50 10 )    &> peak_ram/bl_main_ecoli20000_50_10.txt
+(/usr/bin/time -v ./main data/ecoli50000  50 10 )    &> peak_ram/bl_main_ecoli50000_50_10.txt
+(/usr/bin/time -v ./main data/ecoli100000 50 10 )    &> peak_ram/bl_main_ecoli100000_50_10.txt
+
+
 (/usr/bin/time -v ./baseline data/ecoli1000   10 50 bl_output)    &> peak_ram/bl_base_ecoli1000_50_10.txt
 (/usr/bin/time -v ./baseline data/ecoli2000   10 50 bl_output)    &> peak_ram/bl_base_ecoli2000_50_10.txt
 (/usr/bin/time -v ./baseline data/ecoli5000   10 50 bl_output)    &> peak_ram/bl_base_ecoli5000_50_10.txt
@@ -41,14 +50,6 @@ rm output/*
 (/usr/bin/time -v ./baseline data/ecoli50000  10 50 bl_output)    &> peak_ram/bl_base_ecoli50000_50_10.txt
 (/usr/bin/time -v ./baseline data/ecoli100000 10 50 bl_output)    &> peak_ram/bl_base_ecoli100000_50_10.txt
 
-
-(/usr/bin/time -v ./main data/ecoli1000   50 10 )    &> peak_ram/bl_main_ecoli1000_50_10.txt
-(/usr/bin/time -v ./main data/ecoli2000   50 10 )    &> peak_ram/bl_main_ecoli2000_50_10.txt
-(/usr/bin/time -v ./main data/ecoli5000   50 10 )    &> peak_ram/bl_main_ecoli5000_50_10.txt
-(/usr/bin/time -v ./main data/ecoli10000  50 10 )    &> peak_ram/bl_main_ecoli10000_50_10.txt
-(/usr/bin/time -v ./main data/ecoli20000  50 10 )    &> peak_ram/bl_main_ecoli20000_50_10.txt
-(/usr/bin/time -v ./main data/ecoli50000  50 10 )    &> peak_ram/bl_main_ecoli50000_50_10.txt
-(/usr/bin/time -v ./main data/ecoli100000 50 10 )    &> peak_ram/bl_main_ecoli100000_50_10.txt
 
 
 # # ## change n
