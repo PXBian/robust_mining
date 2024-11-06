@@ -2,7 +2,9 @@
 
 mkdir peak_ram
 rm runtime_details.csv
-gunzip data/*.gz
+gunzip data/dna.200MB_125MB.gz
+gunzip data/dna.200MB_150MB.gz
+gunzip data/dna.200MB_175MB.gz
 make all
 
 

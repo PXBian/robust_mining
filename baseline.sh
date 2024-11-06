@@ -3,7 +3,6 @@
 mkdir peak_ram
 rm runtime_details.csv
 make all
-gunzip data/*.gz
 g++ baseline.cc -o baseline
 rm output/*
 
