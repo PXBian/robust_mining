@@ -9,3 +9,4 @@ endif
 all: main
 
 main: runs.hpp intervaltree.hpp suffixtree.hpp main.cpp 
+

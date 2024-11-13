@@ -55,15 +55,11 @@ int main(int argc, char **argv) {
         cout << "The str length is " << str_length << ", tau = " << tau << ", k = " << k << endl;
 
 
-        string command_str = "rm runtime_details.csv";
+        string command_str = "./baseline " + pathname + " " + to_string(k) + " " + to_string(tau) + " baseline_output";
         const char* command = command_str.c_str();
         system(command);
 
-        command_str = "./baseline " + pathname + " " + to_string(k) + " " + to_string(tau) + " baseline_output";
-        command = command_str.c_str();
-        system(command);
-
-        command_str = "./main " + pathname + " " + to_string(tau) + " " + to_string(k);
+        command_str = "./esa " + pathname + " " + to_string(tau) + " " + to_string(k);
         command = command_str.c_str();
         system(command);
 

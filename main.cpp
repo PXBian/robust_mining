@@ -165,10 +165,10 @@ IntervalTree<INT> is_periodic_preprocessing(unsigned char* text_string, INT text
     // cout << "Go INTo the is_periodic_preprocessing function!" << endl;
 
     // Get all runs of S
-    // string S(reINTerpret_cast<const char*>(text_string), strlen(reINTerpret_cast<const char*>(text_string)) - 1);
+    // string S(reinterpret_cast<const char*>(text_string), strlen(reinterpret_cast<const char*>(text_string)) - 1);
     // auto const R = linear_time_runs::compute_all_runs(S.data(), S.size());
     auto const R = linear_time_runs::compute_all_runs(text_string, text_size);
-    INT poINTs_num = R.size();
+    // INT poINTs_num = R.size();
     // cout << "\nString S contains " << poINTs_num << " runs:" << endl;
 
     // Create an interval tree
@@ -187,6 +187,7 @@ IntervalTree<INT> is_periodic_preprocessing(unsigned char* text_string, INT text
 
     return tree;
 }
+
 
 
 bool is_periodic(INT I, INT J, IntervalTree<INT>& interval_tree, INT &p) {
@@ -551,7 +552,7 @@ int main(int argv, char** argc) {
     size_t pos = text_file.find_last_of("/");
     // Extract the substring after the last '/'
     string file_name = text_file.substr(pos + 1);
-    string output_file = "output/" + file_name + "_" + to_string(freq_threshold) + "_" + to_string(k);
+    string output_file = "output/st_" + file_name + "_" + to_string(freq_threshold) + "_" + to_string(k);
 
     // string text_file_path = "data/" + text_file;
     string text_file_path = text_file;
@@ -613,11 +614,23 @@ int main(int argv, char** argc) {
     // output_stream.close();
 
     auto whole_start = chrono::high_resolution_clock::now();
+
+    start = chrono::high_resolution_clock::now();
+    // InPlacePST ippst = is_periodic_preprocessing(text_string, text_size - 1);  // don't include the last char !
+    IntervalTree<INT> runs = is_periodic_preprocessing(text_string, text_size);
+    cout << "Construct all runs successfully!" << endl;
+    end = chrono::high_resolution_clock::now();
+    elapsed = end - start;
+
+
+    // return 0;   // Max RSS: 9197532
+
     
     // Pre-processing begin
     start = chrono::high_resolution_clock::now();
     STvertex *r = Create_suffix_tree( text_string , text_size+1 );
     cout << "Create ST successfully! The number of leaves is " << liscie << endl;
+    free(text_string);
     end = chrono::high_resolution_clock::now();
     elapsed = end - start;
     // output_stream.open(runtime_detail_csv, ios::app);
@@ -648,6 +661,9 @@ int main(int argv, char** argc) {
       inv_suffix_array[suffix_array[i]] = i;
     }
 
+    // return 0;    // Max RSS: 
+
+
     // interval_map: key is each node in ST, value is <l,r>, where [l,r] is corresponding SA interval of this node
     start = chrono::high_resolution_clock::now();
     vector<STvertex*> rev_bottomup_ordered_nodes = bottom_up_SA_interval(root, suffix_array, inv_suffix_array, text_size, freq_threshold);
@@ -661,20 +677,8 @@ int main(int argv, char** argc) {
     // Pre-processing end
 
 
-    // Check if a substring is periodic, and return its period if it is periodic
-    // Find all runs of S, and store it in an interval tree
-    start = chrono::high_resolution_clock::now();
-    // InPlacePST ippst = is_periodic_preprocessing(text_string, text_size - 1);  // don't include the last char !
-    IntervalTree<INT> runs = is_periodic_preprocessing(text_string, text_size);
-    cout << "Construct all runs successfully!" << endl;
-    end = chrono::high_resolution_clock::now();
-    elapsed = end - start;
-    // output_stream.open(runtime_detail_csv, ios::app);
-    // output_stream << elapsed.count() << ",";
-    // output_stream.close();
-    free(text_string);
+    // return 0;    // Max RSS: 67435236
 
-    // return 0;
 
     // Start MAIN ALGORITHM
     // map<unsigned char,STedge,greater<unsigned char>> children_map;

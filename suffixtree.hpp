@@ -84,7 +84,7 @@ struct STvertex
   	map<unsigned char,STedge, greater<unsigned char>> g; /* edges to children */ // Order the children in descending order to build the SA of this ST
   	STvertex *f; /* suffix link */
   	/* suffix number (0 is the whole word, -1 means the vertex is not a leaf) */
-  	INT numer, str_depth_of_N;
+  	INT numer, str_depth_of_N = 0;
     bool flag; /*false: not frequent and survive; true: frequent and survive*/
     // vector<STvertex*> path; /*the path from root to this node*/
 	STvertex *parent;

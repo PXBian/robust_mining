@@ -12,7 +12,7 @@
 using namespace std;
 
 int main(int argc, char **argv) {
-	const int num_bits = 16;  // Number of bits in each binary string
+	const int num_bits = 10;  // Number of bits in each binary string
     const int total_strings = 1 << num_bits; // Total number of strings (2^16 = 65536)
     
     for (int i = 0; i < total_strings; ++i) {
@@ -34,8 +34,8 @@ int main(int argc, char **argv) {
         }
 
         // Start to execute baseline
-        for (int tau = 2; tau <= 4; tau++) {
-            for (int k = 1; k <= 4; k++) {
+        for (int tau = 2; tau <= 6; tau++) {
+            for (int k = 1; k <= 8; k++) {
                 string command_str = "rm runtime_details.csv";
                 const char* command = command_str.c_str();
                 system(command);
@@ -44,7 +44,7 @@ int main(int argc, char **argv) {
                 command = command_str.c_str();
                 system(command);
 
-                command_str = "./main " + filename + " " + to_string(tau) + " " + to_string(k);
+                command_str = "./esa " + pathname + " " + to_string(tau) + " " + to_string(k);
                 command = command_str.c_str();
                 system(command);
 

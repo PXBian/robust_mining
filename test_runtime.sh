@@ -17,7 +17,7 @@ make all
 # (/usr/bin/time -v ./main data/dna.100MB 100 100)     &> peak_ram/mem_dna100_100_100.txt
 # (/usr/bin/time -v ./main data/dna.100MB 100 1000)    &> peak_ram/mem_dna100_100_1000.txt
 # (/usr/bin/time -v ./main data/dna.100MB 100 10000)   &> peak_ram/mem_dna100_100_10000.txt
-# (/usr/bin/time -v ./main data/dna.100MB 1000 100)    &> peak_ram/mem_dna100_1000_100.txt
+(/usr/bin/time -v ./main data/dna.100MB 1000 100)    &> peak_ram/mem_dna100_1000_100.txt
 # (/usr/bin/time -v ./main data/dna.100MB 1000 1000)   &> peak_ram/mem_dna100_1000_1000.txt
 # (/usr/bin/time -v ./main data/dna.100MB 1000 10000)  &> peak_ram/mem_dna100_1000_10000.txt
 # (/usr/bin/time -v ./main data/dna.100MB 10000 100)   &> peak_ram/mem_dna100_10000_100.txt
@@ -133,7 +133,7 @@ make all
 # (/usr/bin/time -v ./main data/dblp.xml.100MB 100 100)    &> peak_ram/mem_xml100_100_100.txt
 # (/usr/bin/time -v ./main data/dblp.xml.100MB 100 1000)   &> peak_ram/mem_xml100_100_1000.txt
 # (/usr/bin/time -v ./main data/dblp.xml.100MB 100 10000)  &> peak_ram/mem_xml100_100_10000.txt
-# (/usr/bin/time -v ./main data/dblp.xml.100MB 1000 100)   &> peak_ram/mem_xml100_1000_100.txt
+(/usr/bin/time -v ./main data/dblp.xml.100MB 1000 100)   &> peak_ram/mem_xml100_1000_100.txt
 # (/usr/bin/time -v ./main data/dblp.xml.100MB 1000 1000)  &> peak_ram/mem_xml100_1000_1000.txt
 # (/usr/bin/time -v ./main data/dblp.xml.100MB 1000 10000) &> peak_ram/mem_xml100_1000_10000.txt
 # (/usr/bin/time -v ./main data/dblp.xml.100MB 10000 100)  &> peak_ram/mem_xml100_10000_100.txt
