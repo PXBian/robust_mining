@@ -70,34 +70,16 @@ unsigned int construct_tuples ( INT n, INT * SA, vector<B>& b, vector<INT>& LCP,
 	{
     INT l = i - 1;
     
-		// cout << "Current i=" << i << ", l=" << l << ", LCP[i]=" << LCP[i] << ", st.top()=" << st.top() << ", LCP[st.top()]=" << LCP[st.top()] << endl;
-    // cout << "LCP is " << endl;
-    //   for (int I = 0; I < n; I++) {
-    //     cout << LCP[I] << " ";
-    //   }
-    //   cout << endl;
   	while (LCP[i] < LCP[st.top()]) //b[st.top()].lcp
 		{
 			// cout << "Go into the WHILE loop!" << endl;
       x = st.top();	// The index of the lastInterval
       b[x].r = i - 1; 
       st.pop();
-      // cout << "After pop, x=" << x << ", b[x].l=" << b[x].l << ", b[x].r=" << b[x].r << endl;
-      // cout << "LCP is " << endl;
-      // for (int I = 0; I < n; I++) {
-      //   cout << LCP[I] << " ";
-      // }
-      // cout << endl;
       
       l = b[x].l; 
 
       bottomup_order.push_back(x);
-      // cout << "After push_back x to bottomup_order, LCP is " << endl;
-      // for (int I = 0; I < n; I++) {
-      //   cout << LCP[I] << " ";
-      // }
-      // cout << endl;
-
       INT check_top = st.top();
       if (LCP[i] <= LCP[check_top]) 
 			{
@@ -106,18 +88,7 @@ unsigned int construct_tuples ( INT n, INT * SA, vector<B>& b, vector<INT>& LCP,
         b[x].parent = check_top;
 				// cout << "Push x=" << x << " to b[st.top()].ch, where b[st.top()].l=" << b[check_top].l << ", b[st.top()].r=" << b[check_top].r << endl;
 				x = -1;
-
-        // cout << "End of IF in the while loop, LCP is " << endl;
-        // for (int I = 0; I < n; I++) {
-        //   cout << LCP[I] << " ";
-        // }
-        // cout << endl;
       }
-      // cout << "End of while loop, LCP is " << endl;
-      // for (int I = 0; I < n; I++) {
-      //   cout << LCP[I] << " ";
-      // }
-      // cout << endl;
     }
   	if (LCP[i] > LCP[st.top()]) 
 		{
@@ -127,12 +98,7 @@ unsigned int construct_tuples ( INT n, INT * SA, vector<B>& b, vector<INT>& LCP,
 			b[i].r = -1;
       b[i].ch.clear();
 			st.push(i); 
-      // cout << "Push i = " << i << " into the stack!" << endl;
-      // cout << "After push to stack, LCP is " << endl;
-      // for (int I = 0; I < n; I++) {
-      //   cout << LCP[I] << " ";
-      // }
-      // cout << endl;
+
 			// if (~ x) // x == -1: ~-1 = 0, FALSE. x is the index of b[], x=0 means this is the root
       if(x != -1)
 			{
@@ -141,77 +107,12 @@ unsigned int construct_tuples ( INT n, INT * SA, vector<B>& b, vector<INT>& LCP,
 				// cout << "Push x=" << x << " to b[i].ch, where b[i].l=" << b[i].l << ", b[i].r=" << b[i].r << endl;
 
 				x = -1;
-
-        // cout << "If state end, LCP is " << endl;
-        // for (int I = 0; I < n; I++) {
-        //   cout << LCP[I] << " ";
-        // }
-        // cout << endl;
       }
      }
     }
 
-    // cout << "Process the root..." << endl;
-
-    // INT l;
-    // while (!st.empty()) {
-    // //   while (LCP[n - 1] < LCP[st.top()]) //b[st.top()].lcp
-		// // {
-		// 	// cout << "Go into the WHILE loop!" << endl;
-    //   x = st.top();	// The index of the lastInterval
-    //   b[x].r = n - 2; 
-    //   st.pop();
-    //   cout << "After pop, x=" << x << ", b[x].l=" << b[x].l << ", b[x].r=" << b[x].r << endl;
-      
-    //   l = b[x].l; 
-
-    //   if(x != 0)
-		// 	{
-    //     b[st.top()].ch.push_back(x);
-    //     b[x].parent = st.top();
-		// 		// cout << "Push x=" << x << " to b[st.top()].ch, where b[st.top()].l=" << b[st.top()].l << ", b[st.top()].r=" << b[st.top()].r << endl;
-		// 		x = -1;
-    //   }
-    // }
-
-
-
-
-  	// if (!st.empty() && LCP[n-1] > LCP[st.top()]) 
-		// {
-		// 	// cout << "Go into the IF! LCP[i]=" << LCP[i] << ", l=" << l << endl;
-    //   b[n - 1].lcp = LCP[n - 1];
-    //   b[n - 1].l = l;
-		// 	b[n - 1].r = -1;
-    //   b[n - 1].ch.clear();
-		// 	st.push(i); 
-    //   cout << "Push i = " << i << " into the stack!" << endl;
-		// 	// if (~ x) // x == -1: ~-1 = 0, FALSE. x is the index of b[], x=0 means this is the root
-    //   if(x != -1)
-		// 	{
-		// 		b[i].ch.push_back(x);
-    //     b[x].parent = i;
-		// 		// cout << "Push x=" << x << " to b[i].ch, where b[i].l=" << b[i].l << ", b[i].r=" << b[i].r << endl;
-
-		// 		x = -1;
-    //   }
-    //  }
-    // }
-
-	
-  // for (INT v: b[0].ch)			// Here we process all children v of the root node visited by a DFS
-	// {	
-	// 	vector<INT>().swap(b[v].ch);
-	// 	b[v].ch.push_back(b[0].lcp);
-	// 	cout << "Push b[0].lcp=" << b[0].lcp << " to b[v].ch, where b[v].l=" << b[v].l << ", b[v].r=" << b[v].r << endl;
-	// }
-	
 	cout << "Tuples corresponding to internal nodes are constructed." << endl;
     	
-	// sort( b, b+n, &tuples_sorter );		// we sort the tuples more or less in place
-	// cout << "Tuples are sorted." << endl;
-
-	
 	return (1);
 }
 
@@ -749,19 +650,11 @@ int main(int argv, char** argc) {
 
     // return 0;   //Max RSS: 9402300
 
-
     
 	  // B * b = ( B * ) realloc(b, ( text_size ) * sizeof( B ) );
 	  vector<B> b(text_size);
 
-    // cout << "Initial b is " << endl;
-    // for (int i = 0; i < text_size; i++) {
-    //   cout << b[i].l << "," << b[i].r << "," << b[i].lcp << "," << b[i].parent << "," << b[i].FLAG << endl;
-    // }
-
-
     // return 0;   //Max RSS: 18062704
-
 
 
     vector<INT> bottomup_order;
@@ -774,9 +667,6 @@ int main(int argv, char** argc) {
     //   cout << item << " ";
     // }
     // cout << endl;
-
-    // vector<pair<INT,INT>> complete_BU_order;
-
 
     // return 0;     //Max RSS: 21421224
 
@@ -852,16 +742,6 @@ int main(int argv, char** argc) {
       }
     }
 
-    // cout << "The complete_BU_order is " << endl;
-    // for (const auto &item : complete_BU_order) {
-    //   cout << "(" << item.first << "," << item.second << ") ";
-    // }
-    // cout << endl;
-
-    // complete_BU_order.clear();
-    // cout << "Free complete_BU_order" << endl;
-    
-
     // cout << "The tuples are " << endl;
     // for (int i = 0; i < text_size; i++) {
     //   cout << "i=" << i << ", l=" << b[i].l << ", r=" << b[i].r << ", lcp=" << b[i].lcp << ", flag=" << b[i].FLAG << ", parent=" << b[i].parent << ", children are: ";
@@ -873,23 +753,6 @@ int main(int argv, char** argc) {
 
 
     // return 0;     //Max RSS: 16742976
-
-
-
-    // // Check if a substring is periodic, and return its period if it is periodic
-    // // Find all runs of S, and store it in an interval tree
-    // start = chrono::high_resolution_clock::now();
-    // // InPlacePST ippst = is_periodic_preprocessing(text_string, text_size - 1);  // don't include the last char !
-    // IntervalTree<INT> runs = is_periodic_preprocessing(text_string, text_size);
-    // cout << "Construct all runs successfully!" << endl;
-    // end = chrono::high_resolution_clock::now();
-    // elapsed = end - start;
-    // // output_stream.open(runtime_detail_csv, ios::app);
-    // // output_stream << elapsed.count() << ",";
-    // // output_stream.close();
-    // free(text_string);
-
-    // return 0;    // Whole Max RSS: 25937484; Only copy text_string: 16743280; After all_runs before interval tree: 25937488
 
 
     // Start MAIN algorithm
