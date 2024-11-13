@@ -89,6 +89,7 @@ vector<STvertex*> bottom_up_SA_interval(STvertex* &r, INT* &suffix_array, INT* &
 	  // children_map = current->g;
     
 	  bool is_root = current == r;
+    // cout << "is_root = " << is_root << endl;
 
 	  // cout << "In the DFS traverse, the current.numer is " << current->numer << ", it is root " << is_root << endl;
 
@@ -101,8 +102,10 @@ vector<STvertex*> bottom_up_SA_interval(STvertex* &r, INT* &suffix_array, INT* &
       current_interval = {current_idx,current_idx};
     }
     current->SA_interval = current_interval;
+    // cout << "Current interval is [" << current_interval.first << "," << current_interval.second << "]" << endl;
 
 	  // Push all the children to the traversal stack (in the order they appear)
+    // cout << "children size = " << current->g.size() << endl;
 	  for (auto const &child : current->g) {
       child_node = child.second.v;
       DFS_stack.push(child_node);
@@ -110,7 +113,7 @@ vector<STvertex*> bottom_up_SA_interval(STvertex* &r, INT* &suffix_array, INT* &
 
       INT child_str_depth = current_str_depth + child_edge_length;
       child_node->str_depth_of_N = child_str_depth;
-      // cout << "The numer of child_node is" << child_node->numer << ", the child_edge_length is " << child_edge_length << ", the child_str_depth is " << child_str_depth << endl; 
+      // cout <<"The numer of child_node is " << child_node->numer << ", the child_edge_length is " << child_edge_length << ", the child_str_depth is " << child_str_depth << endl; 
       child_node->parent = current;
     }
 
@@ -118,7 +121,7 @@ vector<STvertex*> bottom_up_SA_interval(STvertex* &r, INT* &suffix_array, INT* &
     if (!is_root && current_num < txt_size) {
       // bottom_up_stack.push(current);
       rev_bottomup_ordered_nodes.push_back(current);
-      // cout << "Now push the " << current->numer << " INTo the result_stack!" << endl;
+      // cout << "Now push the " << current->numer << " into the rev_bottomup_ordered_nodes!" << endl; 
     }
 
   }
@@ -167,14 +170,28 @@ IntervalTree<INT> is_periodic_preprocessing(unsigned char* text_string, INT text
     // Get all runs of S
     // string S(reinterpret_cast<const char*>(text_string), strlen(reinterpret_cast<const char*>(text_string)) - 1);
     // auto const R = linear_time_runs::compute_all_runs(S.data(), S.size());
-    auto const R = linear_time_runs::compute_all_runs(text_string, text_size);
+    // Add two \1 before and after the text_string to ensure that the runs function run successfully
+    unsigned char * sequence = ( unsigned char * ) malloc ( ( text_size+2 ) * sizeof ( unsigned char ) );
+    sequence[0] = '\1';
+    memcpy(sequence + 1, text_string, text_size);
+    sequence[text_size+1] = '\1';
+
+    // cout<<"String sequence with length " << text_size + 2 << "is ";
+    // for(INT i=0; i<text_size + 2; i++) {
+    //   cout<< sequence[i] << ":" << (INT) sequence[i] << " ";
+    // }
+    // cout << endl;
+
+    
+    auto const R = linear_time_runs::compute_all_runs(sequence, text_size+2);
     // INT poINTs_num = R.size();
     // cout << "\nString S contains " << poINTs_num << " runs:" << endl;
+    free(sequence);
 
     // Create an interval tree
     IntervalTree<INT> tree;  
     for (auto run : R) {
-      Interval<INT> cur = {run.start, run.end};
+      Interval<INT> cur = {run.start - 1, run.end - 1};
       cur.per = run.period;
       tree.insert(cur);
       // cout << "start=" << run.start
@@ -587,10 +604,7 @@ int main(int argv, char** argc) {
 
     // At the beginning and end of S, add two $ to ensure the all_run runs successfully!
     auto start = chrono::high_resolution_clock::now();
-    text_string[0] = '\1';
-    // cout << "text_file_size is " << text_file_size << ", start reading! " << endl;
-    // for (INT i = 1; i <= text_file_size; i++) {	
-    for (INT i = 1; i <= text_file_size; i++) {	
+    for (INT i = 0; i < text_file_size - 1; i++) {	
       is_text.read(reinterpret_cast<char*>(&chr), 1);
       text_string[i] = chr;
       // cout << "i=" << i << "," << chr << "(" << text_size << "),dec_value=" << (unsigned INT)chr << "; ";
@@ -599,9 +613,9 @@ int main(int argv, char** argc) {
     is_text.close();
     // cout << endl;
     
-    text_string[ text_size+1] = '\1';
-    text_string[ text_size+2] = '\0';	// Change '~' to '!' to make the symbol's ascii is smaller than the chars in txt
-    text_size = text_size + 2;  // Do not include the final \0
+    text_string[ text_size] = 255;
+    text_string[ text_size+1] = '\0';	// Change '~' to '!' to make the symbol's ascii is smaller than the chars in txt
+    text_size = text_size + 1;  // Do not include the final \0
     cout << "Finish reading the text file! text_size = " << text_size << endl;
     // cout << "CHECK! The text_size = " << text_size << endl;
     // for(INT i = 0; i < text_size; i++) {
@@ -628,7 +642,7 @@ int main(int argv, char** argc) {
     
     // Pre-processing begin
     start = chrono::high_resolution_clock::now();
-    STvertex *r = Create_suffix_tree( text_string , text_size+1 );
+    STvertex *r = Create_suffix_tree( text_string , text_size );
     cout << "Create ST successfully! The number of leaves is " << liscie << endl;
     free(text_string);
     end = chrono::high_resolution_clock::now();
@@ -648,10 +662,7 @@ int main(int argv, char** argc) {
     // output_stream.close();
 
 
-    // cout<<"Suffix Array for String ";
-    // for(INT i=0; i<text_size; i++)
-    //     cout<<txt[i];
-   	// cout<<" is: ";
+    // cout<<"SA: ";
     // for(INT i=0; i<text_size; i++)
     //     cout<<suffix_array[i]<<" ";
     // cout<<endl;
@@ -661,7 +672,7 @@ int main(int argv, char** argc) {
       inv_suffix_array[suffix_array[i]] = i;
     }
 
-    // return 0;    // Max RSS: 
+    // return 0;    // Max RSS: 63239776
 
 
     // interval_map: key is each node in ST, value is <l,r>, where [l,r] is corresponding SA interval of this node
@@ -800,13 +811,14 @@ int main(int argv, char** argc) {
   // output_stream.close();
 
   
-  output_stream.open(output_file);
-  // output_stream.open("main_output");
+  // output_stream.open(output_file);
+  output_stream.open("main_output");
   if(!output_stream.is_open()) {
         cout << "Couldn't open output file\n" << endl; 
   }
   // cout << "The OUTPUT with size " << text_size - 2 << " is ";
-  for(INT i = 1; i < text_size - 2; i++) {  // Exclude the first and last special char
+  // for(INT i = 1; i < text_size - 2; i++) {  // Exclude the first and last special char
+  for(INT i = 0; i < text_size - 1; i++) {  // Exclude the first and last special char
     // cout << OUTPUT[i] << " ";
     output_stream << OUTPUT[i] << "\n";
   }
@@ -814,7 +826,7 @@ int main(int argv, char** argc) {
   output_stream.close();
   free(OUTPUT);
 
-  if(freq_threshold == 2) num_of_freq--;    // Remove the case of two \1 at the beginning and end of string S
+  // if(freq_threshold == 2) num_of_freq--;    // Remove the case of two \1 at the beginning and end of string S
   cout << "The num_of_freq = " << num_of_freq << ", num_of_resi = " << num_of_resi << ", num_of_resi / num_of_freq = " << (double) num_of_resi / (double) num_of_freq << ", num_of_freq - num_of_resi = " << num_of_freq - num_of_resi << endl;
 
   cout << "Finish!\n" << endl;

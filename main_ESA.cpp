@@ -126,12 +126,9 @@ IntervalTree<INT> is_periodic_preprocessing(unsigned char* text_string, INT text
 
     // Add two \1 before and after the text_string to ensure that the runs function run successfully
     unsigned char * sequence = ( unsigned char * ) malloc ( ( text_size+2 ) * sizeof ( unsigned char ) );
-    sequence[0] = 1;
+    sequence[0] = '\1';
     memcpy(sequence + 1, text_string, text_size);
-    // for(INT i = 0; i < text_size; i++) {
-    //   sequence[i+1] = text_string[i];
-    // }
-    sequence[text_size+1] = 1;
+    sequence[text_size+1] = '\1';
 
     // cout<<"String sequence with length " << text_size + 2 << "is ";
     // for(INT i=0; i<text_size + 2; i++) {
@@ -408,7 +405,7 @@ bool check_freq_periodic_survive(bool is_node_checking, bool &is_cut_point, vect
     INT p = INT_MAX;
     bool is_periodic_value = is_periodic(I, J, interval_tree, p);  // Here p can store the return value from is_periodic when YES
     
-    B current = b[cur_index];
+    // B current = b[cur_index];
     // cout << "The value of is_periodic is " << is_periodic_value << ", the p = " << p << endl;
     if (is_periodic_value) {
       // is_periodic_yes ++;   // Count the times of answering YES
@@ -426,11 +423,13 @@ bool check_freq_periodic_survive(bool is_node_checking, bool &is_cut_point, vect
           b[cur_index].FLAG = (short int)1;
 
           // cout << "Start to upforward the FLAG" << endl;
-          B it = current;
-          while (it.parent != -1) {
+          // B it = b[cur_index];
+          INT it = cur_index;
+          while (it != 0) {    // This is not the root
             // cout << "it.parent = " << it.parent << endl;
-            b[it.parent].FLAG = (short int)1;
-            it = b[it.parent];
+            INT parent_index = b[it].parent;
+            b[parent_index].FLAG = (short int)1;
+            it = parent_index;
           }
         }
       }
@@ -447,12 +446,20 @@ bool check_freq_periodic_survive(bool is_node_checking, bool &is_cut_point, vect
           b[cur_index].FLAG = (short int)1;
 
 
-          // cout << "Start to upforward the FLAG" << endl;
-          B it = current;
-          while (it.parent != -1) {
+          // // cout << "Start to upforward the FLAG" << endl;
+          // B it = current;
+          // while (it.parent != -1) {
+          //   // cout << "it.parent = " << it.parent << endl;
+          //   b[it.parent].FLAG = (short int)1;
+          //   it = b[it.parent];
+          // }
+
+          INT it = cur_index;
+          while (it != 0) {    // This is not the root
             // cout << "it.parent = " << it.parent << endl;
-            b[it.parent].FLAG = (short int)1;
-            it = b[it.parent];
+            INT parent_index = b[it].parent;
+            b[parent_index].FLAG = (short int)1;
+            it = parent_index;
           }
         }
       }
@@ -670,51 +677,64 @@ int main(int argv, char** argc) {
 
     // return 0;     //Max RSS: 21421224
 
+    // cout << "The tuples before are " << endl;
+    // for (int i = 0; i < text_size; i++) {
+    //   cout << "i=" << i << ", l=" << b[i].l << ", r=" << b[i].r << ", lcp=" << b[i].lcp << ", flag=" << b[i].FLAG << ", parent=" << b[i].parent << ", children are: ";
+    //   for (const auto &child: b[i].ch) {
+    //     cout << child << ",";
+    //   }
+    //   cout << endl;
+    // }
+
     
     INT last_index = -1;
     for(const auto cur_index : bottomup_order) {
-      // cout << "cur_index=" << cur_index << endl;
-      // INT BU_size = complete_BU_order.size();
-      // if (BU_size != 0)
-        // cout << "left bound=" << b[complete_BU_order[BU_size - 1].first].r << ", b[cur_index].l=" << b[cur_index].l << ", b[cur_index].r=" << b[cur_index].r << endl;
-      // if(BU_size == 0) {                            //  CASE I: complete_BU_order is empty: Add all the leaves of b[cur]
+      // cout << "cur_index=" << cur_index << ", last_index=" << last_index << endl;
+  
+      //  CASE I: Start to traverse: Add all the leaves of b[cur_index]
       if(last_index == -1) {     
         // cout << "BU is empty case" << endl;
         // cout << "b[cur_index].l=" << b[cur_index].l << ", b[cur_index].r=" << b[cur_index].r << endl;
         for(INT a = b[cur_index].l; a <= b[cur_index].r; a++) {
           // complete_BU_order.push_back({a,a});
           b[cur_index].ch.push_back(-a);
+          // cout << "in=" << a << " ";
         }
+        // cout << endl;
       }
-      // else if (b[complete_BU_order[BU_size - 1].first].r < b[cur_index].l) {    // CASE II: b[cur] is disjoint with the last item in complete_BU_order (They have same parent)
+      // CASE II: b[cur_index] is disjoint with the last interval (They have same parent)
       else if (b[last_index].r < b[cur_index].l) {
         // cout << "Disjoint case" << endl;
 
-        for (INT a = b[last_index].r + 1; a <= b[cur_index].r; a++) {
+        // for (INT a = b[last_index].r + 1; a <= b[cur_index].r; a++) {
+        for (INT a = b[cur_index].l; a <= b[cur_index].r; a++) {
+
           // complete_BU_order.push_back({a,a});
           b[cur_index].ch.push_back(-a);
+          // cout << "d=" << a << " ";
         }
+        // cout << endl;
       }
+      // CASE III: b[cur_index] includes the last interval (cur is the parent of last)
       else {
         // cout << "Include case" << endl;
         vector<INT> gaps;
 
-        // Check for uncovered points after the first child interval
+        // (a): Check for uncovered points after the first child interval
         for (INT a = b[cur_index].l; a < b[b[cur_index].ch[0]].l; a++) { 
-          // cout << "a=" << a << " ";
+          // cout << "a=" << a << endl;
           gaps.push_back(a);
         }  
-        // Check for uncovered points between consecutive child intervals
+        // (b): Check for uncovered points between consecutive child intervals
         for (INT ch_count = 1; ch_count < b[cur_index].ch.size(); ch_count++) {
           for (int j = b[b[cur_index].ch[ch_count-1]].r + 1; j < b[b[cur_index].ch[ch_count]].l; j++) {
-            // cout << "j=" << j << " ";
+            // cout << "j=" << j << endl;
               gaps.push_back(j);
           }
         }  
-        // Check for uncovered points after the last child interval
-        // for (int a = b[complete_BU_order[BU_size - 1].first].r + 1; a <= b[cur_index].r; a++) {
+        // (c): Check for uncovered points after the last child interval
         for (int a = b[last_index].r + 1; a <= b[cur_index].r; a++) {
-          // cout << "A=" << a << " ";
+          // cout << "A=" << a << endl;
           gaps.push_back(a);
         }
 
@@ -723,15 +743,12 @@ int main(int argv, char** argc) {
           // complete_BU_order.push_back({a,a});
           b[cur_index].ch.push_back(-a);
         }
+        // cout << endl;
 
         gaps.clear();
       }
-      
-      // complete_BU_order.push_back({cur_index, -1});
-      last_index = cur_index;
 
       // Calculate the sum of the num_of_freq
-      
       INT range_left = b[cur_index].l, range_right = b[cur_index].r;
       if(range_right - range_left + 1 >= freq_threshold && cur_index != 0) {
         // current_path = current->path;
@@ -740,6 +757,8 @@ int main(int argv, char** argc) {
         num_of_freq = num_of_freq + (cur_str_depth - parent_str_depth);
         // cout << "Now add " << cur_str_depth - parent_str_depth << " to num_of_freq, num_of_freq = " << num_of_freq << endl;
       }
+
+      last_index = cur_index;
     }
 
     // cout << "The tuples are " << endl;
@@ -883,8 +902,8 @@ int main(int argv, char** argc) {
     chrono::duration<double> whole_elapsed = whole_end - whole_start;
     cout << "The whole process takes " << whole_elapsed.count() << " s." << endl;
 
-    output_stream.open(output_file);
-    // output_stream.open("main_output");
+    // output_stream.open(output_file);
+    output_stream.open("main_output");
     if(!output_stream.is_open()) {
           cout << "Couldn't open output file\n" << endl; 
     }
