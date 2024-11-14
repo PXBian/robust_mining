@@ -24,7 +24,8 @@ using namespace Intervals;
 
 // INT is_periodic_yes = 0, is_periodic_no = 0;
 INT num_of_freq = 0, num_of_resi = 0;
-
+INT freq_count = 0, resi_count = 0;
+vector<INT> outlier;
 
 void build_suffix_array(INT* suffixArray, INT txt_size, STvertex *r){
     for(INT i=0; i< txt_size; i++)
@@ -58,7 +59,7 @@ void build_suffix_array(INT* suffixArray, INT txt_size, STvertex *r){
 }
 
 
-vector<STvertex*> bottom_up_SA_interval(STvertex* &r, INT* &suffix_array, INT* &inv_suffix_array, INT txt_size, INT freq_threshold) {
+vector<STvertex*> bottom_up_SA_interval(STvertex* r, INT* &suffix_array, INT* &inv_suffix_array, INT txt_size, INT freq_threshold) {
 	cout << "The sizeof suffix array is " << txt_size << endl;
 
 	// Stack for traversing the tree
@@ -71,14 +72,13 @@ vector<STvertex*> bottom_up_SA_interval(STvertex* &r, INT* &suffix_array, INT* &
   vector<STvertex*> rev_bottomup_ordered_nodes;
   // map<unsigned char,STedge,greater<unsigned char>> children_map;
 
-  // Start with the root node
-  DFS_stack.push(current);
-  // current_path.push_back(current);
-  // current->parent = new STvertex;
-  // current->parent->numer = -100;
-  current->str_depth_of_N = 0;
+
   // Traverse the tree using DFS & bottom-up
   cout << "Start DFS traverse!" << endl;
+
+  // Start with the root node
+  DFS_stack.push(current);
+  current->str_depth_of_N = 0;
 
   while (!DFS_stack.empty()) {
     current = DFS_stack.top();
@@ -94,7 +94,9 @@ vector<STvertex*> bottom_up_SA_interval(STvertex* &r, INT* &suffix_array, INT* &
 	  // cout << "In the DFS traverse, the current.numer is " << current->numer << ", it is root " << is_root << endl;
 
     pair<INT,INT> current_interval = {-10,-10};
-	  if(current_num > -1 && current_num < txt_size) {	// current is a leaf
+	  // if(current_num > -1 && current_num < txt_size) {	// current is a leaf
+	  if(current_num > -1) {	// current is a leaf
+
       // getting index to SA from invSA
       INT current_idx = inv_suffix_array[current_num];
       // Initialize the interval of the current node (leaf)
@@ -118,12 +120,14 @@ vector<STvertex*> bottom_up_SA_interval(STvertex* &r, INT* &suffix_array, INT* &
     }
 
     // Push the current node to the result stack: Don't push the root, as well as the special char $
-    if (!is_root && current_num < txt_size) {
+    // if (!is_root && current_num < txt_size) {
+    if (!is_root) {
       // bottom_up_stack.push(current);
       rev_bottomup_ordered_nodes.push_back(current);
       // cout << "Now push the " << current->numer << " into the rev_bottomup_ordered_nodes!" << endl; 
     }
 
+    if(current_num >= txt_size) outlier.push_back(current_num);
   }
 
 	cout << "End DFS traverse, start bottom-up ordered traverse..." << endl;
@@ -135,8 +139,6 @@ vector<STvertex*> bottom_up_SA_interval(STvertex* &r, INT* &suffix_array, INT* &
 
     // After the DFS traverse, only leaves have SA_interval
     if (current->SA_interval.first == -10 && current->SA_interval.second == -10) {
-      // children_map = current->g;
-      // vector<INT> current_interval;
       INT current_min = numeric_limits<INT>::max(), current_max = numeric_limits<INT>::min();
       for (auto const &child : current->g) {
         if (child.second.v->SA_interval.first < current_min) {
@@ -157,6 +159,7 @@ vector<STvertex*> bottom_up_SA_interval(STvertex* &r, INT* &suffix_array, INT* &
       INT parent_str_depth = parent_node->str_depth_of_N, cur_str_depth = current->str_depth_of_N;
       num_of_freq = num_of_freq + (cur_str_depth - parent_str_depth);
       // cout << "Now add " << cur_str_depth - parent_str_depth << " to num_of_freq, num_of_freq = " << num_of_freq << endl;
+      freq_count++;
     }
   }
 
@@ -176,13 +179,7 @@ IntervalTree<INT> is_periodic_preprocessing(unsigned char* text_string, INT text
     memcpy(sequence + 1, text_string, text_size);
     sequence[text_size+1] = '\1';
 
-    // cout<<"String sequence with length " << text_size + 2 << "is ";
-    // for(INT i=0; i<text_size + 2; i++) {
-    //   cout<< sequence[i] << ":" << (INT) sequence[i] << " ";
-    // }
-    // cout << endl;
 
-    
     auto const R = linear_time_runs::compute_all_runs(sequence, text_size+2);
     // INT poINTs_num = R.size();
     // cout << "\nString S contains " << poINTs_num << " runs:" << endl;
@@ -589,7 +586,7 @@ int main(int argv, char** argc) {
     INT text_file_size = in_file.tellg();
 
     
-    unsigned char * text_string = ( unsigned char * ) malloc (  ( text_file_size+4 ) * sizeof ( unsigned char ) );
+    unsigned char * text_string = ( unsigned char * ) malloc (  ( text_file_size+2 ) * sizeof ( unsigned char ) );
     char chr = 0;
     // INT text_size = 0;
     INT text_size = 0;
@@ -675,9 +672,8 @@ int main(int argv, char** argc) {
     // return 0;    // Max RSS: 63239776
 
 
-    // interval_map: key is each node in ST, value is <l,r>, where [l,r] is corresponding SA interval of this node
     start = chrono::high_resolution_clock::now();
-    vector<STvertex*> rev_bottomup_ordered_nodes = bottom_up_SA_interval(root, suffix_array, inv_suffix_array, text_size, freq_threshold);
+    vector<STvertex*> rev_bottomup_ordered_nodes = bottom_up_SA_interval(r, suffix_array, inv_suffix_array, text_size, freq_threshold);
     cout << "Construct SA interval for each node in ST successfully. Preprocessing end!" << endl;
     end = chrono::high_resolution_clock::now();
     elapsed = end - start;
@@ -687,7 +683,12 @@ int main(int argv, char** argc) {
     free(inv_suffix_array);
     // Pre-processing end
 
-
+    // cout << "The num_of_freq = " << num_of_freq << ", outlier.size = " << outlier.size() << endl;
+    // for(const auto &item : outlier) {
+    //   cout << item << " ";
+    // }
+    // cout << endl;
+    
     // return 0;    // Max RSS: 67435236
 
 
@@ -735,7 +736,7 @@ int main(int argv, char** argc) {
           else {    // This child node is v
             INT I = suffix_array[child_l], J; // left bound of the substring is fixed, we need to find out the right bound
             INT low = I + current_str_depth - 1, high = I + child_str_depth - 1;
-            J = binary_search_longest_substring(low, high, I, child_l, child_r, freq_threshold, k, is_cut_point, root, current, suffix_array, runs);
+            J = binary_search_longest_substring(low, high, I, child_l, child_r, freq_threshold, k, is_cut_point, r, current, suffix_array, runs);
             INT refined_cut_len = J - I + 1;
 
             for (INT i = child_l; i <= child_r; i++) {
@@ -744,6 +745,8 @@ int main(int argv, char** argc) {
             }
 
             num_of_resi = num_of_resi + J - low;
+
+            resi_count++;
             // cout << "Now add (a)J - low = " << J - low << " to num_of_resi, num_of_resi = " << num_of_resi << endl;
           }
         }
@@ -771,7 +774,7 @@ int main(int argv, char** argc) {
             
             INT I = suffix_array[child_l], J; // left bound of the substring is fixed, we need to find out the right bound
             INT low = I + current_str_depth - 1, high = I + child_str_depth - 1;
-            J = binary_search_longest_substring(low, high, I, child_l, child_r, freq_threshold, k, is_cut_point, root, current, suffix_array, runs);
+            J = binary_search_longest_substring(low, high, I, child_l, child_r, freq_threshold, k, is_cut_point, r, current, suffix_array, runs);
             INT refined_cut_len = J - I + 1;
             
             // cout << "Current child's [l,r] is [" << child_l << "," << child_r << "]" << endl;
@@ -801,11 +804,15 @@ int main(int argv, char** argc) {
     delete *it;
   }
   cout << "Delete the ST" << endl;
+
+  // cout << "freq_count = " << freq_count << ", bottomup vector.size = " << rev_bottomup_ordered_nodes.size() << endl;
   rev_bottomup_ordered_nodes.clear();
 
   auto whole_end = chrono::high_resolution_clock::now();
   chrono::duration<double> whole_elapsed = whole_end - whole_start;
   cout << "The whole process takes " << whole_elapsed.count() << " s." << endl;
+  cout << "The num_of_freq = " << num_of_freq << ", num_of_resi = " << num_of_resi << ", num_of_resi / num_of_freq = " << (double) num_of_resi / (double) num_of_freq << ", num_of_freq - num_of_resi = " << num_of_freq - num_of_resi << endl;
+
   // output_stream.open(runtime_detail_csv, ios::app);
   // output_stream << whole_elapsed.count() << "\n";
   // output_stream.close();
@@ -827,8 +834,7 @@ int main(int argv, char** argc) {
   free(OUTPUT);
 
   // if(freq_threshold == 2) num_of_freq--;    // Remove the case of two \1 at the beginning and end of string S
-  cout << "The num_of_freq = " << num_of_freq << ", num_of_resi = " << num_of_resi << ", num_of_resi / num_of_freq = " << (double) num_of_resi / (double) num_of_freq << ", num_of_freq - num_of_resi = " << num_of_freq - num_of_resi << endl;
-
+  
   cout << "Finish!\n" << endl;
 
   // cout << "\nThe count of is_periodic_yes = " << is_periodic_yes << ", count of is_periodic_no = " << is_periodic_no << endl;

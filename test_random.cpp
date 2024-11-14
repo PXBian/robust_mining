@@ -59,7 +59,7 @@ int main(int argc, char **argv) {
         const char* command = command_str.c_str();
         system(command);
 
-        command_str = "./esa " + pathname + " " + to_string(tau) + " " + to_string(k);
+        command_str = "./main " + pathname + " " + to_string(tau) + " " + to_string(k);
         command = command_str.c_str();
         system(command);
 

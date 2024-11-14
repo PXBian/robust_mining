@@ -26,6 +26,8 @@ typedef int32_t INT;
 
 // INT is_periodic_yes = 0, is_periodic_no = 0;
 INT num_of_freq = 0, num_of_resi = 0;
+INT freq_count = 0, resi_count = 0;
+INT dummy_count = 0;
 
 /* LCP array construction algorithm in O(n) time (Kasai et al.) */
 unsigned int LCParray ( unsigned char * text, INT n, INT * SA, INT * ISA, vector<INT>& LCP )
@@ -598,7 +600,6 @@ int main(int argv, char** argc) {
     // Check if a substring is periodic, and return its period if it is periodic
     // Find all runs of S, and store it in an interval tree
     start = chrono::high_resolution_clock::now();
-    // InPlacePST ippst = is_periodic_preprocessing(text_string, text_size - 1);  // don't include the last char !
     IntervalTree<INT> runs = is_periodic_preprocessing(text_string, text_size);
     cout << "Construct all runs successfully!" << endl;
     end = chrono::high_resolution_clock::now();
@@ -756,6 +757,8 @@ int main(int argv, char** argc) {
         INT parent_str_depth = b[parent_index].lcp, cur_str_depth = b[cur_index].lcp;
         num_of_freq = num_of_freq + (cur_str_depth - parent_str_depth);
         // cout << "Now add " << cur_str_depth - parent_str_depth << " to num_of_freq, num_of_freq = " << num_of_freq << endl;
+      
+        freq_count++;
       }
 
       last_index = cur_index;
@@ -770,6 +773,9 @@ int main(int argv, char** argc) {
     //   cout << endl;
     // }
 
+    for (int i = 0; i < text_size; i++) {
+      if(b[i].r != 0) dummy_count++;  // Include root
+    }
 
     // return 0;     //Max RSS: 16742976
 
@@ -890,17 +896,18 @@ int main(int argv, char** argc) {
     }
 
     cout << "Finish MAIN-ESA algorithm!" << endl;
-
+    // cout << "freq_count = " << freq_count << ", bottomup vector.size = " << bottomup_order.size() << ", dummy_count = " << dummy_count << endl;
+    
     free(SA);
     bottomup_order.clear();
     b.clear();
     // cout << "Free all the data storage" << endl;
-    cout << "The num_of_freq = " << num_of_freq << ", num_of_resi = " << num_of_resi << ", num_of_resi / num_of_freq = " << (double) num_of_resi / (double) num_of_freq << ", num_of_freq - num_of_resi = " << num_of_freq - num_of_resi << endl;
-
 
     auto whole_end = chrono::high_resolution_clock::now();
     chrono::duration<double> whole_elapsed = whole_end - whole_start;
     cout << "The whole process takes " << whole_elapsed.count() << " s." << endl;
+    cout << "The num_of_freq = " << num_of_freq << ", num_of_resi = " << num_of_resi << ", num_of_resi / num_of_freq = " << (double) num_of_resi / (double) num_of_freq << ", num_of_freq - num_of_resi = " << num_of_freq - num_of_resi << endl;
+
 
     // output_stream.open(output_file);
     output_stream.open("main_output");

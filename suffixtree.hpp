@@ -24,59 +24,6 @@ typedef int32_t INT;
 #define VAR(V, init) __typeof(init) V = (init)
 #define FORE(I, C) for (VAR(I, (C).begin()); I != (C).end(); I++)
 
-// INT read_patterns( string pattern_filename, unsigned char ** &patterns, INT &num_patterns)
-// {	
-
-// 	ifstream is_patterns;
-//  	is_patterns.open (pattern_filename, ios::in | ios::binary);
- 	
-// 	INT max_len_pattern = 0;
-// 	INT ALLOC_SIZE = 180224;
-// 	INT seq_len = 0;
-// 	INT max_alloc_seq_len = 0;
-// 	INT max_alloc_seqs = 0;
-// 	unsigned char chr = 0;
-	
-// 	while ( is_patterns.read(reinterpret_cast<char*>(&chr), 1) )
-// 	{
-// 		if( num_patterns >= max_alloc_seqs )
-// 		{
-// 			patterns = ( unsigned char ** ) realloc ( patterns,   ( max_alloc_seqs + ALLOC_SIZE ) * sizeof ( unsigned char* ) );
-// 			patterns[ num_patterns ] = NULL;
-			
-// 			max_alloc_seqs += ALLOC_SIZE;
-// 		}
-		
-// 		if( seq_len != 0 && chr == '\n' )
-// 		{
-// 			patterns[ num_patterns ][ seq_len ] = '\0';
-			
-// 			num_patterns++;
-
-// 			if( seq_len > max_len_pattern)
-// 				max_len_pattern = seq_len;
-			
-// 			seq_len = 0;
-// 			max_alloc_seq_len = 0;
-			
-// 			patterns[ num_patterns ] = NULL;
-// 		}
-// 		else 
-// 		{
-// 			if ( seq_len >= max_alloc_seq_len )
-// 			{
-// 				patterns[ num_patterns ] = ( unsigned char * ) realloc ( patterns[ num_patterns ],   ( max_alloc_seq_len + ALLOC_SIZE ) * sizeof ( unsigned char ) );
-// 				max_alloc_seq_len += ALLOC_SIZE;
-// 			}
-			
-// 			patterns[ num_patterns ][ seq_len ] = ( unsigned char) chr;	
-// 			seq_len++;	
-// 		}
-// 	} 
-// 	is_patterns.close();
-	
-// return 0;
-// }
 
 struct STedge;
 struct STvertex
@@ -171,118 +118,118 @@ STvertex* Create_suffix_tree(unsigned char *x,INT n)
 	return root;
 }
 
-void STDelete(STvertex *w)
-{
-  FORE(it,w->g) STDelete(it->second.v);
-  delete w;
-}
+// void STDelete(STvertex *w)
+// {
+//   FORE(it,w->g) STDelete(it->second.v);
+//   delete w;
+// }
 
 
 
-struct Pair 
-{
-    STvertex * node;
-    map<unsigned char, STedge>::iterator it;
-    Pair(STvertex * _node, map<unsigned char, STedge>::iterator _it)
-    {
-        node = _node;
-        it = _it;
-    }
-};
+// struct Pair 
+// {
+//     STvertex * node;
+//     map<unsigned char, STedge>::iterator it;
+//     Pair(STvertex * _node, map<unsigned char, STedge>::iterator _it)
+//     {
+//         node = _node;
+//         it = _it;
+//     }
+// };
 
 
-INT add_children( stack<STvertex *> * st, STvertex * current, vector<INT> * leaves )
-{
-	map<unsigned char, STedge>::iterator indx; 
+// INT add_children( stack<STvertex *> * st, STvertex * current, vector<INT> * leaves )
+// {
+// 	map<unsigned char, STedge>::iterator indx; 
 
-	for(indx = current->g.begin(); indx != current->g.end(); indx++ )	// Go through all the children of current
-	{
+// 	for(indx = current->g.begin(); indx != current->g.end(); indx++ )	// Go through all the children of current
+// 	{
 	
-		if( indx->second.v->numer != -1 )	// numer == -1: It is not a leaf (root or internal node); != -1: It is a leaf, add it to the leaves vector
-		{
-			leaves->push_back( indx->second.v->numer );
+// 		if( indx->second.v->numer != -1 )	// numer == -1: It is not a leaf (root or internal node); != -1: It is a leaf, add it to the leaves vector
+// 		{
+// 			leaves->push_back( indx->second.v->numer );
 			
-		}
-		else st->push( indx->second.v );	// It is not a leaf: push it to the stack
-	}
+// 		}
+// 		else st->push( indx->second.v );	// It is not a leaf: push it to the stack
+// 	}
 	
 	
-	return 0;
-}
+// 	return 0;
+// }
 
 
-vector<INT> search( STvertex * r )
-{
-	vector<INT> leaves;
-	stack<STvertex *> st;
+// vector<INT> search( STvertex * r )
+// {
+// 	vector<INT> leaves;
+// 	stack<STvertex *> st;
 
-	st.push( r );
+// 	st.push( r );
 	
-	while( st.size() > 0 )
-	{
-		st.pop();
+// 	while( st.size() > 0 )
+// 	{
+// 		st.pop();
 		
-		add_children( &st, r, &leaves );
+// 		add_children( &st, r, &leaves );
 		
-		if( st.size() > 0 )
-			r = st.top();
-	}
+// 		if( st.size() > 0 )
+// 			r = st.top();
+// 	}
 		
-	return leaves;
-}
+// 	return leaves;
+// }
 
-vector<INT> Find(unsigned char *s,STvertex *r, unsigned char *x)	// *s is the pattern needs to be found, intial *r is the root of ST, *x is the text
-{
+// vector<INT> Find(unsigned char *s,STvertex *r, unsigned char *x)	// *s is the pattern needs to be found, intial *r is the root of ST, *x is the text
+// {
 
-	vector<INT> occ;
-	INT n=strlen( (char*) s);
+// 	vector<INT> occ;
+// 	INT n=strlen( (char*) s);
 	
-	INT i=0;
+// 	INT i=0;
 	
-	while (i<n)
-	{
+// 	while (i<n)
+// 	{
 	
-		if (r->g.find(s[i]) == r->g.end())	// Finish searching at the end of children of r
-			return occ;
+// 		if (r->g.find(s[i]) == r->g.end())	// Finish searching at the end of children of r
+// 			return occ;
 		
-		STedge e=r->g[s[i]];	// e is the edge toward to the current child s[i] of r
+// 		STedge e=r->g[s[i]];	// e is the edge toward to the current child s[i] of r
 	
-		FOR(j,e.l,e.r)
-		{
-			if( s[i++]!=x[j] )	// if the current char in the pattern s does not match the text x
-	  			return occ;
+// 		FOR(j,e.l,e.r)
+// 		{
+// 			if( s[i++]!=x[j] )	// if the current char in the pattern s does not match the text x
+// 	  			return occ;
 	  			
-			if (i == n)
-			{
-				r = e.v;	// set r to the child corresponding to e.v
+// 			if (i == n)
+// 			{
+// 				r = e.v;	// set r to the child corresponding to e.v
 				
-				if( r->numer == -1 )	// r is not a leaf
-				{
-					vector<INT> children = search(r);
+// 				if( r->numer == -1 )	// r is not a leaf
+// 				{
+// 					vector<INT> children = search(r);
 					
-					for(INT a = 0; a<children.size(); a++) {
-						occ.push_back( children.at(a) );
-					}	
+// 					for(INT a = 0; a<children.size(); a++) {
+// 						occ.push_back( children.at(a) );
+// 					}	
 								
-				}
-				else occ.push_back( r->numer );
+// 				}
+// 				else occ.push_back( r->numer );
 	
-				return occ;
-			}
-		}
+// 				return occ;
+// 			}
+// 		}
 
-		r=e.v;
-	}
+// 		r=e.v;
+// 	}
  	
- 	occ.push_back( r->numer );
+//  	occ.push_back( r->numer );
 
-	return occ;
-}
+// 	return occ;
+// }
 
-void print_edge(STedge edge, unsigned char *x) {
-	// Print the current info on edge
-	unsigned char substring[edge.r - edge.l + 2];
-	memcpy(substring, x + edge.l, edge.r - edge.l + 1);
-	substring[edge.r - edge.l + 1] = '\0'; // Add null terminator
-	cout << "The string on current edge is " << substring << endl;
-}
+// void print_edge(STedge edge, unsigned char *x) {
+// 	// Print the current info on edge
+// 	unsigned char substring[edge.r - edge.l + 2];
+// 	memcpy(substring, x + edge.l, edge.r - edge.l + 1);
+// 	substring[edge.r - edge.l + 1] = '\0'; // Add null terminator
+// 	cout << "The string on current edge is " << substring << endl;
+// }
