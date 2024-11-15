@@ -910,7 +910,7 @@ int main(int argv, char** argc) {
 
 
     // output_stream.open(output_file);
-    output_stream.open("main_output");
+    output_stream.open("esa_output");
     if(!output_stream.is_open()) {
           cout << "Couldn't open output file\n" << endl; 
     }
