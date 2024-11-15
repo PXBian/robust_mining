@@ -1,3 +1,4 @@
+
 # compile with debug information
 ifeq ($(mode),release)
 	CXXFLAGS=-O3 -Wall
@@ -9,4 +10,3 @@ endif
 all: main
 
 main: runs.hpp intervaltree.hpp suffixtree.hpp main.cpp 
-
