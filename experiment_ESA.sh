@@ -5,7 +5,7 @@ mkdir peak_ram
 # rm output/*
 # g++ -O3 -DNDEBUG -I ~/include -L ~/lib runs.hpp intervaltree.hpp main_ESA.cpp -o esa -lsdsl -ldivsufsort -ldivsufsort64
 # make -f Makefile.64-bit.gcc
-g++ -O3 -o runs.hpp intervaltree.hpp esa main_ESA.cpp  -O3 -DNDEBUG -I ./libsdsl/include/ -L ./libsdsl/lib/ -lsdsl -ldivsufsort -ldivsufsort64
+g++ -O3 -DNDEBUG -I ./libsdsl/include/ -L ./libsdsl/lib/ runs.hpp intervaltree.hpp main_ESA.cpp -o esa -lsdsl -ldivsufsort -ldivsufsort64
 
 
 ## change tau
