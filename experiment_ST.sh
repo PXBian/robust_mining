@@ -1,7 +1,7 @@
 #!/bin/bash
 
 mkdir peak_ram
-# mkdir output
+mkdir output
 make all
 
 
