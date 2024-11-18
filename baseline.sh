@@ -13,17 +13,18 @@ rm output/*
 
 
 ## Change tau and k
-# (/usr/bin/time -v ./baseline data/ecoli10000  5   50 bl_output)    &> peak_ram/bl_base_ecoli10000_50_5.txt
-# (/usr/bin/time -v ./baseline data/ecoli10000  10  50 bl_output)    &> peak_ram/bl_base_ecoli10000_50_10.txt
-# (/usr/bin/time -v ./baseline data/ecoli10000  20  50 bl_output)    &> peak_ram/bl_base_ecoli10000_50_20.txt
-# (/usr/bin/time -v ./baseline data/ecoli10000  50  50 bl_output)    &> peak_ram/bl_base_ecoli10000_50_50.txt
-# (/usr/bin/time -v ./baseline data/ecoli10000  100 50 bl_output)    &> peak_ram/bl_base_ecoli10000_50_100.txt
 
-# (/usr/bin/time -v ./baseline data/ecoli10000  10 5   bl_output)    &> peak_ram/bl_base_ecoli10000_5_10.txt
-# (/usr/bin/time -v ./baseline data/ecoli10000  10 10  bl_output)    &> peak_ram/bl_base_ecoli10000_10_10.txt
-# (/usr/bin/time -v ./baseline data/ecoli10000  10 20  bl_output)    &> peak_ram/bl_base_ecoli10000_20_10.txt
-# (/usr/bin/time -v ./baseline data/ecoli10000  10 50  bl_output)    &> peak_ram/bl_base_ecoli10000_50_10.txt
-# (/usr/bin/time -v ./baseline data/ecoli10000  10 100 bl_output)    &> peak_ram/bl_base_ecoli10000_100_10.txt
+(/usr/bin/time -v ./esa data/ecoli10000  50 5   )    &> peak_ram/bl_esa_ecoli10000_50_5.txt
+(/usr/bin/time -v ./esa data/ecoli10000  50 10  )    &> peak_ram/bl_esa_ecoli10000_50_10.txt
+(/usr/bin/time -v ./esa data/ecoli10000  50 20  )    &> peak_ram/bl_esa_ecoli10000_50_20.txt
+(/usr/bin/time -v ./esa data/ecoli10000  50 50  )    &> peak_ram/bl_esa_ecoli10000_50_50.txt
+(/usr/bin/time -v ./esa data/ecoli10000  50 100 )    &> peak_ram/bl_esa_ecoli10000_50_100.txt
+
+(/usr/bin/time -v ./esa data/ecoli10000  5   10 )    &> peak_ram/bl_esa_ecoli10000_5_10.txt
+(/usr/bin/time -v ./esa data/ecoli10000  10  10 )    &> peak_ram/bl_esa_ecoli10000_10_10.txt
+(/usr/bin/time -v ./esa data/ecoli10000  20  10 )    &> peak_ram/bl_esa_ecoli10000_20_10.txt
+(/usr/bin/time -v ./esa data/ecoli10000  50  10 )    &> peak_ram/bl_esa_ecoli10000_50_10.txt
+(/usr/bin/time -v ./esa data/ecoli10000  100 10 )    &> peak_ram/bl_esa_ecoli10000_100_10.txt
 
 
 (/usr/bin/time -v ./main data/ecoli10000  50 5   )    &> peak_ram/bl_st_ecoli10000_50_5.txt
@@ -39,17 +40,17 @@ rm output/*
 (/usr/bin/time -v ./main data/ecoli10000  100 10 )    &> peak_ram/bl_st_ecoli10000_100_10.txt
 
 
-(/usr/bin/time -v ./esa data/ecoli10000  50 5   )    &> peak_ram/bl_esa_ecoli10000_50_5.txt
-(/usr/bin/time -v ./esa data/ecoli10000  50 10  )    &> peak_ram/bl_esa_ecoli10000_50_10.txt
-(/usr/bin/time -v ./esa data/ecoli10000  50 20  )    &> peak_ram/bl_esa_ecoli10000_50_20.txt
-(/usr/bin/time -v ./esa data/ecoli10000  50 50  )    &> peak_ram/bl_esa_ecoli10000_50_50.txt
-(/usr/bin/time -v ./esa data/ecoli10000  50 100 )    &> peak_ram/bl_esa_ecoli10000_50_100.txt
+# (/usr/bin/time -v ./baseline data/ecoli10000  5   50 bl_output)    &> peak_ram/bl_base_ecoli10000_50_5.txt
+# (/usr/bin/time -v ./baseline data/ecoli10000  10  50 bl_output)    &> peak_ram/bl_base_ecoli10000_50_10.txt
+# (/usr/bin/time -v ./baseline data/ecoli10000  20  50 bl_output)    &> peak_ram/bl_base_ecoli10000_50_20.txt
+# (/usr/bin/time -v ./baseline data/ecoli10000  50  50 bl_output)    &> peak_ram/bl_base_ecoli10000_50_50.txt
+# (/usr/bin/time -v ./baseline data/ecoli10000  100 50 bl_output)    &> peak_ram/bl_base_ecoli10000_50_100.txt
 
-(/usr/bin/time -v ./esa data/ecoli10000  5   10 )    &> peak_ram/bl_esa_ecoli10000_5_10.txt
-(/usr/bin/time -v ./esa data/ecoli10000  10  10 )    &> peak_ram/bl_esa_ecoli10000_10_10.txt
-(/usr/bin/time -v ./esa data/ecoli10000  20  10 )    &> peak_ram/bl_esa_ecoli10000_20_10.txt
-(/usr/bin/time -v ./esa data/ecoli10000  50  10 )    &> peak_ram/bl_esa_ecoli10000_50_10.txt
-(/usr/bin/time -v ./esa data/ecoli10000  100 10 )    &> peak_ram/bl_esa_ecoli10000_100_10.txt
+# (/usr/bin/time -v ./baseline data/ecoli10000  10 5   bl_output)    &> peak_ram/bl_base_ecoli10000_5_10.txt
+# (/usr/bin/time -v ./baseline data/ecoli10000  10 10  bl_output)    &> peak_ram/bl_base_ecoli10000_10_10.txt
+# (/usr/bin/time -v ./baseline data/ecoli10000  10 20  bl_output)    &> peak_ram/bl_base_ecoli10000_20_10.txt
+# (/usr/bin/time -v ./baseline data/ecoli10000  10 50  bl_output)    &> peak_ram/bl_base_ecoli10000_50_10.txt
+# (/usr/bin/time -v ./baseline data/ecoli10000  10 100 bl_output)    &> peak_ram/bl_base_ecoli10000_100_10.txt
 
 
 ## Change n
