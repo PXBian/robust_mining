@@ -296,21 +296,23 @@ vector<STvertex*> bottom_up_SA_interval(STvertex* &r, INT* &suffix_array, INT* &
             // Calculate the sum of the num_of_freq
             // INT range_left = current->SA_interval.first, range_right = current->SA_interval.second;
             if(current_max - current_min + 1 >= freq_threshold) {
-                tmp++;
+                // tmp++;
                 // cout << "This is FREQUENT" << endl;
                 INT cur_str_depth = current->str_depth_of_N;
-                // string freq_pattern = string(reinterpret_cast<char*>(text_string + suffix_array[current_min]), cur_str_depth);
+                for (INT x = 1; x <= cur_str_depth; x++) {
+                    // string freq_pattern = string(reinterpret_cast<char*>(text_string + suffix_array[current_min]), x);
+                    uint64_t freq_fingerprint = karp_rabin_hashing::hash_string(text_string + suffix_array[current_min],x);
+                    // uint64_t freq_fingerprint = 1;
+                    freq_set.insert(freq_fingerprint);
+                    // cout << "freq_pattern = " << freq_pattern << ", freq_fingerprint = " << freq_fingerprint << endl;
+                }
                 
-                uint64_t freq_fingerprint = karp_rabin_hashing::hash_string(text_string + suffix_array[current_min],cur_str_depth);
-                // uint64_t freq_fingerprint = 1;
-                freq_set.insert(freq_fingerprint);
-                // cout << "freq_pattern = " << freq_pattern << ", freq_fingerprint = " << freq_fingerprint << endl;
             }
         }
     }
 
-    cout << "the hashing calling times are " << tmp << endl;
-    // cout << "current size of freq_set = " << freq_set.size() << endl;
+    // cout << "the hashing calling times are " << tmp << endl;
+    cout << "current size of freq_set = " << freq_set.size() << endl;
 
     return rev_bottomup_ordered_nodes;
 }
@@ -342,6 +344,7 @@ int main(int argv, char** argc) {
     is_text.open (text_file_path, ios::in | ios::binary);
 
     unordered_set<uint64_t> freq_set;
+    unordered_set<uint64_t> first_freq_set;
     unordered_set<uint64_t> common_freq_set;
     unordered_set<uint64_t> resi_set;
     karp_rabin_hashing::init();
@@ -444,6 +447,7 @@ int main(int argv, char** argc) {
             start = chrono::high_resolution_clock::now();
             if (str_num == 1) {
                 common_freq_set = freq_set;
+                first_freq_set = freq_set;
             }
             else {
                 unordered_set<uint64_t> intersection_set;
@@ -556,7 +560,7 @@ int main(int argv, char** argc) {
     size_t pos = str_file.find_last_of("/");
     // Extract the substring after the last '/'
     string file_name = str_file.substr(pos + 1);
-    string output_file = "output/" + file_name + "_" + to_string(freq_threshold) + "_" + to_string(k);
+    string output_file = "output/st_" + file_name + "_" + to_string(freq_threshold) + "_" + to_string(k);
     // cout << "output_file = " << output_file << endl;
     // string output_file = "output/" + str_file + "_" + to_string(freq_threshold) + "_" + to_string(k);
     ifstream file(output_file);
@@ -569,8 +573,11 @@ int main(int argv, char** argc) {
             int current_len = stoi(line);
             // cout << "current_len = " << current_len << ", index = " << index << endl;
             // string str(reinterpret_cast<char*>(txt_string + index), current_len);
-            uint64_t str = karp_rabin_hashing::hash_string(txt_string + index, current_len);
-            resi_set.insert(str);
+            for(INT i = 1; i <= current_len; i++) {
+                uint64_t str = karp_rabin_hashing::hash_string(txt_string + index, i);
+                resi_set.insert(str);
+            }
+            
             index ++;
         }
         file.close();
@@ -594,29 +601,51 @@ int main(int argv, char** argc) {
     // }
     // cout << endl;
 
+    // cout << "The first_freq_set is " << endl;
+    // for(const auto &item : first_freq_set) {
+    //     cout << item << " ";
+    // }
+    // cout << endl;
+
     // auto start = chrono::high_resolution_clock::now();
     // Get the intersection of X and Y
-    ofstream out_file ("inter_1");
-    unordered_set<uint64_t> intersectionSet;
+    // ofstream out_file ("inter_1");
+    unordered_set<uint64_t> resi_intersection_set;
+    unordered_set<uint64_t> freq_intersection_set;
+
     for (const auto & elem : resi_set) {
         if (common_freq_set.find(elem) != common_freq_set.end()) {
-            intersectionSet.insert(elem);
-            out_file << elem << "\n";
+            resi_intersection_set.insert(elem);
+            // out_file << elem << "\n";
         }
     }
-    out_file.close();
+    for (const auto & elem : first_freq_set) {
+        if (common_freq_set.find(elem) != common_freq_set.end()) {
+            freq_intersection_set.insert(elem);
+            // out_file << elem << "\n";
+        }
+    }
+    // out_file.close();
     // auto end = chrono::high_resolution_clock::now();
     // chrono::duration<double> elapsed = end - start;
     // final_time = elapsed.count();
 
-    unordered_set<uint64_t> unionSet = common_freq_set;
-    unionSet.insert(resi_set.begin(), resi_set.end());
+    unordered_set<uint64_t> resi_union_set = common_freq_set;
+    unordered_set<uint64_t> freq_union_set = common_freq_set;
+
+    resi_union_set.insert(resi_set.begin(), resi_set.end());
+    freq_union_set.insert(first_freq_set.begin(), first_freq_set.end());
 
 
     INT common_freq_size = common_freq_set.size();
-    INT inter_size = intersectionSet.size();
-    INT union_size = unionSet.size();
-    cout << "common_freq_size (X) = " << common_freq_size << ", inter_size = " << inter_size << ", union_size = " << union_size << ", inter_ratio = " << double(inter_size) / double(common_freq_size) << ", jac_ratio = " << double(inter_size) / double(union_size) << endl;
+    INT resi_inter_size = resi_intersection_set.size();
+    INT resi_union_size = resi_union_set.size();
+    INT freq_inter_size = freq_intersection_set.size();
+    INT freq_union_size = freq_union_set.size();
+    cout << "common_freq_size (Y) = " << common_freq_size << endl;
+    cout << "resi_inter_size = " << resi_inter_size << ", resi_union_size = " << resi_union_size << ", resi_inter_ratio = " << double(resi_inter_size) / double(common_freq_size) << ", resi_jac_ratio = " << double(resi_inter_size) / double(resi_union_size) << endl;
+    cout << "freq_inter_size = " << freq_inter_size << ", freq_union_size = " << freq_union_size << ", freq_inter_ratio = " << double(freq_inter_size) / double(common_freq_size) << ", freq_jac_ratio = " << double(freq_inter_size) / double(freq_union_size) << endl;
+
     cout << "common_time = " << common_time << ", inter_time = " << inter_time << ", first_part_total = " << common_time + inter_time << endl;
 
     cout << "Finish Case Study!\n" << endl;

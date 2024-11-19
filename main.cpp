@@ -818,8 +818,8 @@ int main(int argv, char** argc) {
   // output_stream.close();
 
   
-  // output_stream.open(output_file);
-  output_stream.open("st_output");
+  output_stream.open(output_file);
+  // output_stream.open("st_output");
   if(!output_stream.is_open()) {
         cout << "Couldn't open output file\n" << endl; 
   }

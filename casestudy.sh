@@ -7,25 +7,25 @@ mkdir output
 # gunzip -c chr19_pengxin_1000.txt.gz > data/chr19_pengxin_1000.txt
 
 
-(/usr/bin/time -v ./case /scratch/prj/proj_loukides/pengxin/robust_mining/chr19_pengxin_16.txt 500  5  /scratch/prj/proj_loukides/pengxin/robust_mining/chr19_pengxin_16_1.txt)   &> peak_ram/casestudy_16_500_5.txt
-(/usr/bin/time -v ./case /scratch/prj/proj_loukides/pengxin/robust_mining/chr19_pengxin_16.txt 1000 5  /scratch/prj/proj_loukides/pengxin/robust_mining/chr19_pengxin_16_1.txt)   &> peak_ram/casestudy_16_1000_5.txt
-(/usr/bin/time -v ./case /scratch/prj/proj_loukides/pengxin/robust_mining/chr19_pengxin_16.txt 2500 5  /scratch/prj/proj_loukides/pengxin/robust_mining/chr19_pengxin_16_1.txt)   &> peak_ram/casestudy_16_2500_5.txt
-(/usr/bin/time -v ./case /scratch/prj/proj_loukides/pengxin/robust_mining/chr19_pengxin_16.txt 5000 5  /scratch/prj/proj_loukides/pengxin/robust_mining/chr19_pengxin_16_1.txt)   &> peak_ram/casestudy_16_5000_5.txt
+# (/usr/bin/time -v ./case /scratch/prj/proj_loukides/pengxin/robust_mining/chr19_pengxin_16.txt 500  5  /scratch/prj/proj_loukides/pengxin/robust_mining/chr19_pengxin_16_1.txt)   &> peak_ram/casestudy_16_500_5.txt
+# (/usr/bin/time -v ./case /scratch/prj/proj_loukides/pengxin/robust_mining/chr19_pengxin_16.txt 1000 5  /scratch/prj/proj_loukides/pengxin/robust_mining/chr19_pengxin_16_1.txt)   &> peak_ram/casestudy_16_1000_5.txt
+# (/usr/bin/time -v ./case /scratch/prj/proj_loukides/pengxin/robust_mining/chr19_pengxin_16.txt 2500 5  /scratch/prj/proj_loukides/pengxin/robust_mining/chr19_pengxin_16_1.txt)   &> peak_ram/casestudy_16_2500_5.txt
+# (/usr/bin/time -v ./case /scratch/prj/proj_loukides/pengxin/robust_mining/chr19_pengxin_16.txt 5000 5  /scratch/prj/proj_loukides/pengxin/robust_mining/chr19_pengxin_16_1.txt)   &> peak_ram/casestudy_16_5000_5.txt
 
-(/usr/bin/time -v ./case /scratch/prj/proj_loukides/pengxin/robust_mining/chr19_pengxin_16.txt 500  10  /scratch/prj/proj_loukides/pengxin/robust_mining/chr19_pengxin_16_1.txt)   &> peak_ram/casestudy_16_500_10.txt
-(/usr/bin/time -v ./case /scratch/prj/proj_loukides/pengxin/robust_mining/chr19_pengxin_16.txt 1000 10  /scratch/prj/proj_loukides/pengxin/robust_mining/chr19_pengxin_16_1.txt)   &> peak_ram/casestudy_16_1000_10.txt
-(/usr/bin/time -v ./case /scratch/prj/proj_loukides/pengxin/robust_mining/chr19_pengxin_16.txt 2500 10  /scratch/prj/proj_loukides/pengxin/robust_mining/chr19_pengxin_16_1.txt)   &> peak_ram/casestudy_16_2500_10.txt
-(/usr/bin/time -v ./case /scratch/prj/proj_loukides/pengxin/robust_mining/chr19_pengxin_16.txt 5000 10  /scratch/prj/proj_loukides/pengxin/robust_mining/chr19_pengxin_16_1.txt)   &> peak_ram/casestudy_16_5000_10.txt
+# (/usr/bin/time -v ./case /scratch/prj/proj_loukides/pengxin/robust_mining/chr19_pengxin_16.txt 500  10  /scratch/prj/proj_loukides/pengxin/robust_mining/chr19_pengxin_16_1.txt)   &> peak_ram/casestudy_16_500_10.txt
+# (/usr/bin/time -v ./case /scratch/prj/proj_loukides/pengxin/robust_mining/chr19_pengxin_16.txt 1000 10  /scratch/prj/proj_loukides/pengxin/robust_mining/chr19_pengxin_16_1.txt)   &> peak_ram/casestudy_16_1000_10.txt
+# (/usr/bin/time -v ./case /scratch/prj/proj_loukides/pengxin/robust_mining/chr19_pengxin_16.txt 2500 10  /scratch/prj/proj_loukides/pengxin/robust_mining/chr19_pengxin_16_1.txt)   &> peak_ram/casestudy_16_2500_10.txt
+# (/usr/bin/time -v ./case /scratch/prj/proj_loukides/pengxin/robust_mining/chr19_pengxin_16.txt 5000 10  /scratch/prj/proj_loukides/pengxin/robust_mining/chr19_pengxin_16_1.txt)   &> peak_ram/casestudy_16_5000_10.txt
 
-# (/usr/bin/time -v ./case /scratch/prj/proj_loukides/pengxin/robust_mining/chr19_pengxin_16.txt 1000 10      /scratch/prj/proj_loukides/pengxin/robust_mining/chr19_pengxin_16_1.txt)   &> peak_ram/casestudy_16_1000_10.txt 
-# (/usr/bin/time -v ./case /scratch/prj/proj_loukides/pengxin/robust_mining/chr19_pengxin_16.txt 1000 100     /scratch/prj/proj_loukides/pengxin/robust_mining/chr19_pengxin_16_1.txt)   &> peak_ram/casestudy_16_1000_100.txt 
-# (/usr/bin/time -v ./case /scratch/prj/proj_loukides/pengxin/robust_mining/chr19_pengxin_16.txt 1000 1000    /scratch/prj/proj_loukides/pengxin/robust_mining/chr19_pengxin_16_1.txt)   &> peak_ram/casestudy_16_1000_1000.txt 
-# (/usr/bin/time -v ./case /scratch/prj/proj_loukides/pengxin/robust_mining/chr19_pengxin_16.txt 1000 10000   /scratch/prj/proj_loukides/pengxin/robust_mining/chr19_pengxin_16_1.txt)   &> peak_ram/casestudy_16_1000_10000.txt 
+(/usr/bin/time -v ./case /scratch/prj/proj_loukides/pengxin/robust_mining/chr19_pengxin_16.txt 1000 10      /scratch/prj/proj_loukides/pengxin/robust_mining/chr19_pengxin_16_1.txt)   &> peak_ram/casestudy_16_1000_10.txt 
+(/usr/bin/time -v ./case /scratch/prj/proj_loukides/pengxin/robust_mining/chr19_pengxin_16.txt 1000 100     /scratch/prj/proj_loukides/pengxin/robust_mining/chr19_pengxin_16_1.txt)   &> peak_ram/casestudy_16_1000_100.txt 
+(/usr/bin/time -v ./case /scratch/prj/proj_loukides/pengxin/robust_mining/chr19_pengxin_16.txt 1000 1000    /scratch/prj/proj_loukides/pengxin/robust_mining/chr19_pengxin_16_1.txt)   &> peak_ram/casestudy_16_1000_1000.txt 
+(/usr/bin/time -v ./case /scratch/prj/proj_loukides/pengxin/robust_mining/chr19_pengxin_16.txt 1000 10000   /scratch/prj/proj_loukides/pengxin/robust_mining/chr19_pengxin_16_1.txt)   &> peak_ram/casestudy_16_1000_10000.txt 
 
-# (/usr/bin/time -v ./case /scratch/prj/proj_loukides/pengxin/robust_mining/chr19_pengxin_16.txt 100 10       /scratch/prj/proj_loukides/pengxin/robust_mining/chr19_pengxin_16_1.txt)   &> peak_ram/casestudy_16_100_10.txt 
-# (/usr/bin/time -v ./case /scratch/prj/proj_loukides/pengxin/robust_mining/chr19_pengxin_16.txt 100 100      /scratch/prj/proj_loukides/pengxin/robust_mining/chr19_pengxin_16_1.txt)   &> peak_ram/casestudy_16_100_100.txt 
-# (/usr/bin/time -v ./case /scratch/prj/proj_loukides/pengxin/robust_mining/chr19_pengxin_16.txt 100 1000     /scratch/prj/proj_loukides/pengxin/robust_mining/chr19_pengxin_16_1.txt)   &> peak_ram/casestudy_16_100_1000.txt 
-# (/usr/bin/time -v ./case /scratch/prj/proj_loukides/pengxin/robust_mining/chr19_pengxin_16.txt 100 10000    /scratch/prj/proj_loukides/pengxin/robust_mining/chr19_pengxin_16_1.txt)   &> peak_ram/casestudy_16_100_10000.txt 
+(/usr/bin/time -v ./case /scratch/prj/proj_loukides/pengxin/robust_mining/chr19_pengxin_16.txt 100 10       /scratch/prj/proj_loukides/pengxin/robust_mining/chr19_pengxin_16_1.txt)   &> peak_ram/casestudy_16_100_10.txt 
+(/usr/bin/time -v ./case /scratch/prj/proj_loukides/pengxin/robust_mining/chr19_pengxin_16.txt 100 100      /scratch/prj/proj_loukides/pengxin/robust_mining/chr19_pengxin_16_1.txt)   &> peak_ram/casestudy_16_100_100.txt 
+(/usr/bin/time -v ./case /scratch/prj/proj_loukides/pengxin/robust_mining/chr19_pengxin_16.txt 100 1000     /scratch/prj/proj_loukides/pengxin/robust_mining/chr19_pengxin_16_1.txt)   &> peak_ram/casestudy_16_100_1000.txt 
+(/usr/bin/time -v ./case /scratch/prj/proj_loukides/pengxin/robust_mining/chr19_pengxin_16.txt 100 10000    /scratch/prj/proj_loukides/pengxin/robust_mining/chr19_pengxin_16_1.txt)   &> peak_ram/casestudy_16_100_10000.txt 
 
 
 # (/usr/bin/time -v ./case /scratch/prj/proj_loukides/pengxin/robust_mining/chr19_pengxin_128.txt 10000 10     /scratch/prj/proj_loukides/pengxin/robust_mining/chr19_pengxin_128_1.txt)   &> peak_ram/casestudy_128_10000_10.txt
