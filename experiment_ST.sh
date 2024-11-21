@@ -76,7 +76,6 @@ make all
 (/usr/bin/time -v ./main data/dblp.xml.200MB 10000    100)   &> peak_ram/st_xml200_10000_100.txt
 (/usr/bin/time -v ./main data/dblp.xml.200MB 100000   100)   &> peak_ram/st_xml200_100000_100.txt
 (/usr/bin/time -v ./main data/dblp.xml.200MB 1000000  100)   &> peak_ram/st_xml200_1000000_100.txt
-(/usr/bin/time -v ./main data/dblp.xml.200MB 10000000 100)   &> peak_ram/st_xml200_10000000_100.txt
 ## change k
 (/usr/bin/time -v ./main data/dblp.xml.200MB 10000 10     )    &> peak_ram/st_xml200_10000_10.txt
 (/usr/bin/time -v ./main data/dblp.xml.200MB 10000 100    )    &> peak_ram/st_xml200_10000_100.txt

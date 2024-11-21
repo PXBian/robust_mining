@@ -4,74 +4,75 @@ from matplotlib.ticker import ScalarFormatter
 import numpy as np
 
 
-## Change tau
-# df = pd.read_csv("/home/pengxinbian/Desktop/experiment/Baseline/change_tau.csv")
-# n = []
-# tau = []
-# k = []
-# bl_runtime = []
-# st_runtime = []
-# esa_runtime = []
+# Change tau
+df = pd.read_csv("/home/pengxinbian/Desktop/experiment/Baseline/change_tau.csv")
+n = []
+tau = []
+k = []
+bl_runtime = []
+st_runtime = []
+esa_runtime = []
 
-# bl_mem = []
-# st_mem = []
-# esa_mem = []
-
-
-# for index, row in df.iterrows():
-#     tau.append(row['tau'])
-#     k.append(row['k'])
-#     bl_mem.append(row['bl_mem'] / 1000)
-#     st_mem.append(row['st_mem'] / 1000)
-#     esa_mem.append(row['esa_mem'] / 1000)
-
-#     bl_runtime.append(row['bl_time'])
-#     st_runtime.append(row['st_time'])
-#     esa_runtime.append(row['esa_time'])
+bl_mem = []
+st_mem = []
+esa_mem = []
 
 
+for index, row in df.iterrows():
+    tau.append(row['tau'])
+    k.append(row['k'])
+    bl_mem.append(row['bl_mem'] / 1000)
+    st_mem.append(row['st_mem'] / 1000)
+    esa_mem.append(row['esa_mem'] / 1000)
 
-# ## Runtime
-# bar_width = 0.4
-# n_positions = np.arange(len(tau))
-# plt.bar(n_positions, bl_runtime, width=bar_width, color='b', label='Baseline')
-# plt.bar(n_positions, st_runtime, width=bar_width, color='r', label='RPM-ST')
-# plt.bar(n_positions, esa_runtime, width=bar_width, color='g', label='RPM-ESA')
+    bl_runtime.append(row['bl_time'])
+    st_runtime.append(row['st_time'])
+    esa_runtime.append(row['esa_time'])
 
-# plt.yscale('log')
-# plt.xlabel(r"$\tau$", fontsize=30)
-# plt.ylabel("runtime (s)", fontsize=30)
-# # plt.legend(loc='best', fontsize=28)
-# plt.legend(bbox_to_anchor=(1.04, 1.26), ncol=3, columnspacing=0.5, handletextpad=0.2, fontsize = 23)
-# plt.xticks(n_positions, [5, 10, 20, 50, 100], fontsize=30, rotation=45)
-# plt.yticks(fontsize=30)
-# plt.grid(True, linestyle='--', linewidth=0.5)
-# # Adjust the layout to be tight
-# # plt.tight_layout()
-# # plt.show()
-# plt.savefig("/home/pengxinbian/Desktop/ex_plots/bl_time_tau.pdf", format="pdf", bbox_inches="tight")
-# plt.clf()
+
+
+## Runtime
+bar_width = 0.9
+n_positions = np.arange(len(tau))
+plt.bar(n_positions - bar_width/3, bl_runtime, width=bar_width/3, color='b', label='Baseline')
+plt.bar(n_positions, st_runtime, width=bar_width/3, color='skyblue', label='RPM-ST')
+plt.bar(n_positions + bar_width/3, esa_runtime, width=bar_width/3, color='orange', label='RPM-ESA')
+
+plt.yscale('log')
+plt.xlabel(r"$\tau$", fontsize=30)
+plt.ylabel("Runtime (s)", fontsize=30)
+# plt.legend(loc='best', fontsize=28)
+plt.legend(bbox_to_anchor=(1.04, 1.26), ncol=3, columnspacing=0.5, handletextpad=0.2, fontsize = 23)
+plt.xticks(n_positions, [5, 10, 20, 50, 100], fontsize=30, rotation=45)
+plt.yticks(fontsize=30)
+plt.grid(True, linestyle='--', linewidth=0.5)
+# Adjust the layout to be tight
+# plt.tight_layout()
+# plt.show()
+plt.savefig("/home/pengxinbian/Desktop/ex_plots/bl_time_tau.pdf", format="pdf", bbox_inches="tight")
+plt.clf()
 
 
 # # # Memory
-# n_positions = np.arange(len(tau))
-# plt.bar(n_positions, bl_mem, width=bar_width, color='b', label='Baseline')
-# plt.bar(n_positions, st_mem, width=bar_width, color='r', label='RPM-ST')
-# plt.bar(n_positions, esa_mem, width=bar_width, color='g', label='RPM-ESA')
+bar_width = 0.9
+n_positions = np.arange(len(tau))
+plt.bar(n_positions - bar_width/3, bl_mem, width=bar_width/3, color='b', label='Baseline')
+plt.bar(n_positions, st_mem, width=bar_width/3, color='skyblue', label='RPM-ST')
+plt.bar(n_positions + bar_width/3, esa_mem, width=bar_width/3, color='orange', label='RPM-ESA')
+plt.xlabel(r"$\tau$", fontsize=30)
+plt.ylabel("Memory (MB)", fontsize=30)
+# plt.legend(loc='best', fontsize=28)
+plt.legend(bbox_to_anchor=(1.04, 1.26), ncol=3, columnspacing=0.5, handletextpad=0.2, fontsize = 23)
+plt.xticks(n_positions, [5, 10, 20, 50, 100], fontsize=30, rotation=45)
+plt.yticks(fontsize=30)
+plt.grid(True, linestyle='--', linewidth=0.5)
 
-# plt.xlabel(r"$\tau$", fontsize=30)
-# plt.ylabel("memory (MB)", fontsize=30)
-# # plt.legend(loc='best', fontsize=28)
-# plt.legend(bbox_to_anchor=(1.04, 1.26), ncol=3, columnspacing=0.5, handletextpad=0.2, fontsize = 23)
-# plt.xticks(n_positions, [5, 10, 20, 50, 100], fontsize=30, rotation=45)
-# plt.yticks(fontsize=30)
-# plt.grid(True, linestyle='--', linewidth=0.5)
+# # Adjust the layout to be tight
+# # plt.tight_layout()
+# # plt.show()
+plt.savefig("/home/pengxinbian/Desktop/ex_plots/bl_mem_tau.pdf", format="pdf", bbox_inches="tight")
+plt.clf()
 
-# # # Adjust the layout to be tight
-# # # plt.tight_layout()
-# # # plt.show()
-# plt.savefig("/home/pengxinbian/Desktop/ex_plots/bl_mem_tau.pdf", format="pdf", bbox_inches="tight")
-# plt.clf()
 
 # # Memory
 # bar_width = 0.4
@@ -98,74 +99,75 @@ import numpy as np
 # plt.clf()
 
 
-# # ## Change k
-# df = pd.read_csv("/home/pengxinbian/Desktop/experiment/Baseline/change_k.csv")
-# n = []
-# tau = []
-# k = []
-# bl_runtime = []
-# st_runtime = []
-# esa_runtime = []
+# ## Change k
+df = pd.read_csv("/home/pengxinbian/Desktop/experiment/Baseline/change_k.csv")
+n = []
+tau = []
+k = []
+bl_runtime = []
+st_runtime = []
+esa_runtime = []
 
-# bl_mem = []
-# st_mem = []
-# esa_mem = []
+bl_mem = []
+st_mem = []
+esa_mem = []
 
 
-# for index, row in df.iterrows():
-#     tau.append(row['tau'])
-#     k.append(row['k'])
-#     bl_mem.append(row['bl_mem'] / 1000)
-#     st_mem.append(row['st_mem'] / 1000)
-#     esa_mem.append(row['esa_mem'] / 1000)
+for index, row in df.iterrows():
+    tau.append(row['tau'])
+    k.append(row['k'])
+    bl_mem.append(row['bl_mem'] / 1000)
+    st_mem.append(row['st_mem'] / 1000)
+    esa_mem.append(row['esa_mem'] / 1000)
 
-#     bl_runtime.append(row['bl_time'])
-#     st_runtime.append(row['st_time'])
-#     esa_runtime.append(row['esa_time'])
+    bl_runtime.append(row['bl_time'])
+    st_runtime.append(row['st_time'])
+    esa_runtime.append(row['esa_time'])
 
 
 
 # ## Runtime
-# bar_width = 0.4
-# n_positions = np.arange(len(k))
-# plt.bar(n_positions, bl_runtime, width=bar_width, color='b', label='Baseline')
-# plt.bar(n_positions, st_runtime, width=bar_width, color='r', label='RPM-ST')
-# plt.bar(n_positions, esa_runtime, width=bar_width, color='g', label='RPM-ESA')
+bar_width = 0.9
+n_positions = np.arange(len(k))
+plt.bar(n_positions - bar_width/3, bl_runtime, width=bar_width/3, color='b', label='Baseline')
+plt.bar(n_positions, st_runtime, width=bar_width/3, color='skyblue', label='RPM-ST')
+plt.bar(n_positions + bar_width/3, esa_runtime, width=bar_width/3, color='orange', label='RPM-ESA')
 
-# plt.yscale('log')
-# plt.xlabel(r"$k$", fontsize=30)
-# plt.ylabel("runtime (s)", fontsize=30)
-# # plt.legend(loc='best', fontsize=28)
-# plt.legend(bbox_to_anchor=(1.04, 1.26), ncol=3, columnspacing=0.5, handletextpad=0.2, fontsize = 23)
-# plt.xticks(n_positions, [5, 10, 20, 50, 100], fontsize=30, rotation=45)
-# plt.yticks(fontsize=30)
-# plt.grid(True, linestyle='--', linewidth=0.5)
-# # Adjust the layout to be tight
-# # plt.tight_layout()
-# # plt.show()
-# plt.savefig("/home/pengxinbian/Desktop/ex_plots/bl_time_k.pdf", format="pdf", bbox_inches="tight")
-# plt.clf()
+plt.yscale('log')
+plt.xlabel(r"$k$", fontsize=30)
+plt.ylabel("Runtime (s)", fontsize=30)
+# plt.legend(loc='best', fontsize=28)
+plt.legend(bbox_to_anchor=(1.04, 1.26), ncol=3, columnspacing=0.5, handletextpad=0.2, fontsize = 23)
+plt.xticks(n_positions, [5, 10, 20, 50, 100], fontsize=30, rotation=45)
+plt.yticks(fontsize=30)
+plt.grid(True, linestyle='--', linewidth=0.5)
+# Adjust the layout to be tight
+# plt.tight_layout()
+# plt.show()
+plt.savefig("/home/pengxinbian/Desktop/ex_plots/bl_time_k.pdf", format="pdf", bbox_inches="tight")
+plt.clf()
 
 
 # # # Memory
-# n_positions = np.arange(len(k))
-# plt.bar(n_positions, bl_mem, width=bar_width, color='b', label='Baseline')
-# plt.bar(n_positions, st_mem, width=bar_width, color='r', label='RPM-ST')
-# plt.bar(n_positions, esa_mem, width=bar_width, color='g', label='RPM-ESA')
+bar_width = 0.9
+n_positions = np.arange(len(k))
+plt.bar(n_positions - bar_width/3, bl_mem, width=bar_width/3, color='b', label='Baseline')
+plt.bar(n_positions, st_mem, width=bar_width/3, color='skyblue', label='RPM-ST')
+plt.bar(n_positions + bar_width/3, esa_mem, width=bar_width/3, color='orange', label='RPM-ESA')
 
-# plt.xlabel(r"$k$", fontsize=30)
-# plt.ylabel("memory (MB)", fontsize=30)
-# # plt.legend(loc='best', fontsize=28)
-# plt.legend(bbox_to_anchor=(1.04, 1.26), ncol=3, columnspacing=0.5, handletextpad=0.2, fontsize = 23)
-# plt.xticks(n_positions, [5, 10, 20, 50, 100], fontsize=30, rotation=45)
-# plt.yticks(fontsize=30)
-# plt.grid(True, linestyle='--', linewidth=0.5)
+plt.xlabel(r"$k$", fontsize=30)
+plt.ylabel("Memory (MB)", fontsize=30)
+# plt.legend(loc='best', fontsize=28)
+plt.legend(bbox_to_anchor=(1.04, 1.26), ncol=3, columnspacing=0.5, handletextpad=0.2, fontsize = 23)
+plt.xticks(n_positions, [5, 10, 20, 50, 100], fontsize=30, rotation=45)
+plt.yticks(fontsize=30)
+plt.grid(True, linestyle='--', linewidth=0.5)
 
-# # # Adjust the layout to be tight
-# # # plt.tight_layout()
-# # # plt.show()
-# plt.savefig("/home/pengxinbian/Desktop/ex_plots/bl_mem_k.pdf", format="pdf", bbox_inches="tight")
-# plt.clf()
+# # Adjust the layout to be tight
+# # plt.tight_layout()
+# # plt.show()
+plt.savefig("/home/pengxinbian/Desktop/ex_plots/bl_mem_k.pdf", format="pdf", bbox_inches="tight")
+plt.clf()
 
 
 # ## Change n
@@ -216,21 +218,22 @@ for index, row in df.iterrows():
 # print(main_runtime)
 
 ## Runtime
-bar_width = 0.4
+bar_width = 0.9
 n_positions = np.arange(len(n))
-plt.bar(n_positions, bl_runtime, width=bar_width, color='b', label='Baseline')
-plt.bar(n_positions, st_runtime, width=bar_width, color='r', label='RPM-ST')
-plt.bar(n_positions, esa_runtime, width=bar_width, color='g', label='RPM-ESA')
-# plt.ylim(1, pow(10,2))
+plt.bar(n_positions - bar_width/3, bl_runtime, width=bar_width/3, color='b', label='Baseline')
+plt.bar(n_positions, st_runtime, width=bar_width/3, color='skyblue', label='RPM-ST')
+plt.bar(n_positions + bar_width/3, esa_runtime, width=bar_width/3, color='orange', label='RPM-ESA')
+plt.ylim(0.001, 100000)
 # plt.gca().yaxis.get_major_formatter().set_useOffset(False)
 # plt.gca().yaxis.get_major_formatter().set_scientific(False)
 # plt.xscale('log')
 plt.yscale('log')
 plt.xlabel(r"$n$", fontsize=30)
-plt.ylabel("runtime (s)", fontsize=30)
+plt.ylabel("Runtime (s)", fontsize=30)
 # plt.legend(loc='best', fontsize=28)
 # plt.legend(bbox_to_anchor=(1.03, 1.25), ncol=2, fontsize = 28)
 plt.legend(bbox_to_anchor=(1.04, 1.26), ncol=3, columnspacing=0.5, handletextpad=0.2, fontsize = 23)
+# plt.legend(loc='upper left', bbox_to_anchor=(-0.03, 1.04), fontsize=25)
 plt.xticks(n_positions, [5000,10000,20000,50000,100000], fontsize=30, rotation=45)
 plt.yticks(fontsize=30)
 plt.grid(True, linestyle='--', linewidth=0.5)
@@ -244,19 +247,18 @@ plt.clf()
 
 
 ## Memory
-bar_width = 0.4
+bar_width = 0.9
 n_positions = np.arange(len(n))
-plt.bar(n_positions, bl_runtime, width=bar_width, color='b', label='Baseline')
-plt.bar(n_positions, st_runtime, width=bar_width, color='r', label='RPM-ST')
-plt.bar(n_positions, esa_runtime, width=bar_width, color='g', label='RPM-ESA')
-# plt.ylim(1, pow(10,5))
-# plt.ylim(0, max(bl_mem) + 1000)
+plt.bar(n_positions - bar_width/3, bl_mem, width=bar_width/3, color='b', label='Baseline')
+plt.bar(n_positions, st_mem, width=bar_width/3, color='skyblue', label='RPM-ST')
+plt.bar(n_positions + bar_width/3, esa_mem, width=bar_width/3, color='orange', label='RPM-ESA')
+plt.ylim(1, 10000)
 # plt.gca().yaxis.get_major_formatter().set_useOffset(False)
 # plt.gca().yaxis.get_major_formatter().set_scientific(False)
 plt.yscale('log')
 plt.xlabel(r"$n$", fontsize=30)
-plt.ylabel("memory (MB)", fontsize=30)
-# plt.legend(loc='best', fontsize=28)
+plt.ylabel("Memory (MB)", fontsize=30)
+# plt.legend(loc='upper left', bbox_to_anchor=(-0.03, 1.04), fontsize=25)
 # plt.legend(bbox_to_anchor=(1.03, 1.25), ncol=2, fontsize = 28)
 plt.legend(bbox_to_anchor=(1.04, 1.26), ncol=3, columnspacing=0.5, handletextpad=0.2, fontsize = 23)
 plt.xticks(n_positions, [5000,10000,20000,50000,100000], fontsize=30, rotation=45)
@@ -267,3 +269,5 @@ plt.grid(True, linestyle='--', linewidth=0.5)
 # plt.show()
 plt.savefig("/home/pengxinbian/Desktop/ex_plots/bl_mem_n.pdf", format="pdf", bbox_inches="tight")
 plt.clf()
+
+
