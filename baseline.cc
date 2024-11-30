@@ -7,7 +7,6 @@
 #include <vector>
 #include <climits>
 #include <set>
-#include <chrono>
 
 using namespace std;
 typedef int64_t INT;  
@@ -19,6 +18,22 @@ struct interval
 	INT end;
 	INT contain;
 };
+
+struct W
+{
+	INT i;
+	INT start;
+	INT end;
+	INT is_start;
+	INT interval;
+};
+
+bool comparison(W &a, W &b)
+{
+	if( a.i == b.i )
+		return a.is_start > b.is_start;
+	else return a.i < b.i;
+}
 
 /** KMP pre-processing **/
 void preKmp(unsigned char * x, INT m, INT * kmpNext) 
@@ -98,26 +113,19 @@ INT DP( vector<interval> occ, INT k )
 {
 	INT M = 0;
 
-	vector<set<INT>> hit_intervals;
-	
 	// Compute number of intervals that contain d for initialisation
 	for (INT b = 0; b < occ.size(); b++) 
 	{
 		INT d_b = occ.at(b).end;
 		INT count = 0;
-		set<INT> ins;
 
 		for (INT i = 0; i < occ.size(); i++)
 		{
 
 			if (occ.at(i).start <= d_b && occ.at(i).end >= d_b)
-			{
-				ins.insert( i );
 				count++;
-			}
+
 		}
-		
-		hit_intervals.push_back(ins);
 
 		occ.at(b).contain = count;
 	}
@@ -132,21 +140,60 @@ INT DP( vector<interval> occ, INT k )
 		for(INT j = 0; j<occ.size(); j++)
 			w_ab[i][j] = 0;
 			
-
-	for (INT a = 0; a < occ.size(); a++)
+			
+	vector<W> * to_order = new vector<W>();
+	
+	for(INT a = 0; a<occ.size(); a++)
 	{
-
-		for (INT b = a+1; b < occ.size(); b++)
-		{
-			set<int> difference;
-
-		    	set_difference(hit_intervals.at(b).begin(), hit_intervals.at(b).end(), hit_intervals.at(a).begin(), hit_intervals.at(a).end(), inserter(difference, difference.begin()));
-		    	
-		    	w_ab[a][b] = difference.size();
-		  
-		}
-
+		W s;
+		s.i = occ.at(a).start;
+		s.start = occ.at(a).start;
+		s.end = occ.at(a).end;
+		s.is_start = 1;
+		s.interval = a;
+		
+		to_order->push_back(s);
+		
+		W e;
+		e.i = occ.at(a).end;
+		e.start = occ.at(a).start;
+		e.end = occ.at(a).end;
+		e.is_start = 0;
+		e.interval = a;
+		
+		to_order->push_back(e);
 	}
+	
+	sort(to_order->begin(), to_order->end(), comparison);
+	
+	for(INT a = 0; a<to_order->size(); a++)
+	{
+		if( to_order->at(a).is_start == 0 )
+			continue;
+			
+		W current = to_order->at(a);
+		int q = 0;
+		
+		for(INT b = a+1; b<to_order->size(); b++)
+		{
+			if( to_order->at(b).is_start == 1 && to_order->at(b).start > current.end )
+				q++;
+				
+			else if( to_order->at(b).is_start == 0 && to_order->at(b).start <= current.end )
+			{
+				w_ab[current.interval][to_order->at(b).interval] = q;
+			}
+			
+			else if( to_order->at(b).is_start == 0 && to_order->at(b).start > current.end )
+			{
+				w_ab[current.interval][to_order->at(b).interval] = q;
+				q--;
+			}
+				
+		}
+	}
+	
+	delete( to_order );
 	
 	// Initialize DP
 	INT ** T = new INT*[occ.size()];
@@ -160,7 +207,6 @@ INT DP( vector<interval> occ, INT k )
 		T[0][h] = occ.at(0).contain;
 
 	// Compute DP
-	
 	for (INT b = 1; b < occ.size(); b++)
 	{
 	
@@ -256,8 +302,6 @@ int main(int argc, char **argv)
 		return ( 1 );
 	}
 	
-	auto start = chrono::high_resolution_clock::now();
-
 	vector<interval> occ;
 	
 	unsigned char * pattern = ( unsigned char * ) malloc (  ( n + 1 ) * sizeof ( unsigned char ) );
@@ -317,10 +361,6 @@ int main(int argc, char **argv)
 		
 		free( tested_index );
 	}
-
-	auto end = chrono::high_resolution_clock::now();
-    chrono::duration<double> elapsed = end - start;
-    cout << "The runtime of this whole process is " << elapsed.count() << endl;
 	
 	
 	ofstream output_f(str_out);
