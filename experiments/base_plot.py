@@ -44,7 +44,9 @@ plt.ylabel("Runtime (s)", fontsize=30)
 # plt.legend(loc='best', fontsize=28)
 plt.legend(bbox_to_anchor=(1.04, 1.26), ncol=3, columnspacing=0.5, handletextpad=0.2, fontsize = 23)
 plt.xticks(n_positions, [5, 10, 20, 50, 100], fontsize=30, rotation=45)
-plt.yticks(fontsize=30)
+# plt.yticks(fontsize=30)
+ticks = [10**-2, 10**0, 10**2, 10**4]
+plt.yticks(ticks, [r'$10^{-2}$', r'$10^0$', r'$10^2$', r'$10^4$'], fontsize=30)
 plt.grid(True, linestyle='--', linewidth=0.5)
 # Adjust the layout to be tight
 # plt.tight_layout()
@@ -139,7 +141,9 @@ plt.ylabel("Runtime (s)", fontsize=30)
 # plt.legend(loc='best', fontsize=28)
 plt.legend(bbox_to_anchor=(1.04, 1.26), ncol=3, columnspacing=0.5, handletextpad=0.2, fontsize = 23)
 plt.xticks(n_positions, [5, 10, 20, 50, 100], fontsize=30, rotation=45)
-plt.yticks(fontsize=30)
+# plt.yticks(fontsize=30)
+ticks = [10**-2, 10**0, 10**2, 10**4]
+plt.yticks(ticks, [r'$10^{-2}$', r'$10^0$', r'$10^2$', r'$10^4$'], fontsize=30)
 plt.grid(True, linestyle='--', linewidth=0.5)
 # Adjust the layout to be tight
 # plt.tight_layout()
@@ -220,10 +224,11 @@ for index, row in df.iterrows():
 ## Runtime
 bar_width = 0.9
 n_positions = np.arange(len(n))
+# print(n_positions)
 plt.bar(n_positions - bar_width/3, bl_runtime, width=bar_width/3, color='b', label='Baseline')
 plt.bar(n_positions, st_runtime, width=bar_width/3, color='skyblue', label='RPM-ST')
 plt.bar(n_positions + bar_width/3, esa_runtime, width=bar_width/3, color='orange', label='RPM-ESA')
-plt.ylim(0.001, 100000)
+# plt.ylim(0.001, 10000)
 # plt.gca().yaxis.get_major_formatter().set_useOffset(False)
 # plt.gca().yaxis.get_major_formatter().set_scientific(False)
 # plt.xscale('log')
@@ -235,7 +240,9 @@ plt.ylabel("Runtime (s)", fontsize=30)
 plt.legend(bbox_to_anchor=(1.04, 1.26), ncol=3, columnspacing=0.5, handletextpad=0.2, fontsize = 23)
 # plt.legend(loc='upper left', bbox_to_anchor=(-0.03, 1.04), fontsize=25)
 plt.xticks(n_positions, [5000,10000,20000,50000,100000], fontsize=30, rotation=45)
-plt.yticks(fontsize=30)
+# plt.yticks(fontsize=30)
+ticks = [10**-2, 10**0, 10**2, 10**4]
+plt.yticks(ticks, [r'$10^{-2}$', r'$10^0$', r'$10^2$', r'$10^4$'], fontsize=30)
 plt.grid(True, linestyle='--', linewidth=0.5)
 
 # plt.figure(figsize=(8,6))
@@ -263,6 +270,7 @@ plt.ylabel("Memory (MB)", fontsize=30)
 plt.legend(bbox_to_anchor=(1.04, 1.26), ncol=3, columnspacing=0.5, handletextpad=0.2, fontsize = 23)
 plt.xticks(n_positions, [5000,10000,20000,50000,100000], fontsize=30, rotation=45)
 plt.yticks(fontsize=30)
+
 plt.grid(True, linestyle='--', linewidth=0.5)
 # # Adjust the layout to be tight
 # plt.tight_layout()

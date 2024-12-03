@@ -7,6 +7,7 @@
 #include <vector>
 #include <climits>
 #include <set>
+#include <chrono>
 
 using namespace std;
 typedef int64_t INT;  
@@ -302,6 +303,7 @@ int main(int argc, char **argv)
 		return ( 1 );
 	}
 	
+	auto whole_start = chrono::high_resolution_clock::now();
 	vector<interval> occ;
 	
 	unsigned char * pattern = ( unsigned char * ) malloc (  ( n + 1 ) * sizeof ( unsigned char ) );
@@ -361,8 +363,10 @@ int main(int argc, char **argv)
 		
 		free( tested_index );
 	}
-	
-	
+	auto whole_end = chrono::high_resolution_clock::now();
+	chrono::duration<double> whole_elapsed = whole_end - whole_start;
+	cout << "The whole process takes " << whole_elapsed.count() << " s." << endl;
+		
 	ofstream output_f(str_out);
 	
 	// Output results
