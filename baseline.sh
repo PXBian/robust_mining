@@ -40,16 +40,16 @@ rm output/*
 # (/usr/bin/time -v ./main data/ecoli10000  100 10 )    &> peak_ram/bl_st_ecoli10000_100_10.txt
 
 
-(/usr/bin/time -v ./baseline data/ecoli10000  5   50 bl_output)    &> peak_ram/bl_base_ecoli10000_50_5.txt
-(/usr/bin/time -v ./baseline data/ecoli10000  10  50 bl_output)    &> peak_ram/bl_base_ecoli10000_50_10.txt
-(/usr/bin/time -v ./baseline data/ecoli10000  20  50 bl_output)    &> peak_ram/bl_base_ecoli10000_50_20.txt
-(/usr/bin/time -v ./baseline data/ecoli10000  50  50 bl_output)    &> peak_ram/bl_base_ecoli10000_50_50.txt
-(/usr/bin/time -v ./baseline data/ecoli10000  100 50 bl_output)    &> peak_ram/bl_base_ecoli10000_50_100.txt
+# (/usr/bin/time -v ./baseline data/ecoli10000  5   50 bl_output)    &> peak_ram/bl_base_ecoli10000_50_5.txt
+# (/usr/bin/time -v ./baseline data/ecoli10000  10  50 bl_output)    &> peak_ram/bl_base_ecoli10000_50_10.txt
+# (/usr/bin/time -v ./baseline data/ecoli10000  20  50 bl_output)    &> peak_ram/bl_base_ecoli10000_50_20.txt
+# (/usr/bin/time -v ./baseline data/ecoli10000  50  50 bl_output)    &> peak_ram/bl_base_ecoli10000_50_50.txt
+# (/usr/bin/time -v ./baseline data/ecoli10000  100 50 bl_output)    &> peak_ram/bl_base_ecoli10000_50_100.txt
 
 (/usr/bin/time -v ./baseline data/ecoli10000  10 5   bl_output)    &> peak_ram/bl_base_ecoli10000_5_10.txt
-(/usr/bin/time -v ./baseline data/ecoli10000  10 10  bl_output)    &> peak_ram/bl_base_ecoli10000_10_10.txt
-(/usr/bin/time -v ./baseline data/ecoli10000  10 20  bl_output)    &> peak_ram/bl_base_ecoli10000_20_10.txt
-(/usr/bin/time -v ./baseline data/ecoli10000  10 50  bl_output)    &> peak_ram/bl_base_ecoli10000_50_10.txt
+# (/usr/bin/time -v ./baseline data/ecoli10000  10 10  bl_output)    &> peak_ram/bl_base_ecoli10000_10_10.txt
+# (/usr/bin/time -v ./baseline data/ecoli10000  10 20  bl_output)    &> peak_ram/bl_base_ecoli10000_20_10.txt
+# (/usr/bin/time -v ./baseline data/ecoli10000  10 50  bl_output)    &> peak_ram/bl_base_ecoli10000_50_10.txt
 (/usr/bin/time -v ./baseline data/ecoli10000  10 100 bl_output)    &> peak_ram/bl_base_ecoli10000_100_10.txt
 
 
@@ -70,13 +70,13 @@ rm output/*
 # (/usr/bin/time -v ./main data/ecoli50000  50 10 )    &> peak_ram/bl_st_ecoli50000_50_10.txt
 # (/usr/bin/time -v ./main data/ecoli100000 50 10 )    &> peak_ram/bl_st_ecoli100000_50_10.txt
 
-(/usr/bin/time -v ./baseline data/ecoli1000   10 50 bl_output)    &> peak_ram/bl_base_ecoli1000_50_10.txt
-(/usr/bin/time -v ./baseline data/ecoli2000   10 50 bl_output)    &> peak_ram/bl_base_ecoli2000_50_10.txt
-(/usr/bin/time -v ./baseline data/ecoli5000   10 50 bl_output)    &> peak_ram/bl_base_ecoli5000_50_10.txt
-(/usr/bin/time -v ./baseline data/ecoli10000  10 50 bl_output)    &> peak_ram/bl_base_ecoli10000_50_10.txt
-(/usr/bin/time -v ./baseline data/ecoli20000  10 50 bl_output)    &> peak_ram/bl_base_ecoli20000_50_10.txt
-(/usr/bin/time -v ./baseline data/ecoli50000  10 50 bl_output)    &> peak_ram/bl_base_ecoli50000_50_10.txt
-(/usr/bin/time -v ./baseline data/ecoli100000 10 50 bl_output)    &> peak_ram/bl_base_ecoli100000_50_10.txt
+# (/usr/bin/time -v ./baseline data/ecoli1000   10 50 bl_output)    &> peak_ram/bl_base_ecoli1000_50_10.txt
+# (/usr/bin/time -v ./baseline data/ecoli2000   10 50 bl_output)    &> peak_ram/bl_base_ecoli2000_50_10.txt
+# (/usr/bin/time -v ./baseline data/ecoli5000   10 50 bl_output)    &> peak_ram/bl_base_ecoli5000_50_10.txt
+# (/usr/bin/time -v ./baseline data/ecoli10000  10 50 bl_output)    &> peak_ram/bl_base_ecoli10000_50_10.txt
+# (/usr/bin/time -v ./baseline data/ecoli20000  10 50 bl_output)    &> peak_ram/bl_base_ecoli20000_50_10.txt
+# (/usr/bin/time -v ./baseline data/ecoli50000  10 50 bl_output)    &> peak_ram/bl_base_ecoli50000_50_10.txt
+# (/usr/bin/time -v ./baseline data/ecoli100000 10 50 bl_output)    &> peak_ram/bl_base_ecoli100000_50_10.txt
 
 
 

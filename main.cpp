@@ -195,8 +195,8 @@ IntervalTree<INT> is_periodic_preprocessing(unsigned char* text_string, INT text
       //      << ", end=" <<  run.end
       //      << ", per=" << run.period
       //      << ", len=" << run.length
-      //      << ", exp=" << run.length / (double) run.period
-      //      << ", str=" << S.substr(run.start, run.length) << endl;
+      //      << ", exp=" << run.length / (double) run.period << endl;
+          //  << ", str=" << S.substr(run.start, run.length) << endl;
     }
 
     return tree;
