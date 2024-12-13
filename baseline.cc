@@ -248,7 +248,7 @@ int main(int argc, char **argv)
 	if( argc < 5 )
  	{
         	cout<<"Wrong arguments!\n";
- 		cout<<"./k_kill <text_file> <k> <t> <output_file>\n";
+ 		cout<<"./baseline <text_file> <k> <t> <output_file>\n";
  		exit(-1);
  	}
  	ifstream is;
@@ -270,6 +270,9 @@ int main(int argc, char **argv)
  	
  	std::string str_out(argv[4]);
    
+   	INT dp_calls = 0;
+   	INT kmp_calls = 0;
+   	
    	unsigned char * text = ( unsigned char * ) malloc (  ( text_file_size + 1 ) * sizeof ( unsigned char ) );
    	
   	// Read in text
@@ -335,11 +338,13 @@ int main(int argc, char **argv)
 			
 			// Compute occurrences
 			KMP( pattern, text, occ ); 
+			kmp_calls++;
 			
 			if( occ.size() >= t )
 			{ 
 				// Compute killed intervals
 				INT M = DP( occ, k );
+				dp_calls++;
 				
 				if( occ.size() - M >= t )
 				{
@@ -366,7 +371,9 @@ int main(int argc, char **argv)
 	auto whole_end = chrono::high_resolution_clock::now();
 	chrono::duration<double> whole_elapsed = whole_end - whole_start;
 	cout << "The whole process takes " << whole_elapsed.count() << " s." << endl;
-		
+	cout<<"Total DP calls: "<<dp_calls<<endl;
+	cout<<"Total KMP calls: "<<kmp_calls<<endl;
+	
 	ofstream output_f(str_out);
 	
 	// Output results
