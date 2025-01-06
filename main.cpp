@@ -2,6 +2,7 @@
 #include <string>
 #include <map>
 #include <set>
+#include <unordered_set>
 #include <queue>
 #include <cmath>
 #include <time.h>
@@ -250,9 +251,9 @@ INT greedy(vector<INT>& O, INT t, INT lamda) {
 }
 
 
-bool aperiodic_survive(STvertex* root, INT* &suffix_array, INT freq_threshold, INT k, INT l, INT r, INT I, INT J) {
+bool aperiodic_resilient(STvertex* root, INT* &suffix_array, INT freq_threshold, INT k, INT l, INT r, INT I, INT J) {
   INT Occ = r - l + 1;
-  // cout << "****************Into the aperiodic_survive function.**************" << endl;
+  // cout << "****************Into the aperiodic_resilient function.**************" << endl;
   // cout << "The Occ is " << Occ << ", freq_threshold is " << freq_threshold << ", k is " << k << endl;
   if (Occ >= freq_threshold + 2 * k) {
     // cout << "Into Case 1" << endl;
@@ -324,8 +325,8 @@ INT ceilDivision(INT a, INT b) {
 }
 
 
-bool periodic_survive(INT l, INT r, INT I, INT J, INT freq_threshold, INT k, vector<vector<INT>>& H, INT p) {
-  // cout << "****************Into the periodic_survive function.**************" << endl;
+bool periodic_resilient(INT l, INT r, INT I, INT J, INT freq_threshold, INT k, vector<vector<INT>>& H, INT p) {
+  // cout << "****************Into the periodic_resilient function.**************" << endl;
   INT Occ = r - l + 1;
   // INT alpha = (J - I + 1) / p;
   INT alpha = ceilDivision(J - I + 1, p);
@@ -432,10 +433,10 @@ bool periodic_survive(INT l, INT r, INT I, INT J, INT freq_threshold, INT k, vec
 }
 
 
-bool check_freq_periodic_survive(bool is_node_checking, bool &is_cut_point, STvertex* r, STvertex* current, INT left, INT right, INT I, INT J, INT freq_threshold, INT k, INT* suffix_array, IntervalTree<INT>& interval_tree) {
+bool check_freq_periodic_resilient(bool is_node_checking, bool &is_cut_point, STvertex* r, STvertex* current, INT left, INT right, INT I, INT J, INT freq_threshold, INT k, INT* suffix_array, IntervalTree<INT>& interval_tree) {
   // cout << "current node's left = " << left << ", right = " << right << ", I = " << I << ", J = " << J << endl;
   
-  bool periodic_survive_value = false, aperiodic_survive_value = false;
+  bool periodic_resilient_value = false, aperiodic_resilient_value = false;
   // vector<STvertex*> current_path;
   vector<vector<INT>> H;
   
@@ -459,13 +460,13 @@ bool check_freq_periodic_survive(bool is_node_checking, bool &is_cut_point, STve
       //   cout << endl;
       // }
 
-      // Then call periodic_survive
-      // cout << "Before INTo the periodic_survive, the p = " << p << endl;
-      periodic_survive_value = periodic_survive(left, right, I, J, freq_threshold, k, H, p);
+      // Then call periodic_resilient
+      // cout << "Before INTo the periodic_resilient, the p = " << p << endl;
+      periodic_resilient_value = periodic_resilient(left, right, I, J, freq_threshold, k, H, p);
 
-      // cout << "The value of periodic_survive is " << periodic_survive_value << endl;
-      if (periodic_survive_value) {   // current is a node lying on the cut of ST
-        if (is_node_checking) {   // Propagate upforward the status of frequent and survive to all ancestors except root
+      // cout << "The value of periodic_resilient is " << periodic_resilient_value << endl;
+      if (periodic_resilient_value) {   // current is a node lying on the cut of ST
+        if (is_node_checking) {   // Propagate upforward the status of frequent and resilient to all ancestors except root
           is_cut_point = true;
           current->flag = true;
           // current_path = current->path;
@@ -484,11 +485,11 @@ bool check_freq_periodic_survive(bool is_node_checking, bool &is_cut_point, STve
 
     else {
       // is_periodic_no ++;   // Count the times of answering NO
-      aperiodic_survive_value = aperiodic_survive(r, suffix_array, freq_threshold, k, left, right, I, J);
+      aperiodic_resilient_value = aperiodic_resilient(r, suffix_array, freq_threshold, k, left, right, I, J);
 
-      // cout << "The value of aperiodic_survive is " << aperiodic_survive_value << endl;
-      if (aperiodic_survive_value) {   // current is a node lying on the cut of ST
-        if (is_node_checking) {   // Propagate upforward the status of frequent and survive to all ancestors except root
+      // cout << "The value of aperiodic_resilient is " << aperiodic_resilient_value << endl;
+      if (aperiodic_resilient_value) {   // current is a node lying on the cut of ST
+        if (is_node_checking) {   // Propagate upforward the status of frequent and resilient to all ancestors except root
           is_cut_point = true;
           current->flag = true;
         //   current_path = current->path;
@@ -507,7 +508,7 @@ bool check_freq_periodic_survive(bool is_node_checking, bool &is_cut_point, STve
     }
   }
 
-  return (aperiodic_survive_value || periodic_survive_value);
+  return (aperiodic_resilient_value || periodic_resilient_value);
 }
 
 INT binary_search_longest_substring (INT low, INT high, INT I, INT child_l, INT child_r, INT freq_threshold, INT k, bool &is_cut_point, STvertex* &root, STvertex* &current, INT* &suffix_array, IntervalTree<INT>& interval_tree) {
@@ -519,18 +520,18 @@ INT binary_search_longest_substring (INT low, INT high, INT I, INT child_l, INT 
   while (low < high) {
     mid = low + (high - low) / 2;     // mid is the floor INT
     if (mid == low) {
-      bool is_freq_survive = check_freq_periodic_survive(false, is_cut_point, root, current, child_l, child_r, I, high, freq_threshold, k, suffix_array, interval_tree);
-      if (is_freq_survive) {
+      bool is_freq_resilient = check_freq_periodic_resilient(false, is_cut_point, root, current, child_l, child_r, I, high, freq_threshold, k, suffix_array, interval_tree);
+      if (is_freq_resilient) {
         success_record = high;
       }
       break;
     }
 
     // cout << "current low = " << low << ", high = " << high << ", mid = " << mid << endl;
-    bool is_freq_survive = check_freq_periodic_survive(false, is_cut_point, root, current, child_l, child_r, I, mid, freq_threshold, k, suffix_array, interval_tree);
+    bool is_freq_resilient = check_freq_periodic_resilient(false, is_cut_point, root, current, child_l, child_r, I, mid, freq_threshold, k, suffix_array, interval_tree);
 
-    // cout << "the is_freq_survive result is " << is_freq_survive << endl;
-    if (is_freq_survive) {
+    // cout << "the is_freq_resilient result is " << is_freq_resilient << endl;
+    if (is_freq_resilient) {
       low = mid;
       success_record = mid;
     }
@@ -571,8 +572,6 @@ int main(int argv, char** argc) {
     // string text_file_path = "data/" + text_file;
     string text_file_path = text_file;
 
-    // string text_file_path = "/scratch/prj/proj_loukides/github_useful_strings/useful_strings/" + text_file;
-
     cout << "text_file_path is " << text_file_path << endl;
     cout << "output_file is " << output_file << endl;
 
@@ -599,11 +598,13 @@ int main(int argv, char** argc) {
     // output_stream << text_file << "," << to_string(freq_threshold) << "," << to_string(k) << ",";
     // output_stream.close();
 
+    unordered_set<char> alphabet;
     // At the beginning and end of S, add two $ to ensure the all_run runs successfully!
     auto start = chrono::high_resolution_clock::now();
     for (INT i = 0; i < text_file_size - 1; i++) {	
       is_text.read(reinterpret_cast<char*>(&chr), 1);
       text_string[i] = chr;
+      alphabet.insert(chr);
       // cout << "i=" << i << "," << chr << "(" << text_size << "),dec_value=" << (unsigned INT)chr << "; ";
       text_size++;
     }
@@ -613,7 +614,7 @@ int main(int argv, char** argc) {
     text_string[ text_size] = 255;
     text_string[ text_size+1] = '\0';	// Change '~' to '!' to make the symbol's ascii is smaller than the chars in txt
     text_size = text_size + 1;  // Do not include the final \0
-    cout << "Finish reading the text file! text_size = " << text_size << endl;
+    cout << "Finish reading the text file! text_size = " << text_size << ", alphabet = " << alphabet.size() << endl;
     // cout << "CHECK! The text_size = " << text_size << endl;
     // for(INT i = 0; i < text_size; i++) {
     //   cout << "char:" << (unsigned INT)text_string[i] << endl;
@@ -710,7 +711,7 @@ int main(int argv, char** argc) {
     for (auto it = rev_bottomup_ordered_nodes.rbegin(); it != rev_bottomup_ordered_nodes.rend(); ++it) {
       current = *it;
       
-      bool is_cut_point = false, is_freq_survive = false;
+      bool is_cut_point = false, is_freq_resilient = false;
 
       INT cur_left = current->SA_interval.first, cur_right = current->SA_interval.second;
       if (cur_right - cur_left + 1 < freq_threshold) {  // If the current node is not frequent, continue to the next current
@@ -757,7 +758,7 @@ int main(int argv, char** argc) {
         INT I = suffix_array[cur_left];
         INT J = I + current_str_depth - 1;
         
-        is_freq_survive = check_freq_periodic_survive(true, is_cut_point, r, current, cur_left, cur_right, I, J, freq_threshold, k, suffix_array, runs);
+        is_freq_resilient = check_freq_periodic_resilient(true, is_cut_point, r, current, cur_left, cur_right, I, J, freq_threshold, k, suffix_array, runs);
 
         if (is_cut_point) {
           // cout << "*********This is a cut node! Start binary search to find out the refined cut!********" << endl;
@@ -765,7 +766,7 @@ int main(int argv, char** argc) {
           num_of_resi = num_of_resi + current_str_depth - parent_str_depth;
           // cout << "Now add " << current_str_depth - parent_str_depth << " to num_of_resi, num_of_resi = " << num_of_resi << endl;
           
-          is_freq_survive = false;
+          is_freq_resilient = false;
           for (auto const &child : current->g) {
             child_node = child.second.v;
             // vector<INT> child_SA_interval = child_node->SA_interval;
