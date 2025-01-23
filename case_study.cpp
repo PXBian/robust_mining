@@ -320,7 +320,7 @@ vector<STvertex*> bottom_up_SA_interval(STvertex* &r, INT* &suffix_array, INT* &
 int main(int argv, char** argc) {
 
     if(argv < 4) {
-      cout << "Usage: ./main [text_file] [freq_threshold] [number of letter substitions] [first_str_file]" << endl;
+      cout << "Usage: ./case [text_file] [freq_threshold] [number of letter substitions] [first_str_file]" << endl;
       return 1;
     }
     // Input text file

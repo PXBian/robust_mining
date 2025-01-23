@@ -535,8 +535,6 @@ int main(int argv, char** argc) {
     // string text_file_path = "data/" + text_file;
     string text_file_path = text_file;
 
-    // string text_file_path = "/scratch/prj/proj_loukides/github_useful_strings/useful_strings/" + text_file;
-
     cout << "text_file_path is " << text_file_path << endl;
     cout << "output_file is " << output_file << endl;
 
@@ -590,11 +588,7 @@ int main(int argv, char** argc) {
    	// cout<<endl;
     auto end = chrono::high_resolution_clock::now();
     chrono::duration<double> elapsed = end - start;
-    // output_stream.open(runtime_detail_csv, ios::app);
-    // output_stream << elapsed.count() << ",";
-    // output_stream.close();
 
-    // return 0;   //Max RSS: 208128
 
     auto whole_start = chrono::high_resolution_clock::now();
 
@@ -605,12 +599,6 @@ int main(int argv, char** argc) {
     cout << "Construct all runs successfully!" << endl;
     end = chrono::high_resolution_clock::now();
     elapsed = end - start;
-    // output_stream.open(runtime_detail_csv, ios::app);
-    // output_stream << elapsed.count() << ",";
-    // output_stream.close();
-    
-
-    // return 0;    // Max RSS: 9402032
 
 
     cout << "Start to build SA and LCP" << endl;
@@ -656,14 +644,9 @@ int main(int argv, char** argc) {
     //   }
     // cout << endl;
 
-
-    // return 0;   //Max RSS: 9402300
-
     
 	  // B * b = ( B * ) realloc(b, ( text_size ) * sizeof( B ) );
 	  vector<B> b(text_size);
-
-    // return 0;   //Max RSS: 18062704
 
 
     vector<INT> bottomup_order;
@@ -677,7 +660,6 @@ int main(int argv, char** argc) {
     // }
     // cout << endl;
 
-    // return 0;     //Max RSS: 21421224
 
     // cout << "The tuples before are " << endl;
     // for (int i = 0; i < text_size; i++) {
@@ -777,8 +759,6 @@ int main(int argv, char** argc) {
     for (int i = 0; i < text_size; i++) {
       if(b[i].r != 0) dummy_count++;  // Include root
     }
-
-    // return 0;     //Max RSS: 16742976
 
 
     // Start MAIN algorithm

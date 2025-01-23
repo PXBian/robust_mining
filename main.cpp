@@ -590,7 +590,7 @@ int main(int argv, char** argc) {
     // INT text_size = 0;
     INT text_size = 0;
     
-    string runtime_detail_csv = "runtime_details.csv";
+    // string runtime_detail_csv = "runtime_details.csv";
     ofstream output_stream;
     // output_stream.open(runtime_detail_csv, ios::app);
     // output_stream << "text_file,tau,k,read_txt,create_ST,create_SA,create_intervals,is_periodic_preprocess,find_cut,total\n";
@@ -634,9 +634,6 @@ int main(int argv, char** argc) {
     end = chrono::high_resolution_clock::now();
     elapsed = end - start;
 
-
-    // return 0;   // Max RSS: 9197532
-
     
     // Pre-processing begin
     start = chrono::high_resolution_clock::now();
@@ -670,8 +667,6 @@ int main(int argv, char** argc) {
       inv_suffix_array[suffix_array[i]] = i;
     }
 
-    // return 0;    // Max RSS: 63239776
-
 
     start = chrono::high_resolution_clock::now();
     vector<STvertex*> rev_bottomup_ordered_nodes = bottom_up_SA_interval(r, suffix_array, inv_suffix_array, text_size, freq_threshold);
@@ -689,8 +684,6 @@ int main(int argv, char** argc) {
     //   cout << item << " ";
     // }
     // cout << endl;
-    
-    // return 0;    // Max RSS: 67435236
 
 
     // Start MAIN ALGORITHM
