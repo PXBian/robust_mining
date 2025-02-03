@@ -440,7 +440,7 @@ bool check_freq_periodic_resilient(bool is_node_checking, bool &is_cut_point, ST
   // vector<STvertex*> current_path;
   vector<vector<INT>> H;
   
-  if (right - left + 1 >= freq_threshold) {   // This is a \tau-frequent node
+  if (right - left + 1 >= freq_threshold + k) {   // This is a \tau-frequent node
     // cout << "This node is frequent!" << endl;
     INT p = INT_MAX;
     bool is_periodic_value = is_periodic(I, J, interval_tree, p);  // Here p can store the return value from is_periodic when YES
@@ -512,7 +512,7 @@ bool check_freq_periodic_resilient(bool is_node_checking, bool &is_cut_point, ST
 }
 
 INT binary_search_longest_substring (INT low, INT high, INT I, INT child_l, INT child_r, INT freq_threshold, INT k, bool &is_cut_point, STvertex* &root, STvertex* &current, INT* &suffix_array, IntervalTree<INT>& interval_tree) {
-  if (child_r - child_l + 1 < freq_threshold) {   // If the child node is not frequent, continue to the next child
+  if (child_r - child_l + 1 < freq_threshold + k) {   // If the child node is not frequent, continue to the next child
     return low;
   }
 
@@ -707,7 +707,7 @@ int main(int argv, char** argc) {
       bool is_cut_point = false, is_freq_resilient = false;
 
       INT cur_left = current->SA_interval.first, cur_right = current->SA_interval.second;
-      if (cur_right - cur_left + 1 < freq_threshold) {  // If the current node is not frequent, continue to the next current
+      if (cur_right - cur_left + 1 < freq_threshold + k) {  // If the current node is not frequent, continue to the next current
           continue;
       }
 
