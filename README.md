@@ -2,7 +2,7 @@
 
 ## Pre-install:
 
-Before compiling and running, please install [sdsl](https://github.com/simongog/sdsl-lite) using the following command:
+To set up the environment, install [sdsl](https://github.com/simongog/sdsl-lite) by running:
 
 ```bash pre-install.sh```
 
