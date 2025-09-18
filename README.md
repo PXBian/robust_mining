@@ -2,7 +2,7 @@
 
 ## Description
 
-This repository maintains a 
+This repository contains the implementation of the algorithm proposed in our paper Resilient Pattern Mining (RPM). RPM introduces a time- and space-efficient algorithm for discovering `(τ,k)`-resilient substrings of a given text `S`. This repo provides two implementations: one based on the enhanced suffix array (RPM-ESA) and another based on the suffix tree (RPM-ST).
 
 ## Requirements
 
@@ -27,24 +27,32 @@ cd robust_mining
 
 ### Compile:
 
-For compiling the RPM-ESA algorithm, run:
+To compile the RPM-ESA algorithm, run:
 
-```g++ -O3 -DNDEBUG -I ./libsdsl/include/ -L ./libsdsl/lib/ runs.hpp intervaltree.hpp main_ESA.cpp -o esa -lsdsl -ldivsufsort -ldivsufsort64```
+```bash 
+g++ -O3 -DNDEBUG -I ./libsdsl/include/ -L ./libsdsl/lib/ runs.hpp intervaltree.hpp main_ESA.cpp -o esa -lsdsl -ldivsufsort -ldivsufsort64
+```
 
-For compiling the RPM-ST algorithm, run:
+To compile the RPM-ST algorithm, run:
 
-```make all```
+```bash 
+make all
+```
 
 
 ### Execute:
 
-For executing the RPM-ESA algorithm, run:
+To execute the RPM-ESA algorithm, run:
 
-```./esa <text_file> <τ> <k>```
+```bash
+./esa <text_file> <τ> <k>
+```
 
-For executing the RPM-ST algorithm, run:
+To execute the RPM-ST algorithm, run:
 
-```./main <text_file> <τ> <k>``` 
+```bash 
+./main <text_file> <τ> <k>
+``` 
 
 **Parameters:**
 
@@ -55,18 +63,20 @@ For executing the RPM-ST algorithm, run:
 
 ### Examples
 
-For using RPM-ESA to find the `(τ,k)`-resilient substrings of `S` in data/dna.200MB, run as follows:
+To use RPM-ESA to find the `(τ,k)`-resilient substrings of `S` in `data/dna.200MB`, run as follows:
 
-```./esa data/dna.200MB 10 100```
+```bash 
+./esa data/dna.200MB 10 100
+```
 
-For using RPM-ST to find the `(τ,k)`-resilient substrings of `S` in data/dna.200MB, run as follows:
+To use RPM-ST to find the `(τ,k)`-resilient substrings of `S` in `data/dna.200MB`, run as follows:
 
-```./main data/dna.200MB 10 100```
+```bash 
+./main data/dna.200MB 10 100
+```
 
 
 ## Citation
 Pengxin Bian, Panagiotis Charalampopoulos, Lorraine A. K. Ayad, Manal Mohamed,
 Solon P. Pissis, and Grigorios Loukides. 2025. Resilient Pattern Mining. ICDM'25
-
-
 
